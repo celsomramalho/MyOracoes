@@ -523,6 +523,10 @@ function alternarVelocidade(){
   atualizarBotaoVelocidade();
   
   if(falando && !pausado){
+    if(utteranciaAtual){
+      utteranciaAtual.onend = null;
+      utteranciaAtual.onerror = null;
+    }
     window.speechSynthesis.cancel();
     falarProximaLinha();
   }
@@ -931,6 +935,7 @@ let filaFala = [];
 let indiceFalaAtual = 0;
 let falando = false;
 let pausado = false;
+let utteranciaAtual = null;
 
 function obterLinhasParaFalar(){
   const paragrafos = document.querySelectorAll('#rezar-texto p');
@@ -1033,6 +1038,7 @@ function falarProximaLinha(){
   const utterancia = new SpeechSynthesisUtterance(item.texto);
   utterancia.lang = 'pt-BR';
   utterancia.rate = velocidadeAtual;
+  utteranciaAtual = utterancia;
 
   const vozes = window.speechSynthesis.getVoices();
   const nomeVozDesejada = item.voz2 ? configVozes.r : configVozes.v;
@@ -1060,6 +1066,10 @@ function falarProximaLinha(){
 function pararFala(){
   falando = false;
   pausado = false;
+  if(utteranciaAtual){
+    utteranciaAtual.onend = null;
+    utteranciaAtual.onerror = null;
+  }
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
   document.querySelectorAll('.linha-falando').forEach(el => el.classList.remove('linha-falando'));
   atualizarBotaoFala();
