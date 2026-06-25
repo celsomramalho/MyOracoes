@@ -392,77 +392,135 @@ function atualizarEstrelaRezar(){
   document.getElementById('btn-favoritar-rezar').textContent = ehFav ? '★' : '☆';
 }
 
-// Expande [Título] e [Título]{N} recursivamente, evitando referência circular
-function expandirTexto(texto, titulosVisitados){
-  return (texto || '').replace(/\[([^\[\]]+)\](?:\{(\d+)\})?/g, (match, tituloRef, quantStr) => {
-    const nomeBuscado = tituloRef.trim().toLowerCase();
-    if(titulosVisitados.has(nomeBuscado)){
-      return `(referência circular: ${tituloRef})`;
+// ===================== ÁRVORE DE NÓS PARA RENDERIZAÇÃO =====================
+// Cada nó é um dos tipos:
+//   { tipo: 'linha', texto, classe }        — linha V., R. ou texto livre
+//   { tipo: 'bloco', rotulo, filhos }        — referência expansível ([Título]{N})
+//   { tipo: 'erro', texto }                  — referência circular ou não encontrada
+
+function adicionarLinhas(nos, texto){
+  texto.split('\n').forEach(linhaBruta => {
+    const linha = linhaBruta.trim();
+    if(!linha) return;
+    let classe = '';
+    if(linha.startsWith('V.'))       classe = 'linha-v';
+    else if(linha.startsWith('R.')) classe = 'linha-r';
+    nos.push({ tipo: 'linha', texto: linha, classe });
+  });
+}
+
+function construirArvore(texto, titulosVisitados){
+  const nos = [];
+  const regex = /\[([^\[\]]+)\](?:\{(\d+)\})?/g;
+  let ultimoIndice = 0;
+  let match;
+
+  while((match = regex.exec(texto || '')) !== null){
+    // Texto antes do padrão → linhas normais
+    const textoBefore = texto.slice(ultimoIndice, match.index);
+    if(textoBefore) adicionarLinhas(nos, textoBefore);
+
+    const tituloRef = match[1].trim();
+    const nomeLower = tituloRef.toLowerCase();
+    const quantidade = Math.min(Math.max(parseInt(match[2] || '1', 10) || 1, 1), 200);
+
+    if(titulosVisitados.has(nomeLower)){
+      nos.push({ tipo: 'erro', texto: `(referência circular: ${tituloRef})` });
+    }else{
+      const encontrada =
+        ORACOES.find(o => o.titulo.trim().toLowerCase() === nomeLower) ||
+        ORACOES_OFICIAIS.find(o => o.titulo.trim().toLowerCase() === nomeLower);
+
+      if(!encontrada){
+        nos.push({ tipo: 'erro', texto: `(oração "${tituloRef}" não encontrada)` });
+      }else{
+        const novosVisitados = new Set(titulosVisitados);
+        novosVisitados.add(nomeLower);
+        for(let i = 1; i <= quantidade; i++){
+          const rotulo = quantidade > 1
+            ? `${encontrada.titulo} — ${i}/${quantidade}`
+            : encontrada.titulo;
+          const filhos = construirArvore(encontrada.texto, novosVisitados);
+          nos.push({ tipo: 'bloco', rotulo, filhos });
+        }
+      }
     }
 
-    // Busca em pessoais primeiro, depois em oficiais
-    const encontrada =
-      ORACOES.find(o => o.titulo.trim().toLowerCase() === nomeBuscado) ||
-      ORACOES_OFICIAIS.find(o => o.titulo.trim().toLowerCase() === nomeBuscado);
+    ultimoIndice = match.index + match[0].length;
+  }
 
-    if(!encontrada){
-      return `(oração "${tituloRef}" não encontrada)`;
+  // Texto restante depois do último padrão
+  const textoFinal = texto ? texto.slice(ultimoIndice) : '';
+  if(textoFinal) adicionarLinhas(nos, textoFinal);
+
+  return nos;
+}
+
+function renderizarNos(nos, container){
+  nos.forEach(no => {
+    if(no.tipo === 'linha'){
+      const p = document.createElement('p');
+      if(no.classe) p.className = no.classe;
+      p.textContent = no.texto;
+      container.appendChild(p);
+
+    }else if(no.tipo === 'bloco'){
+      const divBloco = document.createElement('div');
+      divBloco.className = 'bloco-ref';
+
+      const divTitulo = document.createElement('div');
+      divTitulo.className = 'bloco-ref-titulo';
+      const icone = document.createElement('span');
+      icone.className = 'bloco-ref-icone';
+      icone.textContent = '▸';
+      divTitulo.appendChild(icone);
+      divTitulo.appendChild(document.createTextNode(' ' + no.rotulo));
+
+      const divConteudo = document.createElement('div');
+      divConteudo.className = 'bloco-ref-conteudo';
+
+      divTitulo.addEventListener('click', () => {
+        const aberto = divBloco.classList.toggle('aberto');
+        icone.textContent = aberto ? '▾' : '▸';
+      });
+
+      renderizarNos(no.filhos, divConteudo);
+      divBloco.appendChild(divTitulo);
+      divBloco.appendChild(divConteudo);
+      container.appendChild(divBloco);
+
+    }else if(no.tipo === 'erro'){
+      const p = document.createElement('p');
+      p.className = 'linha-ref';
+      p.style.opacity = '0.6';
+      p.textContent = no.texto;
+      container.appendChild(p);
     }
-
-    const quantidade = Math.min(Math.max(parseInt(quantStr || '1', 10) || 1, 1), 200);
-    const novosVisitados = new Set(titulosVisitados);
-    novosVisitados.add(nomeBuscado);
-    const conteudo = expandirTexto(encontrada.texto, novosVisitados);
-
-    let blocos = '';
-    for(let i = 1; i <= quantidade; i++){
-      const rotulo = quantidade > 1 ? `${encontrada.titulo} — ${i}/${quantidade}` : encontrada.titulo;
-      blocos += `\n[[INICIO_REF:${rotulo}]]\n${conteudo}\n[[FIM_REF]]\n`;
-    }
-    return blocos;
   });
 }
 
 function renderizarTextoRezar(textoOriginal){
   const container = document.getElementById('rezar-texto');
-  const expandido = expandirTexto(textoOriginal, new Set());
-  const linhas = expandido.split('\n');
   container.innerHTML = '';
 
-  let dentroDeReferencia = false;
-
-  linhas.forEach(linhaBruta => {
-    const linha = linhaBruta.trim();
-    if(linha === '') return;
-
-    if(linha.startsWith('[[INICIO_REF:')){
-      dentroDeReferencia = true;
-      const nomeRef = linha.replace('[[INICIO_REF:','').replace(']]','');
-      const titulo = document.createElement('p');
-      titulo.className = 'linha-ref';
-      titulo.textContent = nomeRef;
-      container.appendChild(titulo);
-      return;
-    }
-    if(linha === '[[FIM_REF]]'){
-      dentroDeReferencia = false;
-      return;
-    }
-
-    const p = document.createElement('p');
-    if(linha.startsWith('V.')){
-      p.className = 'linha-v';
-    }else if(linha.startsWith('R.')){
-      p.className = 'linha-r';
-    }else if(dentroDeReferencia){
-      p.className = 'linha-ref';
-    }
-    p.textContent = linha;
-    container.appendChild(p);
-  });
+  const arvore = construirArvore(textoOriginal, new Set());
+  renderizarNos(arvore, container);
 
   if(container.innerHTML === ''){
     container.innerHTML = '<p class="dica">Esta oração ainda não tem texto. Toque em "Editar" para escrever.</p>';
+  }
+}
+
+// Expande todos os blocos-ref ancestrais de um elemento (usado pela fala em voz alta)
+function expandirParaElemento(el){
+  let pai = el.parentElement;
+  while(pai && pai.id !== 'rezar-texto'){
+    if(pai.classList.contains('bloco-ref') && !pai.classList.contains('aberto')){
+      pai.classList.add('aberto');
+      const icone = pai.querySelector(':scope > .bloco-ref-titulo > .bloco-ref-icone');
+      if(icone) icone.textContent = '▾';
+    }
+    pai = pai.parentElement;
   }
 }
 
@@ -819,6 +877,8 @@ function falarProximaLinha(){
   }
 
   const item = filaFala[indiceFalaAtual];
+  // Expande blocos recolhidos que contenham a linha atual antes de destacar
+  expandirParaElemento(item.elemento);
   item.elemento.classList.add('linha-falando');
   item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
 

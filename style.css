@@ -390,6 +390,52 @@ html,body{
   margin: 4px 0 10px;
 }
 
+/* ---------- ACORDEÃO DE REFERÊNCIAS ---------- */
+.bloco-ref{
+  margin: 8px 0;
+}
+
+.bloco-ref-titulo{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-style: italic;
+  color: var(--texto-suave);
+  border-left: 2px solid var(--ouro);
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 0 6px 6px 0;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+}
+.bloco-ref-titulo:hover{
+  background: rgba(215,170,86,0.10);
+  color: var(--ouro-suave);
+}
+
+.bloco-ref-icone{
+  color: var(--ouro);
+  font-size: 0.8em;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.bloco-ref-conteudo{
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  padding-left: 16px;
+  border-left: 1px dashed rgba(60,69,112,0.6);
+  margin-left: 11px;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+}
+
+.bloco-ref.aberto > .bloco-ref-conteudo{
+  max-height: 9999px;
+  opacity: 1;
+}
+
+
 /* Destaque de fundo: aparece só na linha que está sendo narrada no momento */
 .linha-falando{
   background: rgba(241,233,218,0.10);
