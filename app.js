@@ -239,9 +239,10 @@ function atualizarProgressoDiario(){
     : Object.keys(rezadasDiarias).length;
 
   if (total === 0) {
-    container.innerHTML = '';
+    container.classList.add('hidden');
     return;
   }
+  container.classList.remove('hidden');
 
   const percent = Math.round((rezados / total) * 100);
 
@@ -315,10 +316,10 @@ function salvarEditor(){
   // Verifica duplicata em pessoais E oficiais
   const nomeLower = titulo.toLowerCase();
   const duplicadaPessoal = ORACOES.find(o =>
-    o.titulo.trim().toLowerCase() === nomeLower && o.id !== editandoId
+    o.titulo && o.titulo.trim().toLowerCase() === nomeLower && o.id !== editandoId
   );
   const duplicadaOficial = ORACOES_OFICIAIS.find(o =>
-    o.titulo.trim().toLowerCase() === nomeLower
+    o.titulo && o.titulo.trim().toLowerCase() === nomeLower
   );
   if(duplicadaPessoal || duplicadaOficial){
     mostrarToast(`Já existe uma oração com esse título${duplicadaOficial ? ' (oficial)' : ''}. Escolha um título diferente.`);
@@ -335,6 +336,7 @@ function salvarEditor(){
 
   salvarOracoes(ORACOES);
   renderizarTudo();
+  mostrarToast('Oração salva com sucesso!', 'sucesso');
 
   if(editandoId){
     abrirRezar(editandoId, 'todas', 'pessoal');
