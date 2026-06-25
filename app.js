@@ -3,6 +3,10 @@ const CHAVE_STORAGE = 'minhas_oracoes_v1';
 const CHAVE_FAVORITAS_OFICIAIS = 'minhas_oracoes_oficiais_favoritas_v1';
 const CHAVE_VOZES = 'minhas_oracoes_vozes_v1';
 const CHAVE_REZADAS_DIARIAMENTE = 'minhas_oracoes_rezadas_diarias_v1';
+const CHAVE_VELOCIDADE = 'minhas_oracoes_velocidade_v1';
+
+const OPCOES_VELOCIDADE = [0.8, 1.0, 1.25, 1.5, 1.75, 2.0];
+let velocidadeAtual = parseFloat(localStorage.getItem(CHAVE_VELOCIDADE)) || 1.0;
 
 function obterDataLocalHoje() {
   const d = new Date();
@@ -433,6 +437,7 @@ function abrirRezar(id, origem, tipo){
   document.getElementById('rezar-titulo').textContent = o.titulo;
   atualizarEstrelaRezar();
   atualizarBotaoMarcarRezada();
+  atualizarBotaoVelocidade();
   renderizarTextoRezar(o.texto);
 
   // Esconder/mostrar botões de editar/excluir/compartilhar conforme tipo
@@ -498,6 +503,29 @@ function alternarRezadaManualmente(){
   atualizarBotaoMarcarRezada();
   renderizarTudo();
   atualizarProgressoDiario();
+}
+
+function atualizarBotaoVelocidade(){
+  const btn = document.getElementById('btn-velocidade');
+  if(btn) {
+    btn.textContent = `⚡ ${velocidadeAtual.toFixed(2).replace('.00', '.0')}x`;
+  }
+}
+
+function alternarVelocidade(){
+  let index = OPCOES_VELOCIDADE.indexOf(velocidadeAtual);
+  if(index === -1) index = 1; // fallback para 1.0
+  
+  index = (index + 1) % OPCOES_VELOCIDADE.length;
+  velocidadeAtual = OPCOES_VELOCIDADE[index];
+  
+  localStorage.setItem(CHAVE_VELOCIDADE, velocidadeAtual.toString());
+  atualizarBotaoVelocidade();
+  
+  if(falando && !pausado){
+    window.speechSynthesis.cancel();
+    falarProximaLinha();
+  }
 }
 
 // ===================== ÁRVORE DE NÓS PARA RENDERIZAÇÃO =====================
@@ -1004,7 +1032,7 @@ function falarProximaLinha(){
 
   const utterancia = new SpeechSynthesisUtterance(item.texto);
   utterancia.lang = 'pt-BR';
-  utterancia.rate = 0.95;
+  utterancia.rate = velocidadeAtual;
 
   const vozes = window.speechSynthesis.getVoices();
   const nomeVozDesejada = item.voz2 ? configVozes.r : configVozes.v;
@@ -1073,6 +1101,7 @@ document.getElementById('btn-compartilhar-atual').addEventListener('click', () =
 document.getElementById('btn-falar').addEventListener('click', alternarFala);
 document.getElementById('btn-ler').addEventListener('click', pararFala);
 document.getElementById('btn-marcar-rezada').addEventListener('click', alternarRezadaManualmente);
+document.getElementById('btn-velocidade').addEventListener('click', alternarVelocidade);
 document.getElementById('btn-config-vozes').addEventListener('click', abrirConfigVozes);
 document.getElementById('btn-fechar-modal-vozes').addEventListener('click', fecharModalVozes);
 document.getElementById('btn-salvar-vozes').addEventListener('click', salvarConfigVozesModal);
