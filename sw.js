@@ -1,10 +1,11 @@
-const CACHE_NOME = 'minhas-oracoes-v1';
+const CACHE_NOME = 'minhas-oracoes-v2';
 const ARQUIVOS_PARA_CACHE = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './manifest.json',
+  './oracoes-oficiais.json',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
@@ -34,6 +35,26 @@ self.addEventListener('fetch', (evento) => {
     return;
   }
 
+  // Estratégia: rede primeiro para os arquivos principais, cache como fallback
+  // Isso garante que atualizações cheguem sem precisar limpar cache manualmente
+  const ehArquivoPrincipal = ARQUIVOS_PARA_CACHE.some(a =>
+    evento.request.url.endsWith(a.replace('./', '/')) ||
+    evento.request.url.endsWith('/')
+  );
+
+  if (ehArquivoPrincipal) {
+    evento.respondWith(
+      fetch(evento.request).then((respostaRede) => {
+        return caches.open(CACHE_NOME).then((cache) => {
+          cache.put(evento.request, respostaRede.clone());
+          return respostaRede;
+        });
+      }).catch(() => caches.match(evento.request))
+    );
+    return;
+  }
+
+  // Para outros recursos: cache primeiro, rede como fallback
   evento.respondWith(
     caches.match(evento.request).then((respostaCache) => {
       return respostaCache || fetch(evento.request).then((respostaRede) => {
