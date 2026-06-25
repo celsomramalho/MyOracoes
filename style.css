@@ -354,10 +354,14 @@ html,body{
   color: var(--voz2);
 }
 
-/* Modo leitura (vindo da Home): oculta Vozes, Editar e Excluir */
-.rezar-acoes.modo-leitura #btn-config-vozes,
-.rezar-acoes.modo-leitura #btn-editar-atual,
-.rezar-acoes.modo-leitura #btn-excluir-atual{
+/* Visibilidade condicional de acordo com a origem da tela "Rezar" */
+/* Vindo da Home (favoritas): mostra só "Rezar em voz alta" e "Ler" */
+#view-rezar[data-origem="home"] .oculto-home{
+  display: none;
+}
+
+/* Vindo de "Todas as orações": esconde o botão "Ler" (só faz sentido no modo leitura da Home) */
+#view-rezar[data-origem="todas"] .apenas-home{
   display: none;
 }
 
