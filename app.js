@@ -21,7 +21,7 @@ function gerarId(){
 let ORACOES = carregarOracoes();
 let editandoId = null;     // id da oração sendo editada (null = criando nova)
 let oracaoAtualId = null;  // id da oração aberta na tela "Rezar"
-let origemRezar = 'home';  // 'home' ou 'todas' — de onde a tela Rezar foi aberta
+let origemRezar = 'home';  // 'home' ou 'todas' — de onde o usuário abriu a tela Rezar
 
 // ===================== NAVEGAÇÃO =====================
 function mostrarView(id){
@@ -160,11 +160,12 @@ function salvarEditor(){
   salvarOracoes(ORACOES);
   renderizarTudo();
 
+  // Após salvar/editar, sempre abre com acesso completo (origem 'todas')
   if(editandoId){
-    abrirRezar(editandoId);
+    abrirRezar(editandoId, 'todas');
   }else{
     const nova = ORACOES[ORACOES.length - 1];
-    abrirRezar(nova.id);
+    abrirRezar(nova.id, 'todas');
   }
 }
 
@@ -235,6 +236,7 @@ function inserirReferencia(titulo){
 function abrirRezar(id, origem){
   oracaoAtualId = id;
   origemRezar = origem || 'home';
+
   const o = ORACOES.find(x => x.id === id);
   if(!o) return;
 
@@ -242,13 +244,9 @@ function abrirRezar(id, origem){
   atualizarEstrelaRezar();
   renderizarTextoRezar(o.texto);
 
-  // Aplica ou remove o modo leitura (oculta botões extras)
-  const acoes = document.querySelector('.rezar-acoes');
-  if(origemRezar === 'home'){
-    acoes.classList.add('modo-leitura');
-  }else{
-    acoes.classList.remove('modo-leitura');
-  }
+  // Aplica a classe de origem na área de ações para CSS controlar visibilidade
+  const acoes = document.getElementById('view-rezar');
+  acoes.dataset.origem = origemRezar;
 
   mostrarView('view-rezar');
 }
@@ -561,13 +559,16 @@ document.getElementById('btn-salvar').addEventListener('click', salvarEditor);
 document.getElementById('btn-inserir-oracao').addEventListener('click', abrirModalInserir);
 document.getElementById('btn-fechar-modal').addEventListener('click', fecharModalInserir);
 
-document.getElementById('btn-voltar-rezar').addEventListener('click', () => mostrarView(origemRezar === 'todas' ? 'view-todas' : 'view-home'));
+document.getElementById('btn-voltar-rezar').addEventListener('click', () => {
+  mostrarView(origemRezar === 'todas' ? 'view-todas' : 'view-home');
+});
 document.getElementById('btn-favoritar-rezar').addEventListener('click', () => {
   if(oracaoAtualId) alternarFavorito(oracaoAtualId);
 });
 document.getElementById('btn-editar-atual').addEventListener('click', () => abrirEditor(oracaoAtualId));
 document.getElementById('btn-excluir-atual').addEventListener('click', excluirOracaoAtual);
 document.getElementById('btn-falar').addEventListener('click', alternarFala);
+document.getElementById('btn-ler').addEventListener('click', pararFala);
 document.getElementById('btn-config-vozes').addEventListener('click', abrirConfigVozes);
 document.getElementById('btn-fechar-modal-vozes').addEventListener('click', fecharModalVozes);
 document.getElementById('btn-salvar-vozes').addEventListener('click', salvarConfigVozesModal);
