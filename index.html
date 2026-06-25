@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1B2238">
+<meta name="description" content="Guarde, organize e reze suas orações favoritas com o Minhas Orações.">
 <title>Minhas Orações</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -32,9 +33,16 @@
       Você ainda não tem orações favoritas.<br>
       Toque na estrela de uma oração para marcá-la aqui, ou crie uma nova.
     </p>
+    <button id="btn-ver-oficiais" class="btn-link btn-oficiais-home">📜 Ver orações oficiais →</button>
+
+    <!-- Exportar / Importar -->
+    <div class="acoes-backup">
+      <button id="btn-exportar-oracoes" class="btn-secundario btn-backup">📤 Exportar backup</button>
+      <button id="btn-importar-oracoes" class="btn-secundario btn-backup">📥 Importar backup</button>
+    </div>
   </main>
 
-  <!-- TELA: TODAS AS ORAÇÕES -->
+  <!-- TELA: TODAS AS ORAÇÕES (PESSOAIS) -->
   <main id="view-todas" class="view">
     <button class="btn-voltar" data-voltar="view-home">← Voltar</button>
     <h2 class="titulo-secao">Todas as orações</h2>
@@ -45,6 +53,15 @@
     </p>
   </main>
 
+  <!-- TELA: ORAÇÕES OFICIAIS (SOMENTE LEITURA) -->
+  <main id="view-oficiais" class="view">
+    <button class="btn-voltar" data-voltar="view-home">← Voltar</button>
+    <h2 class="titulo-secao">Orações oficiais</h2>
+    <div id="lista-oficiais" class="lista-oracoes"></div>
+    <p id="empty-oficiais" class="empty-state hidden">
+      Nenhuma oração oficial cadastrada ainda.
+    </p>
+  </main>
 
   <!-- TELA: CRIAR / EDITAR -->
   <main id="view-editor" class="view">
@@ -59,7 +76,7 @@
       <button id="btn-inserir-oracao" class="btn-secundario" type="button">+ Inserir oração</button>
     </div>
     <textarea id="input-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
-    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva, use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena).</p>
+    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena).</p>
 
     <button id="btn-salvar" class="btn-primario">Salvar oração</button>
   </main>
@@ -73,12 +90,18 @@
       <button id="btn-favoritar-rezar" class="btn-estrela" aria-label="Favoritar">☆</button>
     </div>
 
+    <!-- Badge que aparece somente em orações oficiais -->
+    <div id="badge-rezar-oficial" class="badge-oficial-rezar" style="display:none;">
+      📜 Oração Oficial — somente leitura
+    </div>
+
     <div class="rezar-acoes">
       <button id="btn-falar" class="btn-secundario">🔊 Rezar em voz alta</button>
       <button id="btn-ler" class="btn-secundario apenas-home">📖 Ler</button>
       <button id="btn-config-vozes" class="btn-secundario oculto-home">⚙️ Vozes</button>
-      <button id="btn-editar-atual" class="btn-secundario oculto-home">Editar</button>
-      <button id="btn-excluir-atual" class="btn-secundario btn-perigo oculto-home">Excluir</button>
+      <button id="btn-compartilhar-atual" class="btn-secundario editar-excluir">📤 Compartilhar</button>
+      <button id="btn-editar-atual" class="btn-secundario editar-excluir">Editar</button>
+      <button id="btn-excluir-atual" class="btn-secundario btn-perigo editar-excluir">Excluir</button>
     </div>
 
     <div id="rezar-texto" class="texto-oracao"></div>
@@ -111,6 +134,20 @@
       <div class="modal-botoes">
         <button id="btn-salvar-vozes" class="btn-primario">Salvar</button>
         <button id="btn-fechar-modal-vozes" class="btn-secundario">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: IMPORTAR VIA LINK MÁGICO -->
+  <div id="modal-importar-link" class="modal hidden">
+    <div class="modal-conteudo">
+      <h3>🎁 Oração compartilhada</h3>
+      <p class="dica">Alguém compartilhou uma oração com você:</p>
+      <p id="importar-link-titulo" class="titulo-importar-link"></p>
+      <p class="dica">Deseja adicioná-la às suas orações pessoais?</p>
+      <div class="modal-botoes">
+        <button id="btn-importar-link-sim" class="btn-primario" style="margin-top:0;">Sim, adicionar</button>
+        <button id="btn-importar-link-nao" class="btn-secundario">Não, ignorar</button>
       </div>
     </div>
   </div>

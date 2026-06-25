@@ -470,3 +470,90 @@ html,body{
 }
 
 ::selection{ background: rgba(215,170,86,0.35); }
+
+/* ---------- BADGE OFICIAL (card e tela rezar) ---------- */
+.badge-oficial{
+  font-size: 0.8em;
+  margin-left: 5px;
+  vertical-align: middle;
+  opacity: 0.8;
+}
+
+.badge-oficial-rezar{
+  display: inline-block;
+  background: rgba(215,170,86,0.12);
+  border: 1px solid var(--ouro);
+  color: var(--ouro-suave);
+  font-size: 0.82rem;
+  border-radius: 20px;
+  padding: 4px 12px;
+  margin-bottom: 14px;
+}
+
+/* ---------- BOTÕES BACKUP (Exportar / Importar) ---------- */
+.acoes-backup{
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+.btn-backup{
+  flex: 1;
+  font-size: 0.88rem;
+  text-align: center;
+  color: var(--texto-suave);
+  padding: 10px 8px;
+}
+.btn-backup:hover{
+  border-color: var(--ouro);
+  color: var(--ouro-suave);
+}
+
+/* ---------- LINK (botão orações oficiais home) ---------- */
+.btn-oficiais-home{
+  display: block;
+  margin-top: 20px;
+  font-size: 0.98rem;
+}
+
+/* ---------- TOAST DE NOTIFICAÇÃO ---------- */
+.toast-notificacao{
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--superficie-alta);
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  max-width: 340px;
+  width: calc(100% - 40px);
+  text-align: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+  white-space: pre-line;
+}
+.toast-notificacao.toast-visivel{
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+.toast-sucesso{
+  border-color: var(--ouro);
+  background: rgba(215,170,86,0.15);
+  color: var(--ouro-suave);
+}
+
+/* ---------- TÍTULO MODAL IMPORTAR LINK ---------- */
+.titulo-importar-link{
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ouro-suave);
+  text-align: center;
+  margin: 10px 0;
+}
+

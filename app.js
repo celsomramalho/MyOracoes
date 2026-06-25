@@ -1,5 +1,7 @@
-// ===================== DADOS =====================
+// ===================== DADOS PESSOAIS =====================
 const CHAVE_STORAGE = 'minhas_oracoes_v1';
+const CHAVE_FAVORITAS_OFICIAIS = 'minhas_oracoes_oficiais_favoritas_v1';
+const CHAVE_VOZES = 'minhas_oracoes_vozes_v1';
 
 function carregarOracoes(){
   try{
@@ -14,14 +16,46 @@ function salvarOracoes(lista){
   localStorage.setItem(CHAVE_STORAGE, JSON.stringify(lista));
 }
 
+function carregarFavoritasOficiais(){
+  try{
+    const dados = JSON.parse(localStorage.getItem(CHAVE_FAVORITAS_OFICIAIS) || '[]');
+    return Array.isArray(dados) ? dados : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function salvarFavoritasOficiais(ids){
+  localStorage.setItem(CHAVE_FAVORITAS_OFICIAIS, JSON.stringify(ids));
+}
+
 function gerarId(){
   return 'o_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
 }
 
 let ORACOES = carregarOracoes();
+let ORACOES_OFICIAIS = [];       // carregado via fetch
+let favoritasOficiaisIds = carregarFavoritasOficiais();
 let editandoId = null;     // id da oração sendo editada (null = criando nova)
 let oracaoAtualId = null;  // id da oração aberta na tela "Rezar"
-let origemRezar = 'home';  // 'home' ou 'todas' — de onde o usuário abriu a tela Rezar
+let oracaoAtualTipo = 'pessoal'; // 'pessoal' ou 'oficial'
+let origemRezar = 'home';  // 'home', 'todas' ou 'oficiais'
+
+// ===================== CARREGAMENTO DAS OFICIAIS =====================
+async function carregarOficiais(){
+  try{
+    const res = await fetch('./oracoes-oficiais.json');
+    if(res.ok){
+      const dados = await res.json();
+      ORACOES_OFICIAIS = Array.isArray(dados) ? dados : [];
+    }
+  }catch(e){
+    ORACOES_OFICIAIS = [];
+  }
+  renderizarOficiais();
+  renderizarFavoritas(); // re-renderiza home para incluir favoritas oficiais
+  renderizarListaModalInserir(); // atualiza modal de inserir se estiver aberto
+}
 
 // ===================== NAVEGAÇÃO =====================
 function mostrarView(id){
@@ -31,29 +65,17 @@ function mostrarView(id){
   window.scrollTo(0,0);
 }
 
+// ===================== ESCAPE DE HTML =====================
+function escaparHTML(texto){
+  const div = document.createElement('div');
+  div.textContent = texto || '';
+  return div.innerHTML;
+}
+
 // ===================== RENDERIZAÇÃO DAS LISTAS =====================
 function obterInicial(titulo){
   const t = (titulo || '').trim();
   return t ? t[0].toUpperCase() : '?';
-}
-
-function criarCardOracao(oracao, origem){
-  const card = document.createElement('div');
-  card.className = 'card-oracao';
-  card.innerHTML = `
-    <div class="card-inicial">${escaparHTML(obterInicial(oracao.titulo))}</div>
-    <div class="card-corpo">
-      <h3>${escaparHTML(oracao.titulo)}</h3>
-      <p>${escaparHTML(primeiraLinhaUtil(oracao.texto))}</p>
-    </div>
-    <button class="btn-estrela-card" aria-label="Favoritar">${oracao.favorita ? '★' : '☆'}</button>
-  `;
-  card.querySelector('.btn-estrela-card').addEventListener('click', (ev) => {
-    ev.stopPropagation();
-    alternarFavorito(oracao.id);
-  });
-  card.addEventListener('click', () => abrirRezar(oracao.id, origem));
-  return card;
 }
 
 function primeiraLinhaUtil(texto){
@@ -61,16 +83,59 @@ function primeiraLinhaUtil(texto){
   return linha ? linha.replace(/^V\.\s*|^R\.\s*/,'') : '';
 }
 
+function criarCardOracao(oracao, origem, tipo){
+  const ehOficial = tipo === 'oficial';
+  const ehFavorita = ehOficial
+    ? favoritasOficiaisIds.includes(oracao.id)
+    : !!oracao.favorita;
+
+  const card = document.createElement('div');
+  card.className = 'card-oracao';
+
+  // Badge de oficial
+  const badgeOficial = ehOficial
+    ? `<span class="badge-oficial" title="Oração Oficial">📜</span>`
+    : '';
+
+  card.innerHTML = `
+    <div class="card-inicial">${escaparHTML(obterInicial(oracao.titulo))}</div>
+    <div class="card-corpo">
+      <h3>${escaparHTML(oracao.titulo)}${badgeOficial}</h3>
+      <p>${escaparHTML(primeiraLinhaUtil(oracao.texto))}</p>
+    </div>
+    <button class="btn-estrela-card" aria-label="Favoritar">${ehFavorita ? '★' : '☆'}</button>
+  `;
+
+  card.querySelector('.btn-estrela-card').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    if(ehOficial){
+      alternarFavoritoOficial(oracao.id);
+    } else {
+      alternarFavorito(oracao.id);
+    }
+  });
+
+  card.addEventListener('click', () => abrirRezar(oracao.id, origem, tipo || 'pessoal'));
+  return card;
+}
+
 function renderizarFavoritas(){
   const lista = document.getElementById('lista-favoritas');
   const vazio = document.getElementById('empty-favoritas');
   lista.innerHTML = '';
-  const favoritas = ORACOES.filter(o => o.favorita);
-  if(favoritas.length === 0){
+
+  const pessoaisFav = ORACOES.filter(o => o.favorita);
+  const oficaisFav = ORACOES_OFICIAIS.filter(o => favoritasOficiaisIds.includes(o.id));
+  const todasFav = [
+    ...pessoaisFav.map(o => ({ ...o, _tipo: 'pessoal' })),
+    ...oficaisFav.map(o => ({ ...o, _tipo: 'oficial' })),
+  ].sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+
+  if(todasFav.length === 0){
     vazio.classList.remove('hidden');
   }else{
     vazio.classList.add('hidden');
-    favoritas.forEach(o => lista.appendChild(criarCardOracao(o, 'home')));
+    todasFav.forEach(o => lista.appendChild(criarCardOracao(o, 'home', o._tipo)));
   }
 }
 
@@ -82,14 +147,28 @@ function renderizarTodas(){
     vazio.classList.remove('hidden');
   }else{
     vazio.classList.add('hidden');
-    ORACOES.slice().sort((a,b)=> a.titulo.localeCompare(b.titulo, 'pt-BR'))
-      .forEach(o => lista.appendChild(criarCardOracao(o, 'todas')));
+    ORACOES.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'))
+      .forEach(o => lista.appendChild(criarCardOracao(o, 'todas', 'pessoal')));
+  }
+}
+
+function renderizarOficiais(){
+  const lista = document.getElementById('lista-oficiais');
+  const vazio = document.getElementById('empty-oficiais');
+  lista.innerHTML = '';
+  if(ORACOES_OFICIAIS.length === 0){
+    vazio.classList.remove('hidden');
+  }else{
+    vazio.classList.add('hidden');
+    ORACOES_OFICIAIS.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'))
+      .forEach(o => lista.appendChild(criarCardOracao(o, 'oficiais', 'oficial')));
   }
 }
 
 function renderizarTudo(){
   renderizarFavoritas();
   renderizarTodas();
+  renderizarOficiais();
 }
 
 function alternarFavorito(id){
@@ -97,15 +176,22 @@ function alternarFavorito(id){
   if(!o) return;
   o.favorita = !o.favorita;
   salvarOracoes(ORACOES);
-  renderizarTudo();
+  renderizarFavoritas();
+  renderizarTodas();
   if(oracaoAtualId === id) atualizarEstrelaRezar();
 }
 
-// ===================== ESCAPE DE HTML =====================
-function escaparHTML(texto){
-  const div = document.createElement('div');
-  div.textContent = texto || '';
-  return div.innerHTML;
+function alternarFavoritoOficial(id){
+  const idx = favoritasOficiaisIds.indexOf(id);
+  if(idx === -1){
+    favoritasOficiaisIds.push(id);
+  }else{
+    favoritasOficiaisIds.splice(idx, 1);
+  }
+  salvarFavoritasOficiais(favoritasOficiaisIds);
+  renderizarFavoritas();
+  renderizarOficiais();
+  if(oracaoAtualId === id) atualizarEstrelaRezar();
 }
 
 // ===================== EDITOR (CRIAR / EDITAR) =====================
@@ -141,11 +227,16 @@ function salvarEditor(){
     return;
   }
 
-  const duplicada = ORACOES.find(o =>
-    o.titulo.trim().toLowerCase() === titulo.toLowerCase() && o.id !== editandoId
+  // Verifica duplicata em pessoais E oficiais
+  const nomeLower = titulo.toLowerCase();
+  const duplicadaPessoal = ORACOES.find(o =>
+    o.titulo.trim().toLowerCase() === nomeLower && o.id !== editandoId
   );
-  if(duplicada){
-    alert('Já existe uma oração com esse título. Escolha um título diferente, ou edite a oração existente.');
+  const duplicadaOficial = ORACOES_OFICIAIS.find(o =>
+    o.titulo.trim().toLowerCase() === nomeLower
+  );
+  if(duplicadaPessoal || duplicadaOficial){
+    mostrarToast(`Já existe uma oração com esse título${duplicadaOficial ? ' (oficial)' : ''}. Escolha um título diferente.`);
     return;
   }
 
@@ -160,17 +251,16 @@ function salvarEditor(){
   salvarOracoes(ORACOES);
   renderizarTudo();
 
-  // Após salvar/editar, sempre abre com acesso completo (origem 'todas')
   if(editandoId){
-    abrirRezar(editandoId, 'todas');
+    abrirRezar(editandoId, 'todas', 'pessoal');
   }else{
     const nova = ORACOES[ORACOES.length - 1];
-    abrirRezar(nova.id, 'todas');
+    abrirRezar(nova.id, 'todas', 'pessoal');
   }
 }
 
 function excluirOracaoAtual(){
-  if(!oracaoAtualId) return;
+  if(!oracaoAtualId || oracaoAtualTipo !== 'pessoal') return;
   const o = ORACOES.find(x => x.id === oracaoAtualId);
   if(!o) return;
   if(!confirm(`Excluir a oração "${o.titulo}"? Essa ação não pode ser desfeita.`)) return;
@@ -180,18 +270,35 @@ function excluirOracaoAtual(){
   mostrarView('view-home');
 }
 
+// ===================== TOAST NOTIFICAÇÃO =====================
+function mostrarToast(msg, tipo){
+  let toast = document.getElementById('toast-notificacao');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id = 'toast-notificacao';
+    document.getElementById('app').appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.className = 'toast-notificacao' + (tipo === 'sucesso' ? ' toast-sucesso' : '');
+  toast.classList.add('toast-visivel');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('toast-visivel'), 3500);
+}
+
 // ===================== INSERIR REFERÊNCIA [Título] =====================
 let posicaoCursorSalva = null;
 
-function abrirModalInserir(){
-  const inputTexto = document.getElementById('input-texto');
-  posicaoCursorSalva = inputTexto.selectionStart;
-
+function renderizarListaModalInserir(){
   const lista = document.getElementById('lista-modal-inserir');
+  if(!lista) return;
+
   lista.innerHTML = '';
 
-  const disponiveis = ORACOES.filter(o => o.id !== editandoId)
-    .slice().sort((a,b)=> a.titulo.localeCompare(b.titulo, 'pt-BR'));
+  const pessoais = ORACOES.filter(o => o.id !== editandoId)
+    .map(o => ({ ...o, _tipo: 'pessoal' }));
+  const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
+  const disponiveis = [...pessoais, ...oficiais]
+    .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
 
   if(disponiveis.length === 0){
     lista.innerHTML = '<p class="dica">Você ainda não tem outras orações salvas para inserir aqui.</p>';
@@ -199,11 +306,17 @@ function abrirModalInserir(){
     disponiveis.forEach(o => {
       const item = document.createElement('div');
       item.className = 'item-modal';
-      item.textContent = o.titulo;
+      item.innerHTML = `${escaparHTML(o.titulo)}${o._tipo === 'oficial' ? ' <span style="color:var(--texto-suave);font-size:0.8em;">📜 oficial</span>' : ''}`;
       item.addEventListener('click', () => inserirReferencia(o.titulo));
       lista.appendChild(item);
     });
   }
+}
+
+function abrirModalInserir(){
+  const inputTexto = document.getElementById('input-texto');
+  posicaoCursorSalva = inputTexto.selectionStart;
+  renderizarListaModalInserir();
   document.getElementById('modal-inserir').classList.remove('hidden');
 }
 
@@ -216,7 +329,7 @@ function inserirReferencia(titulo){
     `Quantas vezes rezar "${titulo}" aqui?\n(Ex: 10 para uma dezena. Deixe 1 para rezar uma única vez.)`,
     '1'
   );
-  if(respostaQuantidade === null) return; // usuário cancelou
+  if(respostaQuantidade === null) return;
 
   const quantidade = Math.min(Math.max(parseInt(respostaQuantidade, 10) || 1, 1), 200);
 
@@ -233,27 +346,50 @@ function inserirReferencia(titulo){
 }
 
 // ===================== TELA "REZAR" =====================
-function abrirRezar(id, origem){
+function abrirRezar(id, origem, tipo){
   oracaoAtualId = id;
+  oracaoAtualTipo = tipo || 'pessoal';
   origemRezar = origem || 'home';
 
-  const o = ORACOES.find(x => x.id === id);
+  const ehOficial = oracaoAtualTipo === 'oficial';
+  const o = ehOficial
+    ? ORACOES_OFICIAIS.find(x => x.id === id)
+    : ORACOES.find(x => x.id === id);
+
   if(!o) return;
 
   document.getElementById('rezar-titulo').textContent = o.titulo;
   atualizarEstrelaRezar();
   renderizarTextoRezar(o.texto);
 
+  // Esconder/mostrar botões de editar/excluir/compartilhar conforme tipo
+  const botoesEditarExcluir = document.querySelectorAll('.editar-excluir');
+  botoesEditarExcluir.forEach(btn => {
+    btn.style.display = ehOficial ? 'none' : '';
+  });
+
+  // Botão compartilhar: apenas em pessoais
+  const btnCompartilhar = document.getElementById('btn-compartilhar-atual');
+  if(btnCompartilhar) btnCompartilhar.style.display = ehOficial ? 'none' : '';
+
+  // Badge de oficial na tela de rezar
+  const badgeRezar = document.getElementById('badge-rezar-oficial');
+  if(badgeRezar) badgeRezar.style.display = ehOficial ? 'inline' : 'none';
+
   // Aplica a classe de origem na área de ações para CSS controlar visibilidade
-  const acoes = document.getElementById('view-rezar');
-  acoes.dataset.origem = origemRezar;
+  const viewRezar = document.getElementById('view-rezar');
+  viewRezar.dataset.origem = origemRezar;
+  viewRezar.dataset.tipo = oracaoAtualTipo;
 
   mostrarView('view-rezar');
 }
 
 function atualizarEstrelaRezar(){
-  const o = ORACOES.find(x => x.id === oracaoAtualId);
-  document.getElementById('btn-favoritar-rezar').textContent = (o && o.favorita) ? '★' : '☆';
+  const ehOficial = oracaoAtualTipo === 'oficial';
+  const ehFav = ehOficial
+    ? favoritasOficiaisIds.includes(oracaoAtualId)
+    : !!ORACOES.find(x => x.id === oracaoAtualId)?.favorita;
+  document.getElementById('btn-favoritar-rezar').textContent = ehFav ? '★' : '☆';
 }
 
 // Expande [Título] e [Título]{N} recursivamente, evitando referência circular
@@ -263,7 +399,12 @@ function expandirTexto(texto, titulosVisitados){
     if(titulosVisitados.has(nomeBuscado)){
       return `(referência circular: ${tituloRef})`;
     }
-    const encontrada = ORACOES.find(o => o.titulo.trim().toLowerCase() === nomeBuscado);
+
+    // Busca em pessoais primeiro, depois em oficiais
+    const encontrada =
+      ORACOES.find(o => o.titulo.trim().toLowerCase() === nomeBuscado) ||
+      ORACOES_OFICIAIS.find(o => o.titulo.trim().toLowerCase() === nomeBuscado);
+
     if(!encontrada){
       return `(oração "${tituloRef}" não encontrada)`;
     }
@@ -325,15 +466,190 @@ function renderizarTextoRezar(textoOriginal){
   }
 }
 
+// ===================== EXPORTAR / IMPORTAR ORAÇÕES PESSOAIS =====================
+function exportarOracoes(){
+  const dados = {
+    versao: 1,
+    exportadoEm: new Date().toISOString(),
+    oracoes: ORACOES
+  };
+  const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `minhas-oracoes-backup-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  mostrarToast('Arquivo de backup baixado!', 'sucesso');
+}
+
+function importarOracoesDeArquivo(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.addEventListener('change', async () => {
+    const arquivo = input.files[0];
+    if(!arquivo) return;
+    try{
+      const texto = await arquivo.text();
+      const dados = JSON.parse(texto);
+
+      // Aceita tanto array direto quanto o formato com wrapper { oracoes: [...] }
+      let lista = Array.isArray(dados) ? dados : dados.oracoes;
+      if(!Array.isArray(lista)){
+        mostrarToast('Arquivo inválido. Certifique-se de usar um backup gerado por este app.');
+        return;
+      }
+
+      let importadas = 0;
+      const bloqueadas = [];
+
+      lista.forEach(o => {
+        if(!o.titulo || typeof o.titulo !== 'string') return;
+        const nomeLower = o.titulo.trim().toLowerCase();
+
+        const duplicadaPessoal = ORACOES.find(x => x.titulo.trim().toLowerCase() === nomeLower);
+        const duplicadaOficial = ORACOES_OFICIAIS.find(x => x.titulo.trim().toLowerCase() === nomeLower);
+
+        if(duplicadaPessoal || duplicadaOficial){
+          bloqueadas.push(o.titulo);
+          return;
+        }
+
+        ORACOES.push({
+          id: gerarId(),
+          titulo: o.titulo.trim(),
+          texto: o.texto || '',
+          favorita: !!o.favorita
+        });
+        importadas++;
+      });
+
+      salvarOracoes(ORACOES);
+      renderizarTudo();
+
+      let msg = '';
+      if(importadas > 0) msg += `${importadas} oração(ões) importada(s) com sucesso!`;
+      if(bloqueadas.length > 0){
+        msg += `${msg ? '\n' : ''}${bloqueadas.length} bloqueada(s) por título já existente: "${bloqueadas.join('", "')}"`;
+      }
+      if(!msg) msg = 'Nenhuma oração nova encontrada no arquivo.';
+      mostrarToast(msg, importadas > 0 ? 'sucesso' : '');
+
+    }catch(e){
+      mostrarToast('Erro ao ler o arquivo. Certifique-se de que é um JSON válido.');
+    }
+  });
+  input.click();
+}
+
+// ===================== COMPARTILHAR VIA LINK MÁGICO =====================
+function compartilharOracao(id){
+  const o = ORACOES.find(x => x.id === id);
+  if(!o) return;
+
+  try{
+    // Codificação segura para UTF-8 (suporta acentos do português)
+    const dadosStr = JSON.stringify({ titulo: o.titulo, texto: o.texto });
+    const base64 = btoa(unescape(encodeURIComponent(dadosStr)));
+    const link = `${window.location.origin}${window.location.pathname}?importar=${base64}`;
+
+    const texto = `Quero compartilhar esta oração com você pelo app Minhas Orações:\n\n"${o.titulo}"\n\n${link}`;
+
+    if(navigator.share){
+      navigator.share({ title: o.titulo, text: texto }).catch(() => {
+        copiarParaClipboard(link);
+      });
+    }else{
+      // Fallback: WhatsApp Web
+      const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+      window.open(urlWhatsApp, '_blank');
+    }
+  }catch(e){
+    mostrarToast('Não foi possível gerar o link de compartilhamento.');
+  }
+}
+
+function copiarParaClipboard(texto){
+  navigator.clipboard.writeText(texto).then(() => {
+    mostrarToast('Link copiado para a área de transferência!', 'sucesso');
+  }).catch(() => {
+    mostrarToast('Não foi possível copiar o link automaticamente.');
+  });
+}
+
+// ===================== RECEBER LINK MÁGICO (?importar=...) =====================
+function verificarLinkImportacao(){
+  const params = new URLSearchParams(window.location.search);
+  const base64 = params.get('importar');
+  if(!base64) return;
+
+  // Limpa o parâmetro da URL sem recarregar a página
+  const urlLimpa = window.location.pathname;
+  history.replaceState(null, '', urlLimpa);
+
+  try{
+    const dadosStr = decodeURIComponent(escape(atob(base64)));
+    const dados = JSON.parse(dadosStr);
+
+    if(!dados.titulo || typeof dados.titulo !== 'string'){
+      mostrarToast('Link inválido ou corrompido.');
+      return;
+    }
+
+    // Aguarda ORACOES_OFICIAIS ser carregado antes de exibir o modal
+    // (pode já estar carregado ou não; o modal lida com isso)
+    exibirModalImportacaoLink(dados.titulo, dados.texto || '');
+  }catch(e){
+    mostrarToast('Não foi possível ler os dados do link de compartilhamento.');
+  }
+}
+
+function exibirModalImportacaoLink(titulo, texto){
+  const modal = document.getElementById('modal-importar-link');
+  if(!modal) return;
+
+  document.getElementById('importar-link-titulo').textContent = `"${titulo}"`;
+  modal.classList.remove('hidden');
+
+  // Remove listeners antigos para evitar duplicação
+  const btnSim = document.getElementById('btn-importar-link-sim');
+  const btnNao = document.getElementById('btn-importar-link-nao');
+  const novoSim = btnSim.cloneNode(true);
+  const novoNao = btnNao.cloneNode(true);
+  btnSim.parentNode.replaceChild(novoSim, btnSim);
+  btnNao.parentNode.replaceChild(novoNao, btnNao);
+
+  novoSim.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    importarUmaOracao(titulo, texto);
+  });
+  novoNao.addEventListener('click', () => modal.classList.add('hidden'));
+}
+
+function importarUmaOracao(titulo, texto){
+  const nomeLower = titulo.trim().toLowerCase();
+  const duplicadaPessoal = ORACOES.find(o => o.titulo.trim().toLowerCase() === nomeLower);
+  const duplicadaOficial = ORACOES_OFICIAIS.find(o => o.titulo.trim().toLowerCase() === nomeLower);
+
+  if(duplicadaPessoal || duplicadaOficial){
+    mostrarToast(`Já existe uma oração com o título "${titulo}"${duplicadaOficial ? ' (oficial)' : ''}. Importação cancelada.`);
+    return;
+  }
+
+  ORACOES.push({ id: gerarId(), titulo: titulo.trim(), texto: texto || '', favorita: false });
+  salvarOracoes(ORACOES);
+  renderizarTudo();
+  mostrarToast(`Oração "${titulo}" adicionada às suas orações!`, 'sucesso');
+}
+
 // ===================== VOZES (uma para V., outra para R.) =====================
-const CHAVE_VOZES = 'minhas_oracoes_vozes_v1';
 let configVozes = JSON.parse(localStorage.getItem(CHAVE_VOZES) || 'null') || { v: null, r: null };
 
 function salvarConfigVozes(){
   localStorage.setItem(CHAVE_VOZES, JSON.stringify(configVozes));
 }
 
-// As vozes do navegador às vezes demoram a carregar; espera elas ficarem prontas
 function aguardarVozesDisponiveis(){
   return new Promise((resolve) => {
     if(!('speechSynthesis' in window)){ resolve([]); return; }
@@ -357,7 +673,6 @@ function ordenarVozesPtPrimeiro(vozes){
   });
 }
 
-// Escolhe duas vozes diferentes automaticamente, priorizando português
 function escolherVozesAutomaticas(vozes){
   const portugues = vozes.filter(v => v.lang.toLowerCase().startsWith('pt'));
   if(portugues.length >= 2) return { v: portugues[0].name, r: portugues[1].name };
@@ -427,14 +742,13 @@ function obterLinhasParaFalar(){
   const paragrafos = document.querySelectorAll('#rezar-texto p');
   const linhas = [];
   paragrafos.forEach(p => {
-    if(p.classList.contains('linha-ref')) return; // título de referência não é falado
+    if(p.classList.contains('linha-ref')) return;
     let texto = p.textContent.replace(/^V\.\s*/,'').replace(/^R\.\s*/,'').trim();
     if(texto) linhas.push({ elemento: p, texto, voz2: p.classList.contains('linha-r') });
   });
   return linhas;
 }
 
-// Decide o que o botão deve fazer de acordo com o estado atual
 async function alternarFala(){
   if(!('speechSynthesis' in window)){
     alert('Seu navegador não tem suporte a leitura em voz alta.');
@@ -520,7 +834,6 @@ function falarProximaLinha(){
     utterancia.voice = vozEncontrada;
     utterancia.pitch = 1.0;
   }else{
-    // Contingência: não há duas vozes distintas disponíveis, diferencia pelo tom
     utterancia.pitch = item.voz2 ? 1.25 : 1.0;
   }
 
@@ -546,6 +859,8 @@ function pararFala(){
 
 // ===================== LIGAÇÃO DOS BOTÕES =====================
 document.getElementById('btn-ver-todas').addEventListener('click', () => mostrarView('view-todas'));
+document.getElementById('btn-ver-oficiais').addEventListener('click', () => mostrarView('view-oficiais'));
+
 document.querySelectorAll('[data-voltar]').forEach(btn => {
   btn.addEventListener('click', () => mostrarView(btn.dataset.voltar));
 });
@@ -560,21 +875,35 @@ document.getElementById('btn-inserir-oracao').addEventListener('click', abrirMod
 document.getElementById('btn-fechar-modal').addEventListener('click', fecharModalInserir);
 
 document.getElementById('btn-voltar-rezar').addEventListener('click', () => {
-  mostrarView(origemRezar === 'todas' ? 'view-todas' : 'view-home');
+  if(origemRezar === 'todas') mostrarView('view-todas');
+  else if(origemRezar === 'oficiais') mostrarView('view-oficiais');
+  else mostrarView('view-home');
 });
 document.getElementById('btn-favoritar-rezar').addEventListener('click', () => {
-  if(oracaoAtualId) alternarFavorito(oracaoAtualId);
+  if(!oracaoAtualId) return;
+  if(oracaoAtualTipo === 'oficial'){
+    alternarFavoritoOficial(oracaoAtualId);
+  }else{
+    alternarFavorito(oracaoAtualId);
+  }
 });
 document.getElementById('btn-editar-atual').addEventListener('click', () => abrirEditor(oracaoAtualId));
 document.getElementById('btn-excluir-atual').addEventListener('click', excluirOracaoAtual);
+document.getElementById('btn-compartilhar-atual').addEventListener('click', () => compartilharOracao(oracaoAtualId));
 document.getElementById('btn-falar').addEventListener('click', alternarFala);
 document.getElementById('btn-ler').addEventListener('click', pararFala);
 document.getElementById('btn-config-vozes').addEventListener('click', abrirConfigVozes);
 document.getElementById('btn-fechar-modal-vozes').addEventListener('click', fecharModalVozes);
 document.getElementById('btn-salvar-vozes').addEventListener('click', salvarConfigVozesModal);
 
+// Exportar / Importar
+document.getElementById('btn-exportar-oracoes').addEventListener('click', exportarOracoes);
+document.getElementById('btn-importar-oracoes').addEventListener('click', importarOracoesDeArquivo);
+
 // ===================== INICIALIZAÇÃO =====================
-renderizarTudo();
+renderizarTodas(); // renderiza pessoais imediatamente
+carregarOficiais(); // carrega oficiais e re-renderiza tudo
+verificarLinkImportacao(); // verifica se há link mágico na URL
 
 // ===================== PWA: SERVICE WORKER =====================
 if('serviceWorker' in navigator){

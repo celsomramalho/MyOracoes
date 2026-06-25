@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B2238">
+<title>Admin - Orações Oficiais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Estilos específicos adicionais do admin */
+  .admin-login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px);
+    text-align: center;
+    padding: 20px;
+  }
+  .admin-login-box {
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    padding: 30px;
+    border-radius: var(--raio);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .btn-excluir {
+    background: none;
+    border: 1px solid var(--perigo);
+    color: var(--perigo);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.9rem;
+    transition: background 0.15s;
+  }
+  .btn-excluir:hover {
+    background: var(--voz2-fundo);
+  }
+  .instrucoes-box {
+    background: rgba(215, 170, 86, 0.08);
+    border: 1px solid var(--ouro);
+    border-radius: var(--raio);
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .instrucoes-box h4 {
+    color: var(--ouro-suave);
+    margin: 0 0 8px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+  }
+  .instrucoes-box ol {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--texto-suave);
+  }
+  .instrucoes-box li {
+    margin-bottom: 6px;
+  }
+  .instrucoes-box li strong {
+    color: var(--texto);
+  }
+  .card-acoes {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <header class="topbar">
+    <div class="flame" aria-hidden="true"><span></span></div>
+    <h1>Painel Admin - Orações Oficiais</h1>
+  </header>
+
+  <!-- TELA DE LOGIN -->
+  <main id="view-login" class="view view-active">
+    <div class="admin-login">
+      <div class="admin-login-box">
+        <h2 class="titulo-secao" style="margin-top: 0;">Acesso Restrito</h2>
+        <p class="dica">Digite a senha de administrador para prosseguir.</p>
+        <input id="input-senha" type="password" placeholder="Senha" style="width: 100%; text-align: center; font-size: 1.2rem; padding: 10px; margin-top: 15px;" autocomplete="current-password">
+        <button id="btn-entrar" class="btn-primario" style="margin-top: 15px;">Entrar</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- TELA PRINCIPAL: LISTAR ORAÇÕES OFICIAIS -->
+  <main id="view-admin-list" class="view">
+    <div class="instrucoes-box">
+      <h4>Como atualizar o app no ar:</h4>
+      <ol>
+        <li>Crie, edite ou remova as orações oficiais abaixo.</li>
+        <li>Clique em <strong>"Baixar arquivo atualizado"</strong> para fazer o download do <code>oracoes-oficiais.json</code>.</li>
+        <li>Vá no seu GitHub, acesse a pasta do repositório <code>MyOracoes</code>.</li>
+        <li>Faça o upload/substitua o arquivo <code>oracoes-oficiais.json</code> antigo pelo que você acabou de baixar.</li>
+        <li>A Vercel atualizará o site automaticamente em segundos!</li>
+      </ol>
+    </div>
+
+    <div class="nav-header">
+      <h2 class="titulo-secao" style="margin: 0;">Orações Oficiais Atuais</h2>
+      <button id="btn-exportar-json" class="btn-secundario" style="border-color: var(--ouro); color: var(--ouro-suave);">📥 Baixar arquivo atualizado</button>
+    </div>
+
+    <div id="lista-admin-oficiais" class="lista-oracoes" style="margin-bottom: 30px;"></div>
+
+    <button id="btn-criar-nova-oficial" class="btn-primario" style="margin-top: 10px;">+ Criar Nova Oração Oficial</button>
+    <a href="index.html" class="btn-link" style="display: block; text-align: center; margin-top: 20px;">← Voltar para o Aplicativo</a>
+  </main>
+
+  <!-- TELA: FORMULÁRIO CRIAR / EDITAR OFICIAL -->
+  <main id="view-admin-form" class="view">
+    <button class="btn-voltar" id="btn-cancelar-admin-form">← Cancelar</button>
+    <h2 class="titulo-secao" id="admin-form-cabecalho">Nova Oração Oficial</h2>
+
+    <label class="campo-label" for="input-oficial-titulo">Título</label>
+    <input id="input-oficial-titulo" type="text" placeholder="Ex: Pai Nosso" autocomplete="off">
+
+    <label class="campo-label" for="input-oficial-texto">Texto</label>
+    <textarea id="input-oficial-texto" placeholder="V. Primeiro orador...\nR. Segundo orador..."></textarea>
+    <p class="dica">Use <strong>V.</strong> no começo da linha para primeira voz e <strong>R.</strong> para segunda voz.</p>
+
+    <button id="btn-salvar-oficial" class="btn-primario">Salvar Oração Oficial</button>
+  </main>
+
+</div>
+
+<script>
+  const SENHA_CORRETA = 'storosario';
+  const CHAVE_SESSION = 'myoracoes_admin_autenticado';
+  
+  let oracoesOficiais = [];
+  let editandoId = null;
+
+  // Verificação de autenticação na sessão
+  if (sessionStorage.getItem(CHAVE_SESSION) === 'true') {
+    liberarAdmin();
+  }
+
+  // Ações de Login
+  document.getElementById('btn-entrar').addEventListener('click', tentarLogin);
+  document.getElementById('input-senha').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') tentarLogin();
+  });
+
+  function tentarLogin() {
+    const senha = document.getElementById('input-senha').value;
+    if (senha === SENHA_CORRETA) {
+      sessionStorage.setItem(CHAVE_SESSION, 'true');
+      liberarAdmin();
+    } else {
+      alert('Senha incorreta!');
+      document.getElementById('input-senha').value = '';
+      document.getElementById('input-senha').focus();
+    }
+  }
+
+  function liberarAdmin() {
+    mostrarView('view-admin-list');
+    carregarDadosIniciais();
+  }
+
+  function mostrarView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('view-active'));
+    document.getElementById(id).classList.add('view-active');
+    window.scrollTo(0,0);
+  }
+
+  async function carregarDadosIniciais() {
+    try {
+      // Carrega o arquivo oficial atual que já está na Vercel / localmente
+      const res = await fetch('./oracoes-oficiais.json');
+      if (res.ok) {
+        oracoesOficiais = await res.json();
+      }
+    } catch(e) {
+      console.log("Não foi possível carregar orações oficiais existentes, inicializando vazio.", e);
+      oracoesOficiais = [];
+    }
+    renderizarListaAdmin();
+  }
+
+  function renderizarListaAdmin() {
+    const lista = document.getElementById('lista-admin-oficiais');
+    lista.innerHTML = '';
+
+    if (oracoesOficiais.length === 0) {
+      lista.innerHTML = '<p class="empty-state">Nenhuma oração oficial cadastrada ainda.</p>';
+      return;
+    }
+
+    // Ordenar em ordem alfabética
+    const ordenadas = oracoesOficiais.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+
+    ordenadas.forEach(o => {
+      const card = document.createElement('div');
+      card.className = 'card-oracao';
+      card.innerHTML = `
+        <div class="card-inicial">${(o.titulo || '?')[0].toUpperCase()}</div>
+        <div class="card-corpo">
+          <h3>${o.titulo}</h3>
+          <p>${primeiraLinhaUtil(o.texto)}</p>
+        </div>
+        <div class="card-acoes">
+          <button class="btn-secundario btn-editar" style="padding: 4px 10px; font-size: 0.9rem;">Editar</button>
+          <button class="btn-excluir">Excluir</button>
+        </div>
+      `;
+
+      card.querySelector('.btn-editar').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        abrirForm(o.id);
+      });
+
+      card.querySelector('.btn-excluir').addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        excluirOficial(o.id);
+      });
+
+      card.addEventListener('click', () => abrirForm(o.id));
+      lista.appendChild(card);
+    });
+  }
+
+  function primeiraLinhaUtil(texto) {
+    const linha = (texto || '').split('\n').map(l => l.trim()).find(l => l.length > 0);
+    return linha ? linha.replace(/^V\.\s*|^R\.\s*/,'') : '';
+  }
+
+  function abrirForm(id) {
+    editandoId = id || null;
+    const inputTitulo = document.getElementById('input-oficial-titulo');
+    const inputTexto = document.getElementById('input-oficial-texto');
+    const cabecalho = document.getElementById('admin-form-cabecalho');
+
+    if (editandoId) {
+      const o = oracoesOficiais.find(x => x.id === editandoId);
+      cabecalho.textContent = 'Editar Oração Oficial';
+      inputTitulo.value = o ? o.titulo : '';
+      inputTexto.value = o ? o.texto : '';
+    } else {
+      cabecalho.textContent = 'Nova Oração Oficial';
+      inputTitulo.value = '';
+      inputTexto.value = '';
+    }
+
+    mostrarView('view-admin-form');
+    inputTitulo.focus();
+  }
+
+  function excluirOficial(id) {
+    const o = oracoesOficiais.find(x => x.id === id);
+    if (!o) return;
+    if (confirm(`Excluir a oração oficial "${o.titulo}"?`)) {
+      oracoesOficiais = oracoesOficiais.filter(x => x.id !== id);
+      renderizarListaAdmin();
+    }
+  }
+
+  // Botão Criar Nova
+  document.getElementById('btn-criar-nova-oficial').addEventListener('click', () => abrirForm(null));
+
+  // Botão Cancelar Formulário
+  document.getElementById('btn-cancelar-admin-form').addEventListener('click', () => {
+    mostrarView('view-admin-list');
+  });
+
+  // Botão Salvar Formulário
+  document.getElementById('btn-salvar-oficial').addEventListener('click', () => {
+    const titulo = document.getElementById('input-oficial-titulo').value.trim();
+    const texto = document.getElementById('input-oficial-texto').value;
+
+    if (!titulo) {
+      alert('Dê um título para a oração.');
+      return;
+    }
+
+    // Verificar duplicidade de título no conjunto de oficiais
+    const duplicada = oracoesOficiais.find(o => 
+      o.titulo.trim().toLowerCase() === titulo.toLowerCase() && o.id !== editandoId
+    );
+    if (duplicada) {
+      alert('Já existe uma oração oficial com esse título.');
+      return;
+    }
+
+    if (editandoId) {
+      const o = oracoesOficiais.find(x => x.id === editandoId);
+      if (o) {
+        o.titulo = titulo;
+        o.texto = texto;
+      }
+    } else {
+      const novoId = 'oficial_' + Date.now().toString(36);
+      oracoesOficiais.push({ id: novoId, titulo, texto });
+    }
+
+    renderizarListaAdmin();
+    mostrarView('view-admin-list');
+  });
+
+  // Botão Baixar arquivo JSON atualizado
+  document.getElementById('btn-exportar-json').addEventListener('click', () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(oracoesOficiais, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href",     dataStr     );
+    dlAnchorElem.setAttribute("download", "oracoes-oficiais.json");
+    dlAnchorElem.click();
+  });
+</script>
+</body>
+</html>
