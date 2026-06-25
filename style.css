@@ -657,4 +657,68 @@ html,body{
   background: rgba(46, 125, 50, 0.1);
 }
 
+/* ---------- PROGRESSO DE LEITURA POR SEÇÃO ---------- */
+
+/* Wrapper de parágrafos agrupados em uma seção */
+.grupo-texto-secao{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  margin: 2px 0;
+  transition: background 0.2s;
+}
+.grupo-texto-secao > .grupo-texto-conteudo{
+  flex: 1;
+}
+
+/* Botão de check por seção */
+.btn-check-secao{
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(215, 170, 86, 0.25);
+  background: transparent;
+  color: rgba(215, 170, 86, 0.3);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;
+  margin-top: 2px;
+}
+.btn-check-secao:hover{
+  border-color: var(--ouro);
+  color: var(--ouro);
+  transform: scale(1.1);
+}
+.btn-check-secao.ativo{
+  border-color: #66bb6a;
+  background: rgba(46, 125, 50, 0.18);
+  color: #81c784;
+}
+
+/* Botão de check no bloco-ref: empurra para direita com margin-left: auto */
+.bloco-ref-titulo .btn-check-secao{
+  margin-left: auto;
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+/* Estado de seção concluída */
+.secao-concluida > .grupo-texto-conteudo p,
+.secao-concluida > .bloco-ref-titulo > span:not(.bloco-ref-icone):not(.btn-check-secao){
+  opacity: 0.45;
+  transition: opacity 0.3s;
+}
+.secao-concluida.bloco-ref > .bloco-ref-titulo > span:first-of-type{
+  opacity: 0.45;
+}
+/* Linha de texto concluída dentro de grupo */
+.secao-concluida .grupo-texto-conteudo p{
+  opacity: 0.45;
+}
 

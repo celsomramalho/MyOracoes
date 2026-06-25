@@ -3,6 +3,7 @@ const CHAVE_STORAGE = 'minhas_oracoes_v1';
 const CHAVE_FAVORITAS_OFICIAIS = 'minhas_oracoes_oficiais_favoritas_v1';
 const CHAVE_VOZES = 'minhas_oracoes_vozes_v1';
 const CHAVE_REZADAS_DIARIAMENTE = 'minhas_oracoes_rezadas_diarias_v1';
+const CHAVE_PROGRESSO_LEITURA = 'minhas_oracoes_progresso_leitura_v1';
 const CHAVE_VELOCIDADE = 'minhas_oracoes_velocidade_v1';
 
 const OPCOES_VELOCIDADE = [0.8, 1.0, 1.25, 1.5, 1.75, 2.0];
@@ -37,6 +38,19 @@ function salvarRezadasDiarias(dados) {
 }
 
 let rezadasDiarias = carregarRezadasDiarias();
+
+// ===================== PROGRESSO DE LEITURA POR SEÇÃO =====================
+function carregarProgressoLeitura(){
+  try{
+    return JSON.parse(localStorage.getItem(CHAVE_PROGRESSO_LEITURA) || '{}');
+  }catch(e){ return {}; }
+}
+function salvarProgressoLeitura(){
+  localStorage.setItem(CHAVE_PROGRESSO_LEITURA, JSON.stringify(progressoLeitura));
+}
+let progressoLeitura = carregarProgressoLeitura();
+// secaoCtxAtual: { n, oracaoId, elementos: [{idx, el, btn}], totalSecoes }
+let secaoCtxAtual = null;
 
 function carregarOracoes(){
   try{
@@ -613,44 +627,114 @@ function construirArvore(texto, titulosVisitados){
   return nos;
 }
 
-function renderizarNos(nos, container){
-  nos.forEach(no => {
-    if(no.tipo === 'linha'){
-      const p = document.createElement('p');
-      if(no.classe) p.className = no.classe;
-      p.textContent = no.texto;
-      container.appendChild(p);
+// Cria botão de marcar seção rezada
+function criarBtnCheck(idx, ctx){
+  const btn = document.createElement('button');
+  btn.className = 'btn-check-secao';
+  btn.dataset.idx = idx;
+  btn.title = 'Marcar como rezada';
+  btn.textContent = '✓';
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const marcadas = progressoLeitura[ctx.oracaoId] || [];
+    if(marcadas.includes(idx)){
+      desmarcarSecao(ctx.oracaoId, idx);
+    }else{
+      marcarSecao(ctx.oracaoId, idx);
+    }
+  });
+  return btn;
+}
 
-    }else if(no.tipo === 'bloco'){
+// Agrupa nós consecutivos do tipo 'linha' em blocos {tipo:'grupo-linhas', linhas}
+function agruparNos(nos){
+  const grupos = [];
+  let linhasAtm = [];
+  for(const no of nos){
+    if(no.tipo === 'linha'){
+      linhasAtm.push(no);
+    }else{
+      if(linhasAtm.length > 0){
+        grupos.push({ tipo: 'grupo-linhas', linhas: linhasAtm });
+        linhasAtm = [];
+      }
+      grupos.push(no);
+    }
+  }
+  if(linhasAtm.length > 0) grupos.push({ tipo: 'grupo-linhas', linhas: linhasAtm });
+  return grupos;
+}
+
+function renderizarNos(nos, container, ctx){
+  agruparNos(nos).forEach(g => {
+    if(g.tipo === 'grupo-linhas'){
+      const idx = ctx ? ctx.n++ : -1;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'grupo-texto-secao';
+      if(idx >= 0) wrapper.dataset.secaoIdx = idx;
+
+      const conteudo = document.createElement('div');
+      conteudo.className = 'grupo-texto-conteudo';
+      g.linhas.forEach(no => {
+        const p = document.createElement('p');
+        if(no.classe) p.className = no.classe;
+        p.textContent = no.texto;
+        conteudo.appendChild(p);
+      });
+      wrapper.appendChild(conteudo);
+
+      if(ctx){
+        const btn = criarBtnCheck(idx, ctx);
+        wrapper.appendChild(btn);
+        ctx.elementos.push({ idx, el: wrapper, btn });
+      }
+      container.appendChild(wrapper);
+
+    }else if(g.tipo === 'bloco'){
+      const idx = ctx ? ctx.n++ : -1;
       const divBloco = document.createElement('div');
       divBloco.className = 'bloco-ref';
+      if(idx >= 0) divBloco.dataset.secaoIdx = idx;
 
       const divTitulo = document.createElement('div');
       divTitulo.className = 'bloco-ref-titulo';
+
       const icone = document.createElement('span');
       icone.className = 'bloco-ref-icone';
       icone.textContent = '▸';
       divTitulo.appendChild(icone);
-      divTitulo.appendChild(document.createTextNode(' ' + no.rotulo));
+
+      const textoSpan = document.createElement('span');
+      textoSpan.className = 'bloco-ref-texto';
+      textoSpan.textContent = ' ' + g.rotulo;
+      divTitulo.appendChild(textoSpan);
+
+      if(ctx){
+        const btn = criarBtnCheck(idx, ctx);
+        divTitulo.appendChild(btn);
+        ctx.elementos.push({ idx, el: divBloco, btn });
+      }
 
       const divConteudo = document.createElement('div');
       divConteudo.className = 'bloco-ref-conteudo';
 
-      divTitulo.addEventListener('click', () => {
+      divTitulo.addEventListener('click', (e) => {
+        if(e.target.classList.contains('btn-check-secao')) return;
         const aberto = divBloco.classList.toggle('aberto');
         icone.textContent = aberto ? '▾' : '▸';
       });
 
-      renderizarNos(no.filhos, divConteudo);
+      // Filhos NÃO recebem ctx (só nível raiz tem índices de seção)
+      renderizarNos(g.filhos, divConteudo, null);
       divBloco.appendChild(divTitulo);
       divBloco.appendChild(divConteudo);
       container.appendChild(divBloco);
 
-    }else if(no.tipo === 'erro'){
+    }else if(g.tipo === 'erro'){
       const p = document.createElement('p');
       p.className = 'linha-ref';
       p.style.opacity = '0.6';
-      p.textContent = no.texto;
+      p.textContent = g.texto;
       container.appendChild(p);
     }
   });
@@ -661,11 +745,62 @@ function renderizarTextoRezar(textoOriginal){
   container.innerHTML = '';
 
   const arvore = construirArvore(textoOriginal, new Set());
-  renderizarNos(arvore, container);
+
+  const ctx = oracaoAtualId ? { n: 0, oracaoId: oracaoAtualId, elementos: [] } : null;
+  secaoCtxAtual = ctx;
+
+  renderizarNos(arvore, container, ctx);
+
+  if(ctx) atualizarVisuaisProgresso(ctx.oracaoId, ctx.elementos);
 
   if(container.innerHTML === ''){
     container.innerHTML = '<p class="dica">Esta oração ainda não tem texto. Toque em "Editar" para escrever.</p>';
   }
+}
+
+// ===================== MARCAÇÃO DE PROGRESSO POR SEÇÃO =====================
+function marcarSecao(oracaoId, idx){
+  if(!progressoLeitura[oracaoId]) progressoLeitura[oracaoId] = [];
+  const set = new Set(progressoLeitura[oracaoId]);
+  // Marca a seção clicada E todas as anteriores (cascata)
+  for(let i = 0; i <= idx; i++) set.add(i);
+  progressoLeitura[oracaoId] = [...set].sort((a,b) => a-b);
+  salvarProgressoLeitura();
+  if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
+    atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
+  }
+}
+
+function desmarcarSecao(oracaoId, idx){
+  if(!progressoLeitura[oracaoId]) return;
+  const set = new Set(progressoLeitura[oracaoId]);
+  set.delete(idx);
+  progressoLeitura[oracaoId] = [...set].sort((a,b) => a-b);
+  salvarProgressoLeitura();
+  if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
+    atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
+  }
+}
+
+function limparProgressoLeitura(){
+  if(!oracaoAtualId) return;
+  delete progressoLeitura[oracaoAtualId];
+  salvarProgressoLeitura();
+  if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoAtualId){
+    atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
+  }
+  mostrarToast('Progresso de leitura reiniciado.');
+}
+
+function atualizarVisuaisProgresso(oracaoId, elementos){
+  if(!elementos) return;
+  const concluidas = new Set(progressoLeitura[oracaoId] || []);
+  elementos.forEach(({ idx, el, btn }) => {
+    const marcada = concluidas.has(idx);
+    el.classList.toggle('secao-concluida', marcada);
+    btn.classList.toggle('ativo', marcada);
+    btn.title = marcada ? 'Desmarcar' : 'Marcar como rezada';
+  });
 }
 
 // Expande todos os blocos-ref ancestrais de um elemento (usado pela fala em voz alta)
@@ -960,7 +1095,11 @@ function obterLinhasParaFalar(){
   paragrafos.forEach(p => {
     if(p.classList.contains('linha-ref')) return;
     let texto = p.textContent.replace(/^V\.\s*/,'').replace(/^R\.\s*/,'').trim();
-    if(texto) linhas.push({ elemento: p, texto, voz2: p.classList.contains('linha-r') });
+    if(!texto) return;
+    // Identifica a seção à qual este parágrafo pertence
+    const secaoEl = p.closest('[data-secao-idx]');
+    const secaoIdx = secaoEl ? parseInt(secaoEl.dataset.secaoIdx) : -1;
+    linhas.push({ elemento: p, texto, voz2: p.classList.contains('linha-r'), secaoIdx });
   });
   return linhas;
 }
@@ -1070,7 +1209,23 @@ function falarProximaLinha(){
 
   utterancia.onend = () => {
     if(!falando || pausado) return;
+    const secaoIdxAtual = item.secaoIdx;
     indiceFalaAtual++;
+    // Auto-marca a seção quando a voz termina todas as linhas dela
+    if(oracaoAtualId && secaoIdxAtual >= 0 && secaoCtxAtual){
+      const proximoItem = filaFala[indiceFalaAtual];
+      if(!proximoItem || proximoItem.secaoIdx !== secaoIdxAtual){
+        const jaConc = (progressoLeitura[oracaoAtualId] || []).includes(secaoIdxAtual);
+        if(!jaConc){
+          if(!progressoLeitura[oracaoAtualId]) progressoLeitura[oracaoAtualId] = [];
+          const set = new Set(progressoLeitura[oracaoAtualId]);
+          set.add(secaoIdxAtual);
+          progressoLeitura[oracaoAtualId] = [...set].sort((a,b) => a-b);
+          salvarProgressoLeitura();
+          atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
+        }
+      }
+    }
     falarProximaLinha();
   };
   utterancia.onerror = () => {
@@ -1128,6 +1283,7 @@ document.getElementById('btn-compartilhar-atual').addEventListener('click', () =
 document.getElementById('btn-falar').addEventListener('click', alternarFala);
 document.getElementById('btn-ler').addEventListener('click', pararFala);
 document.getElementById('btn-marcar-rezada').addEventListener('click', alternarRezadaManualmente);
+document.getElementById('btn-reiniciar-progresso').addEventListener('click', limparProgressoLeitura);
 document.getElementById('btn-velocidade').addEventListener('click', alternarVelocidade);
 document.getElementById('btn-config-vozes').addEventListener('click', abrirConfigVozes);
 document.getElementById('btn-fechar-modal-vozes').addEventListener('click', fecharModalVozes);
