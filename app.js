@@ -21,6 +21,7 @@ function gerarId(){
 let ORACOES = carregarOracoes();
 let editandoId = null;     // id da oração sendo editada (null = criando nova)
 let oracaoAtualId = null;  // id da oração aberta na tela "Rezar"
+let origemRezar = 'home';  // 'home' ou 'todas' — de onde a tela Rezar foi aberta
 
 // ===================== NAVEGAÇÃO =====================
 function mostrarView(id){
@@ -36,7 +37,7 @@ function obterInicial(titulo){
   return t ? t[0].toUpperCase() : '?';
 }
 
-function criarCardOracao(oracao){
+function criarCardOracao(oracao, origem){
   const card = document.createElement('div');
   card.className = 'card-oracao';
   card.innerHTML = `
@@ -51,7 +52,7 @@ function criarCardOracao(oracao){
     ev.stopPropagation();
     alternarFavorito(oracao.id);
   });
-  card.addEventListener('click', () => abrirRezar(oracao.id));
+  card.addEventListener('click', () => abrirRezar(oracao.id, origem));
   return card;
 }
 
@@ -69,7 +70,7 @@ function renderizarFavoritas(){
     vazio.classList.remove('hidden');
   }else{
     vazio.classList.add('hidden');
-    favoritas.forEach(o => lista.appendChild(criarCardOracao(o)));
+    favoritas.forEach(o => lista.appendChild(criarCardOracao(o, 'home')));
   }
 }
 
@@ -82,7 +83,7 @@ function renderizarTodas(){
   }else{
     vazio.classList.add('hidden');
     ORACOES.slice().sort((a,b)=> a.titulo.localeCompare(b.titulo, 'pt-BR'))
-      .forEach(o => lista.appendChild(criarCardOracao(o)));
+      .forEach(o => lista.appendChild(criarCardOracao(o, 'todas')));
   }
 }
 
@@ -231,14 +232,24 @@ function inserirReferencia(titulo){
 }
 
 // ===================== TELA "REZAR" =====================
-function abrirRezar(id){
+function abrirRezar(id, origem){
   oracaoAtualId = id;
+  origemRezar = origem || 'home';
   const o = ORACOES.find(x => x.id === id);
   if(!o) return;
 
   document.getElementById('rezar-titulo').textContent = o.titulo;
   atualizarEstrelaRezar();
   renderizarTextoRezar(o.texto);
+
+  // Aplica ou remove o modo leitura (oculta botões extras)
+  const acoes = document.querySelector('.rezar-acoes');
+  if(origemRezar === 'home'){
+    acoes.classList.add('modo-leitura');
+  }else{
+    acoes.classList.remove('modo-leitura');
+  }
+
   mostrarView('view-rezar');
 }
 
@@ -550,7 +561,7 @@ document.getElementById('btn-salvar').addEventListener('click', salvarEditor);
 document.getElementById('btn-inserir-oracao').addEventListener('click', abrirModalInserir);
 document.getElementById('btn-fechar-modal').addEventListener('click', fecharModalInserir);
 
-document.getElementById('btn-voltar-rezar').addEventListener('click', () => mostrarView('view-home'));
+document.getElementById('btn-voltar-rezar').addEventListener('click', () => mostrarView(origemRezar === 'todas' ? 'view-todas' : 'view-home'));
 document.getElementById('btn-favoritar-rezar').addEventListener('click', () => {
   if(oracaoAtualId) alternarFavorito(oracaoAtualId);
 });

@@ -354,6 +354,13 @@ html,body{
   color: var(--voz2);
 }
 
+/* Modo leitura (vindo da Home): oculta Vozes, Editar e Excluir */
+.rezar-acoes.modo-leitura #btn-config-vozes,
+.rezar-acoes.modo-leitura #btn-editar-atual,
+.rezar-acoes.modo-leitura #btn-excluir-atual{
+  display: none;
+}
+
 .texto-oracao{
   background: var(--bg-alto);
   border: 1px solid var(--borda);
