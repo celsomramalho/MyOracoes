@@ -135,12 +135,25 @@
     <label class="campo-label" for="input-oficial-titulo">Título</label>
     <input id="input-oficial-titulo" type="text" placeholder="Ex: Pai Nosso" autocomplete="off">
 
-    <label class="campo-label" for="input-oficial-texto">Texto</label>
-    <textarea id="input-oficial-texto" placeholder="V. Primeiro orador...\nR. Segundo orador..."></textarea>
-    <p class="dica">Use <strong>V.</strong> no começo da linha para primeira voz e <strong>R.</strong> para segunda voz.</p>
+    <div class="editor-toolbar">
+      <label class="campo-label" for="input-oficial-texto">Texto</label>
+      <button id="btn-inserir-oracao-admin" class="btn-secundario" type="button">+ Inserir oração</button>
+    </div>
+    <textarea id="input-oficial-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
+    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena).</p>
 
     <button id="btn-salvar-oficial" class="btn-primario">Salvar Oração Oficial</button>
   </main>
+
+  <!-- MODAL: INSERIR ORAÇÃO -->
+  <div id="modal-inserir-admin" class="modal hidden">
+    <div class="modal-conteudo">
+      <h3>Inserir oração</h3>
+      <p class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
+      <div id="lista-modal-inserir-admin" class="lista-modal"></div>
+      <button id="btn-fechar-modal-admin" class="btn-secundario">Cancelar</button>
+    </div>
+  </div>
 
 </div>
 
@@ -326,6 +339,66 @@
     dlAnchorElem.setAttribute("download", "oracoes-oficiais.json");
     dlAnchorElem.click();
   });
+
+  // Modal Inserir Oração
+  let posicaoCursorSalva = null;
+
+  function renderizarListaModalInserirAdmin(){
+    const lista = document.getElementById('lista-modal-inserir-admin');
+    if(!lista) return;
+
+    lista.innerHTML = '';
+
+    const disponiveis = oracoesOficiais.filter(o => o.id !== editandoId)
+      .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+
+    if(disponiveis.length === 0){
+      lista.innerHTML = '<p class="dica">Nenhuma outra oração oficial cadastrada para inserir como referência.</p>';
+    }else{
+      disponiveis.forEach(o => {
+        const item = document.createElement('div');
+        item.className = 'item-modal';
+        item.textContent = o.titulo;
+        item.addEventListener('click', () => inserirReferenciaAdmin(o.titulo));
+        lista.appendChild(item);
+      });
+    }
+  }
+
+  function abrirModalInserirAdmin(){
+    const inputTexto = document.getElementById('input-oficial-texto');
+    posicaoCursorSalva = inputTexto.selectionStart;
+    renderizarListaModalInserirAdmin();
+    document.getElementById('modal-inserir-admin').classList.remove('hidden');
+  }
+
+  function fecharModalInserirAdmin(){
+    document.getElementById('modal-inserir-admin').classList.add('hidden');
+  }
+
+  function inserirReferenciaAdmin(titulo){
+    const respostaQuantidade = prompt(
+      `Quantas vezes rezar "${titulo}" aqui?\n(Ex: 10 para uma dezena. Deixe 1 para rezar uma única vez.)`,
+      '1'
+    );
+    if(respostaQuantidade === null) return;
+
+    const quantidade = Math.min(Math.max(parseInt(respostaQuantidade, 10) || 1, 1), 200);
+
+    const inputTexto = document.getElementById('input-oficial-texto');
+    const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
+    const referencia = quantidade > 1 ? `[${titulo}]{${quantidade}}` : `[${titulo}]`;
+    const antes = inputTexto.value.slice(0, pos);
+    const depois = inputTexto.value.slice(pos);
+    inputTexto.value = antes + referencia + depois;
+    fecharModalInserirAdmin();
+    inputTexto.focus();
+    const novaPos = pos + referencia.length;
+    inputTexto.setSelectionRange(novaPos, novaPos);
+  }
+
+  document.getElementById('btn-inserir-oracao-admin').addEventListener('click', abrirModalInserirAdmin);
+  document.getElementById('btn-fechar-modal-admin').addEventListener('click', fecharModalInserirAdmin);
 </script>
 </body>
 </html>
