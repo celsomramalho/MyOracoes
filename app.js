@@ -98,6 +98,15 @@ function mostrarView(id){
   document.getElementById(id).classList.add('view-active');
   pararFala();
   window.scrollTo(0,0);
+
+  const fab = document.getElementById('fab-nova');
+  if(fab){
+    if(id === 'view-home' || id === 'view-todas'){
+      fab.style.display = '';
+    } else {
+      fab.style.display = 'none';
+    }
+  }
 }
 
 // ===================== ESCAPE DE HTML =====================
@@ -449,10 +458,6 @@ function abrirRezar(id, origem, tipo){
   // Botão compartilhar: apenas em pessoais
   const btnCompartilhar = document.getElementById('btn-compartilhar-atual');
   if(btnCompartilhar) btnCompartilhar.style.display = ehOficial ? 'none' : '';
-
-  // Badge de oficial na tela de rezar
-  const badgeRezar = document.getElementById('badge-rezar-oficial');
-  if(badgeRezar) badgeRezar.style.display = ehOficial ? 'inline' : 'none';
 
   // Aplica a classe de origem na área de ações para CSS controlar visibilidade
   const viewRezar = document.getElementById('view-rezar');
