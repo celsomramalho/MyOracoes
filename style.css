@@ -603,3 +603,57 @@ html,body{
   margin: 10px 0;
 }
 
+/* ---------- PROGRESSO DIÁRIO ---------- */
+.progresso-diario-container{
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+.progresso-diario-info{
+  display: flex;
+  justify-content: space-between;
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  color: var(--texto-suave);
+  margin-bottom: 8px;
+}
+.progresso-diario-barra{
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+.progresso-diario-preenchimento{
+  background: linear-gradient(90deg, var(--ouro) 0%, var(--ouro-suave) 100%);
+  height: 100%;
+  width: 0;
+  transition: width 0.4s ease-out;
+  border-radius: 4px;
+}
+
+/* ---------- BADGE DE ORAÇÃO REZADA HOJE ---------- */
+.badge-rezada{
+  display: inline-flex;
+  align-items: center;
+  background: rgba(46, 125, 50, 0.15);
+  color: #81c784;
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  border: 1px solid rgba(129, 199, 132, 0.3);
+  font-family: sans-serif;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+/* ---------- BOTÃO REZADA ATIVO ---------- */
+.rezar-acoes button.rezada-ativo{
+  border-color: #2e7d32;
+  color: #81c784;
+  background: rgba(46, 125, 50, 0.1);
+}
+
+

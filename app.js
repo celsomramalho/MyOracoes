@@ -2,6 +2,37 @@
 const CHAVE_STORAGE = 'minhas_oracoes_v1';
 const CHAVE_FAVORITAS_OFICIAIS = 'minhas_oracoes_oficiais_favoritas_v1';
 const CHAVE_VOZES = 'minhas_oracoes_vozes_v1';
+const CHAVE_REZADAS_DIARIAMENTE = 'minhas_oracoes_rezadas_diarias_v1';
+
+function obterDataLocalHoje() {
+  const d = new Date();
+  const ano = d.getFullYear();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
+}
+
+function carregarRezadasDiarias() {
+  try {
+    const dados = JSON.parse(localStorage.getItem(CHAVE_REZADAS_DIARIAMENTE) || '{}');
+    const hoje = obterDataLocalHoje();
+    if (dados.data === hoje) {
+      return dados.ids || {};
+    } else {
+      const novo = { data: hoje, ids: {} };
+      salvarRezadasDiarias(novo);
+      return novo.ids;
+    }
+  } catch (e) {
+    return {};
+  }
+}
+
+function salvarRezadasDiarias(dados) {
+  localStorage.setItem(CHAVE_REZADAS_DIARIAMENTE, JSON.stringify(dados));
+}
+
+let rezadasDiarias = carregarRezadasDiarias();
 
 function carregarOracoes(){
   try{
@@ -97,10 +128,16 @@ function criarCardOracao(oracao, origem, tipo){
     ? `<span class="badge-oficial" title="Oração Oficial">📜</span>`
     : '';
 
+  // Badge de rezada hoje
+  const horaRezada = rezadasDiarias[oracao.id];
+  const badgeRezada = horaRezada
+    ? `<span class="badge-rezada" title="Rezada hoje às ${horaRezada}">✓ ${horaRezada}</span>`
+    : '';
+
   card.innerHTML = `
     <div class="card-inicial">${escaparHTML(obterInicial(oracao.titulo))}</div>
     <div class="card-corpo">
-      <h3>${escaparHTML(oracao.titulo)}${badgeOficial}</h3>
+      <h3>${escaparHTML(oracao.titulo)}${badgeOficial}${badgeRezada}</h3>
       <p>${escaparHTML(primeiraLinhaUtil(oracao.texto))}</p>
     </div>
     <button class="btn-estrela-card" aria-label="Favoritar">${ehFavorita ? '★' : '☆'}</button>
@@ -137,6 +174,7 @@ function renderizarFavoritas(){
     vazio.classList.add('hidden');
     todasFav.forEach(o => lista.appendChild(criarCardOracao(o, 'home', o._tipo)));
   }
+  atualizarProgressoDiario();
 }
 
 function renderizarTodas(){
@@ -169,6 +207,40 @@ function renderizarTudo(){
   renderizarFavoritas();
   renderizarTodas();
   renderizarOficiais();
+}
+
+function atualizarProgressoDiario(){
+  const container = document.getElementById('progresso-diario');
+  if(!container) return;
+
+  const pessoaisFav = ORACOES.filter(o => o.favorita);
+  const oficiaisFav = ORACOES_OFICIAIS.filter(o => favoritasOficiaisIds.includes(o.id));
+  const todasFav = [
+    ...pessoaisFav.map(o => ({ ...o, _tipo: 'pessoal' })),
+    ...oficaisFav.map(o => ({ ...o, _tipo: 'oficial' })),
+  ];
+
+  const total = todasFav.length > 0 ? todasFav.length : (ORACOES.length + ORACOES_OFICIAIS.length);
+  const rezados = todasFav.length > 0
+    ? todasFav.filter(o => rezadasDiarias[o.id]).length
+    : Object.keys(rezadasDiarias).length;
+
+  if (total === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const percent = Math.round((rezados / total) * 100);
+
+  container.innerHTML = `
+    <div class="progresso-diario-info">
+      <span>${rezados} de ${total} orações rezadas hoje</span>
+      <span>${percent}%</span>
+    </div>
+    <div class="progresso-diario-barra">
+      <div class="progresso-diario-preenchimento" style="width: ${percent}%"></div>
+    </div>
+  `;
 }
 
 function alternarFavorito(id){
@@ -360,6 +432,7 @@ function abrirRezar(id, origem, tipo){
 
   document.getElementById('rezar-titulo').textContent = o.titulo;
   atualizarEstrelaRezar();
+  atualizarBotaoMarcarRezada();
   renderizarTextoRezar(o.texto);
 
   // Esconder/mostrar botões de editar/excluir/compartilhar conforme tipo
@@ -390,6 +463,41 @@ function atualizarEstrelaRezar(){
     ? favoritasOficiaisIds.includes(oracaoAtualId)
     : !!ORACOES.find(x => x.id === oracaoAtualId)?.favorita;
   document.getElementById('btn-favoritar-rezar').textContent = ehFav ? '★' : '☆';
+}
+
+function atualizarBotaoMarcarRezada(){
+  const btn = document.getElementById('btn-marcar-rezada');
+  if(!btn || !oracaoAtualId) return;
+
+  const rezada = !!rezadasDiarias[oracaoAtualId];
+  if(rezada){
+    btn.textContent = `✓ Rezada hoje às ${rezadasDiarias[oracaoAtualId]}`;
+    btn.classList.add('rezada-ativo');
+  }else{
+    btn.textContent = `✓ Marcar como rezada`;
+    btn.classList.remove('rezada-ativo');
+  }
+}
+
+function alternarRezadaManualmente(){
+  if(!oracaoAtualId) return;
+  const hoje = obterDataLocalHoje();
+  
+  if(rezadasDiarias[oracaoAtualId]){
+    delete rezadasDiarias[oracaoAtualId];
+    mostrarToast('Oração marcada como não rezada hoje.');
+  }else{
+    const d = new Date();
+    const hora = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    rezadasDiarias[oracaoAtualId] = `${hora}:${min}`;
+    mostrarToast('Oração marcada como rezada hoje!', 'sucesso');
+  }
+  
+  salvarRezadasDiarias({ data: hoje, ids: rezadasDiarias });
+  atualizarBotaoMarcarRezada();
+  renderizarTudo();
+  atualizarProgressoDiario();
 }
 
 // ===================== ÁRVORE DE NÓS PARA RENDERIZAÇÃO =====================
@@ -872,6 +980,18 @@ function falarProximaLinha(){
   document.querySelectorAll('.linha-falando').forEach(el => el.classList.remove('linha-falando'));
 
   if(!falando || indiceFalaAtual >= filaFala.length){
+    if(falando && oracaoAtualId && !rezadasDiarias[oracaoAtualId]){
+      const hoje = obterDataLocalHoje();
+      const d = new Date();
+      const hora = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      rezadasDiarias[oracaoAtualId] = `${hora}:${min}`;
+      salvarRezadasDiarias({ data: hoje, ids: rezadasDiarias });
+      atualizarBotaoMarcarRezada();
+      renderizarTudo();
+      atualizarProgressoDiario();
+      mostrarToast('Oração concluída e marcada como rezada!', 'sucesso');
+    }
     pararFala();
     return;
   }
@@ -952,6 +1072,7 @@ document.getElementById('btn-excluir-atual').addEventListener('click', excluirOr
 document.getElementById('btn-compartilhar-atual').addEventListener('click', () => compartilharOracao(oracaoAtualId));
 document.getElementById('btn-falar').addEventListener('click', alternarFala);
 document.getElementById('btn-ler').addEventListener('click', pararFala);
+document.getElementById('btn-marcar-rezada').addEventListener('click', alternarRezadaManualmente);
 document.getElementById('btn-config-vozes').addEventListener('click', abrirConfigVozes);
 document.getElementById('btn-fechar-modal-vozes').addEventListener('click', fecharModalVozes);
 document.getElementById('btn-salvar-vozes').addEventListener('click', salvarConfigVozesModal);
