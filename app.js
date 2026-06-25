@@ -588,12 +588,17 @@ function construirArvore(texto, titulosVisitados){
       }else{
         const novosVisitados = new Set(titulosVisitados);
         novosVisitados.add(nomeLower);
-        for(let i = 1; i <= quantidade; i++){
-          const rotulo = quantidade > 1
-            ? `${encontrada.titulo} — ${i}/${quantidade}`
-            : encontrada.titulo;
+        if(quantidade > 1){
+          const subBlocos = [];
+          for(let i = 1; i <= quantidade; i++){
+            const rotulo = `${encontrada.titulo} — ${i}/${quantidade}`;
+            const filhos = construirArvore(encontrada.texto, novosVisitados);
+            subBlocos.push({ tipo: 'bloco', rotulo, filhos });
+          }
+          nos.push({ tipo: 'bloco', rotulo: `${encontrada.titulo} x${quantidade}`, filhos: subBlocos });
+        }else{
           const filhos = construirArvore(encontrada.texto, novosVisitados);
-          nos.push({ tipo: 'bloco', rotulo, filhos });
+          nos.push({ tipo: 'bloco', rotulo: encontrada.titulo, filhos });
         }
       }
     }
