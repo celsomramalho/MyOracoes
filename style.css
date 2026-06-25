@@ -227,7 +227,7 @@ html,body{
   text-transform: uppercase;
 }
 
-#input-titulo, #input-texto{
+#input-titulo, #input-texto, #input-oficial-titulo, #input-oficial-texto, #input-senha{
   width:100%;
   background: var(--superficie);
   border: 1px solid var(--borda);
@@ -236,13 +236,14 @@ html,body{
   font-family: 'EB Garamond', serif;
   font-size: 1.08rem;
   padding: 12px 14px;
+  box-sizing: border-box;
 }
-#input-titulo:focus, #input-texto:focus{
+#input-titulo:focus, #input-texto:focus, #input-oficial-titulo:focus, #input-oficial-texto:focus, #input-senha:focus{
   outline: none;
   border-color: var(--ouro);
 }
 
-#input-texto{
+#input-texto, #input-oficial-texto{
   min-height: 260px;
   resize: vertical;
   line-height: 1.7;
