@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B2238">
+<title>Minhas Orações</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <header class="topbar">
+    <div class="flame" aria-hidden="true"><span></span></div>
+    <h1>Minhas Orações</h1>
+  </header>
+
+  <!-- TELA INICIAL: FAVORITAS -->
+  <main id="view-home" class="view view-active">
+    <div class="toolbar">
+      <h2 class="titulo-secao">Favoritas</h2>
+      <button id="btn-ver-todas" class="btn-link">Ver todas →</button>
+    </div>
+    <div id="lista-favoritas" class="lista-oracoes"></div>
+    <p id="empty-favoritas" class="empty-state hidden">
+      Você ainda não tem orações favoritas.<br>
+      Toque na estrela de uma oração para marcá-la aqui, ou crie uma nova.
+    </p>
+  </main>
+
+  <!-- TELA: TODAS AS ORAÇÕES -->
+  <main id="view-todas" class="view">
+    <button class="btn-voltar" data-voltar="view-home">← Voltar</button>
+    <h2 class="titulo-secao">Todas as orações</h2>
+    <div id="lista-todas" class="lista-oracoes"></div>
+    <p id="empty-todas" class="empty-state hidden">
+      Nenhuma oração cadastrada ainda.<br>
+      Toque no botão "+" para criar a primeira.
+    </p>
+  </main>
+
+  <!-- TELA: CRIAR / EDITAR -->
+  <main id="view-editor" class="view">
+    <button class="btn-voltar" id="btn-cancelar-editor">← Cancelar</button>
+    <h2 class="titulo-secao" id="editor-cabecalho">Nova oração</h2>
+
+    <label class="campo-label" for="input-titulo">Título</label>
+    <input id="input-titulo" type="text" placeholder="Ex: Ave Maria" autocomplete="off">
+
+    <div class="editor-toolbar">
+      <label class="campo-label" for="input-texto">Texto</label>
+      <button id="btn-inserir-oracao" class="btn-secundario" type="button">+ Inserir oração</button>
+    </div>
+    <textarea id="input-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
+    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva, use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena).</p>
+
+    <button id="btn-salvar" class="btn-primario">Salvar oração</button>
+  </main>
+
+  <!-- TELA: REZAR -->
+  <main id="view-rezar" class="view">
+    <button class="btn-voltar" id="btn-voltar-rezar">← Voltar</button>
+
+    <div class="rezar-cabecalho">
+      <h2 id="rezar-titulo"></h2>
+      <button id="btn-favoritar-rezar" class="btn-estrela" aria-label="Favoritar">☆</button>
+    </div>
+
+    <div class="rezar-acoes">
+      <button id="btn-falar" class="btn-secundario">🔊 Rezar em voz alta</button>
+      <button id="btn-config-vozes" class="btn-secundario">⚙️ Vozes</button>
+      <button id="btn-editar-atual" class="btn-secundario">Editar</button>
+      <button id="btn-excluir-atual" class="btn-secundario btn-perigo">Excluir</button>
+    </div>
+
+    <div id="rezar-texto" class="texto-oracao"></div>
+  </main>
+
+  <button id="fab-nova" class="fab" aria-label="Nova oração">+</button>
+
+  <!-- MODAL: INSERIR ORAÇÃO -->
+  <div id="modal-inserir" class="modal hidden">
+    <div class="modal-conteudo">
+      <h3>Inserir oração</h3>
+      <p class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
+      <div id="lista-modal-inserir" class="lista-modal"></div>
+      <button id="btn-fechar-modal" class="btn-secundario">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL: VOZES -->
+  <div id="modal-vozes" class="modal hidden">
+    <div class="modal-conteudo">
+      <h3>Vozes da leitura</h3>
+      <p class="dica">Escolha uma voz para cada narrador. As vozes disponíveis dependem do seu aparelho ou navegador.</p>
+
+      <label class="campo-label" for="select-voz-v">Voz do V. (primeiro narrador)</label>
+      <select id="select-voz-v"></select>
+
+      <label class="campo-label" for="select-voz-r">Voz do R. (segunda voz)</label>
+      <select id="select-voz-r"></select>
+
+      <div class="modal-botoes">
+        <button id="btn-salvar-vozes" class="btn-primario">Salvar</button>
+        <button id="btn-fechar-modal-vozes" class="btn-secundario">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
