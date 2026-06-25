@@ -17,6 +17,16 @@
   {
     "id": "oficial_mqtuc5nv",
     "titulo": "Angelus (tempo comum)",
-    "texto": "V. O anjo do Senhor anunciou a Maria.\nR. E ela concebeu do Espírito Santo.\n[Ave Maria]\n\nV. Eis aqui a escrava do Senhor.\nR. Faça-se em mim segundo a vossa palavra.\n[Ave Maria]\n\nV. E o Verbo se fez carne.\nR. E habitou entre nós.\n[Ave Maria]\n\nV. Rogai por nós, santa Mãe de Deus.\nR. Para que sejamos dignos das promessas de Cristo.\n\nV. Oremos\nV. Infundi, Senhor, nós vos pedimos, em nossas almas a vossa graça, para que nós, que conhecemos pela anunciação do Anjo a encarnação de Jesus Cristo, vosso Filho, cheguemos por sua paixão e sua cruz à glória da ressurreição. Pelo mesmo Cristo, Senhor nosso. \nR. Amém."
+    "texto": "V. O anjo do Senhor anunciou a Maria.\nR. E ela concebeu do Espírito Santo.\n[Ave Maria]\n\nV. Eis aqui a escrava do Senhor.\nR. Faça-se em mim segundo a vossa palavra.\n[Ave Maria]\n\nV. E o Verbo se fez carne.\nR. E habitou entre nós.\n[Ave Maria]\n\nV. Rogai por nós, santa Mãe de Deus.\nR. Para que sejamos dignos das promessas de Cristo.\n\nV. Oremos\nV. Infundi, Senhor, nós vos pedimos, em nossas almas a vossa graça, para que nós, que conhecemos pela anunciação do Anjo a encarnação de Jesus Cristo, vosso Filho, cheguemos por sua paixão e sua cruz à glória da ressurreição. Pelo mesmo Cristo, Senhor nosso. Amém."
+  },
+  {
+    "id": "oficial_mqtzgbps",
+    "titulo": "Dezena terco",
+    "texto": "[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\nV. Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas para o Céu e socorrei principalmente as que mais precisarem.\nR. Ó Virgem Dolorosíssima, as Vossas Lágrimas derrubaram o império infernal!"
+  },
+  {
+    "id": "oficial_mqtzl9dc",
+    "titulo": "Mistério Gozoso",
+    "texto": "1 Mistério: A Encarnação do Senhor\n[Dezena terco]\n2 Mistério: A visitação de Nossa Senhora à sua prima Santa Isabel\n[Dezena terco]\n3 Mistério: O Nascimento do Filho de Deus em Belém\n[Dezena terco]\n4 Mistério: A purificação de Nossa Senhora\n[Dezena terco]\n5 Mistério: Jesus perdido e achado no templo\n[Dezena terco]\n"
   }
 ]
