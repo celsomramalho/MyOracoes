@@ -19,14 +19,20 @@
 
   <header class="topbar">
     <div class="flame" aria-hidden="true"><span></span></div>
-    <h1>Minhas Orações</h1>
+    <h1 id="topbar-titulo">Minhas Orações</h1>
+    <button id="btn-topbar-home" class="btn-topbar-home hidden" title="Voltar para a Home" aria-label="Voltar para a Home">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </button>
   </header>
 
-  <!-- TELA INICIAL: FAVORITAS -->
+  <!-- TELA INICIAL: HOME -->
   <main id="view-home" class="view view-active">
-    <div class="toolbar">
-      <h2 class="titulo-secao">★ Favoritas</h2>
-      <button id="btn-ver-todas" class="btn-link">Ver minhas orações →</button>
+    <div class="home-nav-container">
+      <button id="btn-ver-todas" class="btn-nav-home">✏️ Minhas Orações</button>
+      <button id="btn-ver-oficiais" class="btn-nav-home">📜 Orações Oficiais</button>
     </div>
     <div id="progresso-diario" class="progresso-diario-container"></div>
     <div id="lista-favoritas" class="lista-oracoes"></div>
@@ -34,7 +40,6 @@
       Você ainda não tem orações favoritas.<br>
       Toque na estrela de uma oração para marcá-la aqui, ou crie uma nova.
     </p>
-    <button id="btn-ver-oficiais" class="btn-link btn-oficiais-home">📜 Ver orações oficiais →</button>
 
     <!-- Exportar / Importar -->
     <div class="acoes-backup">
@@ -45,8 +50,6 @@
 
   <!-- TELA: TODAS AS ORAÇÕES (PESSOAIS) -->
   <main id="view-todas" class="view">
-    <button class="btn-voltar" data-voltar="view-home">← Voltar</button>
-    <h2 class="titulo-secao">Todas as orações</h2>
     <div id="lista-todas" class="lista-oracoes"></div>
     <p id="empty-todas" class="empty-state hidden">
       Nenhuma oração cadastrada ainda.<br>
@@ -56,8 +59,6 @@
 
   <!-- TELA: ORAÇÕES OFICIAIS (SOMENTE LEITURA) -->
   <main id="view-oficiais" class="view">
-    <button class="btn-voltar" data-voltar="view-home">← Voltar</button>
-    <h2 class="titulo-secao">Orações oficiais</h2>
     <div id="lista-oficiais" class="lista-oracoes"></div>
     <p id="empty-oficiais" class="empty-state hidden">
       Nenhuma oração oficial cadastrada ainda.
@@ -66,9 +67,6 @@
 
   <!-- TELA: CRIAR / EDITAR -->
   <main id="view-editor" class="view">
-    <button class="btn-voltar" id="btn-cancelar-editor">← Cancelar</button>
-    <h2 class="titulo-secao" id="editor-cabecalho">Nova oração</h2>
-
     <label class="campo-label" for="input-titulo">Título</label>
     <input id="input-titulo" type="text" placeholder="Ex: Ave Maria" autocomplete="off">
 
@@ -80,12 +78,11 @@
     <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena).</p>
 
     <button id="btn-salvar" class="btn-primario">Salvar oração</button>
+    <button id="btn-excluir-editor" class="btn-secundario btn-perigo" style="margin-top: 10px; width: 100%;">Excluir oração</button>
   </main>
 
   <!-- TELA: REZAR -->
   <main id="view-rezar" class="view">
-    <button class="btn-voltar" id="btn-voltar-rezar">← Voltar</button>
-
     <div class="rezar-cabecalho">
       <h2 id="rezar-titulo"></h2>
       <button id="btn-favoritar-rezar" class="btn-estrela" aria-label="Favoritar">☆</button>
@@ -93,14 +90,21 @@
 
     <div class="rezar-acoes">
       <button id="btn-ler" class="btn-secundario apenas-home">📖 Ler</button>
-      <button id="btn-falar" class="btn-secundario">🔊 Rezar em voz alta</button>
+      <button id="btn-falar" class="btn-secundario">🔊 Testar fala</button>
       <button id="btn-marcar-rezada" class="btn-secundario">✓ Marcar como rezada</button>
       <button id="btn-reiniciar-progresso" class="btn-secundario" title="Apagar marcações de progresso desta oração">🔄 Reiniciar progresso</button>
       <button id="btn-velocidade" class="btn-secundario">⚡ 1.0x</button>
       <button id="btn-config-vozes" class="btn-secundario oculto-home">⚙️ Vozes</button>
-      <button id="btn-compartilhar-atual" class="btn-secundario editar-excluir">📤 Compartilhar</button>
-      <button id="btn-editar-atual" class="btn-secundario editar-excluir">Editar</button>
-      <button id="btn-excluir-atual" class="btn-secundario btn-perigo editar-excluir">Excluir</button>
+      <button id="btn-compartilhar-atual" class="btn-secundario editar-excluir">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        Compartilhar
+      </button>
     </div>
 
     <div id="rezar-texto" class="texto-oracao"></div>

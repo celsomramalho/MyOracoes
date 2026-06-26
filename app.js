@@ -113,12 +113,35 @@ function mostrarView(id){
   pararFala();
   window.scrollTo(0,0);
 
+  // Controle do FAB: Só aparece em view-todas
   const fab = document.getElementById('fab-nova');
   if(fab){
-    if(id === 'view-home' || id === 'view-todas'){
+    if(id === 'view-todas'){
       fab.style.display = '';
     } else {
       fab.style.display = 'none';
+    }
+  }
+
+  // Atualização do título do cabeçalho global e do botão home da topbar
+  const topbarTitulo = document.getElementById('topbar-titulo');
+  const btnTopbarHome = document.getElementById('btn-topbar-home');
+  
+  if (topbarTitulo && btnTopbarHome) {
+    if (id === 'view-home') {
+      topbarTitulo.textContent = 'Minhas Orações';
+      btnTopbarHome.classList.add('hidden');
+    } else {
+      btnTopbarHome.classList.remove('hidden');
+      if (id === 'view-todas') {
+        topbarTitulo.textContent = 'Minhas Orações';
+      } else if (id === 'view-oficiais') {
+        topbarTitulo.textContent = 'Orações Oficiais';
+      } else if (id === 'view-editor') {
+        topbarTitulo.textContent = editandoId ? '✏️ Criar/Editar' : '✏️ Criar/Editar';
+      } else if (id === 'view-rezar') {
+        topbarTitulo.textContent = '🙏 Modo Rezar';
+      }
     }
   }
 }
@@ -179,7 +202,13 @@ function criarCardOracao(oracao, origem, tipo){
     }
   });
 
-  card.addEventListener('click', () => abrirRezar(oracao.id, origem, tipo || 'pessoal'));
+  card.addEventListener('click', () => {
+    if (tipo === 'pessoal' && origem === 'todas') {
+      abrirEditor(oracao.id);
+    } else {
+      abrirRezar(oracao.id, origem, tipo || 'pessoal');
+    }
+  });
   return card;
 }
 
@@ -302,19 +331,19 @@ function alternarFavoritoOficial(id){
 // ===================== EDITOR (CRIAR / EDITAR) =====================
 function abrirEditor(id){
   editandoId = id || null;
-  const titulo = document.getElementById('editor-cabecalho');
   const inputTitulo = document.getElementById('input-titulo');
   const inputTexto = document.getElementById('input-texto');
 
+  const btnExcluir = document.getElementById('btn-excluir-editor');
   if(editandoId){
     const o = ORACOES.find(x => x.id === editandoId);
-    titulo.textContent = 'Editar oração';
     inputTitulo.value = o ? o.titulo : '';
     inputTexto.value = o ? o.texto : '';
+    if(btnExcluir) btnExcluir.style.display = '';
   }else{
-    titulo.textContent = 'Nova oração';
     inputTitulo.value = '';
     inputTexto.value = '';
+    if(btnExcluir) btnExcluir.style.display = 'none';
   }
   mostrarView('view-editor');
   inputTitulo.focus();
@@ -358,10 +387,9 @@ function salvarEditor(){
   mostrarToast('Oração salva com sucesso!', 'sucesso');
 
   if(editandoId){
-    abrirRezar(editandoId, 'todas', 'pessoal');
+    mostrarView('view-todas');
   }else{
-    const nova = ORACOES[ORACOES.length - 1];
-    abrirRezar(nova.id, 'todas', 'pessoal');
+    mostrarView('view-todas');
   }
 }
 
@@ -373,7 +401,7 @@ function excluirOracaoAtual(){
   ORACOES = ORACOES.filter(x => x.id !== oracaoAtualId);
   salvarOracoes(ORACOES);
   renderizarTudo();
-  mostrarView('view-home');
+  mostrarView('view-todas');
 }
 
 // ===================== TOAST NOTIFICAÇÃO =====================
@@ -469,12 +497,6 @@ function abrirRezar(id, origem, tipo){
   atualizarBotaoMarcarRezada();
   atualizarBotaoVelocidade();
   renderizarTextoRezar(o.texto);
-
-  // Esconder/mostrar botões de editar/excluir/compartilhar conforme tipo
-  const botoesEditarExcluir = document.querySelectorAll('.editar-excluir');
-  botoesEditarExcluir.forEach(btn => {
-    btn.style.display = ehOficial ? 'none' : '';
-  });
 
   // Botão compartilhar: apenas em pessoais
   const btnCompartilhar = document.getElementById('btn-compartilhar-atual');
@@ -1154,7 +1176,7 @@ function atualizarBotaoFala(){
   const btn = document.getElementById('btn-falar');
   if(!btn) return;
   if(!falando){
-    btn.textContent = '🔊 Rezar em voz alta';
+    btn.textContent = '🔊 Testar fala';
     btn.classList.remove('tocando');
   }else if(pausado){
     btn.textContent = '▶ Continuar';
@@ -1251,24 +1273,21 @@ function pararFala(){
 document.getElementById('btn-ver-todas').addEventListener('click', () => mostrarView('view-todas'));
 document.getElementById('btn-ver-oficiais').addEventListener('click', () => mostrarView('view-oficiais'));
 
-document.querySelectorAll('[data-voltar]').forEach(btn => {
-  btn.addEventListener('click', () => mostrarView(btn.dataset.voltar));
+document.getElementById('btn-topbar-home').addEventListener('click', () => {
+  const activeView = document.querySelector('.view-active');
+  if (activeView && activeView.id === 'view-editor' && editandoId) {
+    abrirRezar(editandoId, origemRezar, oracaoAtualTipo);
+  } else {
+    mostrarView('view-home');
+  }
 });
 
 document.getElementById('fab-nova').addEventListener('click', () => abrirEditor(null));
-document.getElementById('btn-cancelar-editor').addEventListener('click', () => {
-  mostrarView(editandoId ? 'view-rezar' : 'view-home');
-});
 document.getElementById('btn-salvar').addEventListener('click', salvarEditor);
 
 document.getElementById('btn-inserir-oracao').addEventListener('click', abrirModalInserir);
 document.getElementById('btn-fechar-modal').addEventListener('click', fecharModalInserir);
 
-document.getElementById('btn-voltar-rezar').addEventListener('click', () => {
-  if(origemRezar === 'todas') mostrarView('view-todas');
-  else if(origemRezar === 'oficiais') mostrarView('view-oficiais');
-  else mostrarView('view-home');
-});
 document.getElementById('btn-favoritar-rezar').addEventListener('click', () => {
   if(!oracaoAtualId) return;
   if(oracaoAtualTipo === 'oficial'){
@@ -1277,8 +1296,6 @@ document.getElementById('btn-favoritar-rezar').addEventListener('click', () => {
     alternarFavorito(oracaoAtualId);
   }
 });
-document.getElementById('btn-editar-atual').addEventListener('click', () => abrirEditor(oracaoAtualId));
-document.getElementById('btn-excluir-atual').addEventListener('click', excluirOracaoAtual);
 document.getElementById('btn-compartilhar-atual').addEventListener('click', () => compartilharOracao(oracaoAtualId));
 document.getElementById('btn-falar').addEventListener('click', alternarFala);
 document.getElementById('btn-ler').addEventListener('click', pararFala);
@@ -1292,6 +1309,16 @@ document.getElementById('btn-salvar-vozes').addEventListener('click', salvarConf
 // Exportar / Importar
 document.getElementById('btn-exportar-oracoes').addEventListener('click', exportarOracoes);
 document.getElementById('btn-importar-oracoes').addEventListener('click', importarOracoesDeArquivo);
+document.getElementById('btn-excluir-editor').addEventListener('click', () => {
+  if(!editandoId) return;
+  const o = ORACOES.find(x => x.id === editandoId);
+  if(!o) return;
+  if(!confirm(`Excluir a oração "${o.titulo}"? Essa ação não pode ser desfeita.`)) return;
+  ORACOES = ORACOES.filter(x => x.id !== editandoId);
+  salvarOracoes(ORACOES);
+  renderizarTudo();
+  mostrarView('view-todas');
+});
 
 // ===================== INICIALIZAÇÃO =====================
 renderizarTodas(); // renderiza pessoais imediatamente

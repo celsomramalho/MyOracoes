@@ -118,28 +118,59 @@ html,body{
   margin: 6px 0 14px;
 }
 
-.btn-link{
-  background:none;
-  border:none;
+.btn-topbar-home {
+  background: none;
+  border: none;
   color: var(--ouro);
-  font-family: 'EB Garamond', serif;
-  font-size: 1rem;
   cursor: pointer;
-  padding: 4px 0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  transition: background 0.15s, color 0.15s;
 }
-.btn-link:hover{ color: var(--ouro-suave); }
+.btn-topbar-home:hover {
+  background: var(--superficie-alta);
+  color: var(--ouro-suave);
+}
+.btn-topbar-home.hidden {
+  display: none;
+}
 
-.btn-voltar{
-  background:none;
-  border:none;
-  color: var(--texto-suave);
-  font-size: 1rem;
-  font-family: 'EB Garamond', serif;
-  cursor: pointer;
-  padding: 10px 0;
-  margin-bottom: 4px;
+/* Container de navegação na Home */
+.home-nav-container {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0 20px;
 }
-.btn-voltar:hover{ color: var(--texto); }
+.btn-nav-home {
+  flex: 1;
+  background: var(--superficie);
+  border: 1.5px solid var(--borda);
+  color: var(--texto);
+  border-radius: 12px;
+  padding: 14px 10px;
+  font-size: 1.05rem;
+  font-family: 'EB Garamond', serif;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+.btn-nav-home:hover {
+  border-color: var(--ouro);
+  background: var(--superficie-alta);
+}
+.btn-nav-home:active {
+  transform: scale(0.98);
+}
 
 /* ---------- CARDS DE ORAÇÃO ---------- */
 .lista-oracoes{
