@@ -625,13 +625,8 @@ function construirArvore(texto, titulosVisitados){
         const novosVisitados = new Set(titulosVisitados);
         novosVisitados.add(nomeLower);
         if(quantidade > 1){
-          const subBlocos = [];
-          for(let i = 1; i <= quantidade; i++){
-            const rotulo = `${encontrada.titulo} — ${i}/${quantidade}`;
-            const filhos = construirArvore(encontrada.texto, novosVisitados);
-            subBlocos.push({ tipo: 'bloco', rotulo, filhos });
-          }
-          nos.push({ tipo: 'bloco', rotulo: `${encontrada.titulo} x${quantidade}`, filhos: subBlocos });
+          const filhos = construirArvore(encontrada.texto, novosVisitados);
+          nos.push({ tipo: 'repetido', rotulo: encontrada.titulo, quantidade, filhos });
         }else{
           const filhos = construirArvore(encontrada.texto, novosVisitados);
           nos.push({ tipo: 'bloco', rotulo: encontrada.titulo, filhos });
@@ -712,7 +707,7 @@ function renderizarNos(nos, container, ctx){
       }
       container.appendChild(wrapper);
 
-    }else if(g.tipo === 'bloco'){
+    }else if(g.tipo === 'bloco' || g.tipo === 'repetido'){
       const idx = ctx ? ctx.n++ : -1;
       const divBloco = document.createElement('div');
       divBloco.className = 'bloco-ref';
@@ -728,7 +723,7 @@ function renderizarNos(nos, container, ctx){
 
       const textoSpan = document.createElement('span');
       textoSpan.className = 'bloco-ref-texto';
-      textoSpan.textContent = ' ' + g.rotulo;
+      textoSpan.textContent = ' ' + g.rotulo + (g.tipo === 'repetido' ? ` x${g.quantidade}` : '');
       divTitulo.appendChild(textoSpan);
 
       if(ctx){
@@ -739,6 +734,56 @@ function renderizarNos(nos, container, ctx){
 
       const divConteudo = document.createElement('div');
       divConteudo.className = 'bloco-ref-conteudo';
+
+      if(g.tipo === 'repetido'){
+        // Criar fileira de contas
+        const fileira = document.createElement('div');
+        fileira.className = 'fileira-contas';
+        
+        // Vamos guardar o progresso desse bloco repetido no localStorage de forma reativa
+        // Usaremos uma chave como: `contas_${oracaoId}_${idx}`
+        const chaveContas = `contas_${oracaoAtualId}_${idx}`;
+        let contasConcluidas = parseInt(localStorage.getItem(chaveContas) || '0', 10);
+
+        for(let i = 1; i <= g.quantidade; i++){
+          const conta = document.createElement('button');
+          conta.className = 'conta-terco';
+          conta.dataset.contaIdx = i;
+          if(i <= contasConcluidas) {
+            conta.classList.add('concluida');
+          }
+          conta.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const atual = parseInt(conta.dataset.contaIdx, 10);
+            
+            // Se clicar na última já concluída, desmarca aquela e as seguintes. Caso contrário, marca até ela.
+            if(atual === contasConcluidas){
+              contasConcluidas = atual - 1;
+            } else {
+              contasConcluidas = atual;
+            }
+            
+            localStorage.setItem(chaveContas, contasConcluidas);
+            
+            // Atualizar classes das contas do bloco
+            fileira.querySelectorAll('.conta-terco').forEach(c => {
+              const cIdx = parseInt(c.dataset.contaIdx, 10);
+              c.classList.toggle('concluida', cIdx <= contasConcluidas);
+            });
+
+            // Se todas as contas foram rezadas, marcar o bloco como rezado
+            if(ctx){
+              if(contasConcluidas === g.quantidade){
+                marcarSecao(ctx.oracaoId, idx);
+              } else {
+                desmarcarSecao(ctx.oracaoId, idx);
+              }
+            }
+          });
+          fileira.appendChild(conta);
+        }
+        divConteudo.appendChild(fileira);
+      }
 
       divTitulo.addEventListener('click', (e) => {
         if(e.target.classList.contains('btn-check-secao')) return;
@@ -808,6 +853,16 @@ function limparProgressoLeitura(){
   if(!oracaoAtualId) return;
   delete progressoLeitura[oracaoAtualId];
   salvarProgressoLeitura();
+  
+  // Limpar chaves de progresso de contas repetidas
+  for (let i = 0; i < localStorage.length; i++) {
+    const chave = localStorage.key(i);
+    if (chave && chave.startsWith(`contas_${oracaoAtualId}_`)) {
+      localStorage.removeItem(chave);
+      i--; // ajusta index pois removemos item
+    }
+  }
+
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoAtualId){
     atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
   }
@@ -822,6 +877,25 @@ function atualizarVisuaisProgresso(oracaoId, elementos){
     el.classList.toggle('secao-concluida', marcada);
     btn.classList.toggle('ativo', marcada);
     btn.title = marcada ? 'Desmarcar' : 'Marcar como rezada';
+
+    // Se for um bloco repetido, atualizar o estado visual de suas contas
+    const fileira = el.querySelector('.fileira-contas');
+    if(fileira) {
+      const chaveContas = `contas_${oracaoId}_${idx}`;
+      if (marcada) {
+        // Se a seção inteira está marcada, todas as contas ficam concluídas
+        fileira.querySelectorAll('.conta-terco').forEach(c => {
+          c.classList.add('concluida');
+        });
+      } else {
+        // Senão, lê o progresso individual
+        const contasConcluidas = parseInt(localStorage.getItem(chaveContas) || '0', 10);
+        fileira.querySelectorAll('.conta-terco').forEach(c => {
+          const cIdx = parseInt(c.dataset.contaIdx, 10);
+          c.classList.toggle('concluida', cIdx <= contasConcluidas);
+        });
+      }
+    }
   });
 }
 
@@ -1128,17 +1202,86 @@ let pausado = false;
 let utteranciaAtual = null;
 
 function obterLinhasParaFalar(){
-  const paragrafos = document.querySelectorAll('#rezar-texto p');
+  const container = document.getElementById('rezar-texto');
   const linhas = [];
-  paragrafos.forEach(p => {
-    if(p.classList.contains('linha-ref')) return;
-    let texto = p.textContent.replace(/^V\.\s*/,'').replace(/^R\.\s*/,'').trim();
-    if(!texto) return;
-    // Identifica a seção à qual este parágrafo pertence
-    const secaoEl = p.closest('[data-secao-idx]');
-    const secaoIdx = secaoEl ? parseInt(secaoEl.dataset.secaoIdx) : -1;
-    linhas.push({ elemento: p, texto, voz2: p.classList.contains('linha-r'), secaoIdx });
+
+  // Função recursiva para varrer os nós do DOM no container de rezar
+  function varrerEl(el) {
+    if (el.classList && el.classList.contains('bloco-ref')) {
+      const secaoIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : -1;
+      const fileira = el.querySelector(':scope > .bloco-ref-conteudo > .fileira-contas');
+      
+      if (fileira) {
+        // Bloco repetido! Pegamos o número de contas (quantidade)
+        const contas = fileira.querySelectorAll('.conta-terco');
+        const quantidade = contas.length;
+        
+        // Coletamos todos os parágrafos filhos diretos ou internos desse bloco que seriam lidos
+        const conteudoDiv = el.querySelector(':scope > .bloco-ref-conteudo');
+        
+        // Pegamos as linhas que estão DENTRO do conteúdo, mas EXCLUINDO outros sub-blocos ou repetidos (serão lidos em sua própria vez se houverem, mas simplificando, pegamos parágrafos que pertencem a este escopo de repetição)
+        // Vamos extrair apenas os parágrafos válidos dentro desse bloco de forma sequencial
+        const pInternos = [];
+        conteudoDiv.querySelectorAll('p').forEach(p => {
+          // Garante que o parágrafo pertence a este bloco e não a um sub-bloco interno
+          if (p.closest('.bloco-ref') === el) {
+            pInternos.push(p);
+          }
+        });
+
+        // Repete o bloco inteiro de parágrafos 'quantidade' de vezes
+        for (let i = 1; i <= quantidade; i++) {
+          pInternos.forEach(p => {
+            if (p.classList.contains('linha-ref')) return;
+            let texto = p.textContent.replace(/^V\.\s*/,'').replace(/^R\.\s*/,'').trim();
+            if(!texto) return;
+            linhas.push({
+              elemento: p,
+              texto,
+              voz2: p.classList.contains('linha-r'),
+              secaoIdx,
+              repetido: true,
+              contaIdx: i,
+              blocoEl: el
+            });
+          });
+        }
+      } else {
+        // Bloco normal
+        const conteudoDiv = el.querySelector(':scope > .bloco-ref-conteudo');
+        if (conteudoDiv) {
+          Array.from(conteudoDiv.children).forEach(filho => {
+            varrerEl(filho);
+          });
+        }
+      }
+    } else if (el.classList && el.classList.contains('grupo-texto-secao')) {
+      const secaoIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : -1;
+      el.querySelectorAll('p').forEach(p => {
+        let texto = p.textContent.replace(/^V\.\s*/,'').replace(/^R\.\s*/,'').trim();
+        if(!texto) return;
+        linhas.push({
+          elemento: p,
+          texto,
+          voz2: p.classList.contains('linha-r'),
+          secaoIdx,
+          repetido: false
+        });
+      });
+    } else {
+      // Outros elementos ou filhos normais
+      if (el.children) {
+        Array.from(el.children).forEach(filho => {
+          varrerEl(filho);
+        });
+      }
+    }
+  }
+
+  Array.from(container.children).forEach(filho => {
+    varrerEl(filho);
   });
+
   return linhas;
 }
 
@@ -1229,6 +1372,16 @@ function falarProximaLinha(){
   item.elemento.classList.add('linha-falando');
   item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
 
+  // Pulsar conta ativa se for bloco repetido
+  document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
+  if (item.repetido && item.blocoEl) {
+    const fileira = item.blocoEl.querySelector('.fileira-contas');
+    if (fileira) {
+      const contaAtiva = fileira.querySelector(`.conta-terco[data-conta-idx="${item.contaIdx}"]`);
+      if (contaAtiva) contaAtiva.classList.add('ativa');
+    }
+  }
+
   const utterancia = new SpeechSynthesisUtterance(item.texto);
   utterancia.lang = 'pt-BR';
   utterancia.rate = velocidadeAtual;
@@ -1248,6 +1401,23 @@ function falarProximaLinha(){
   utterancia.onend = () => {
     if(!falando || pausado) return;
     const secaoIdxAtual = item.secaoIdx;
+    
+    // Se for repetido e chegamos ao final de uma repetição desta conta (verificamos se a próxima linha é da próxima conta ou se mudou de seção)
+    const proximoItem = filaFala[indiceFalaAtual + 1];
+    if (item.repetido && item.blocoEl && (!proximoItem || proximoItem.contaIdx !== item.contaIdx || proximoItem.secaoIdx !== secaoIdxAtual)) {
+      const chaveContas = `contas_${oracaoAtualId}_${secaoIdxAtual}`;
+      localStorage.setItem(chaveContas, item.contaIdx);
+      
+      const fileira = item.blocoEl.querySelector('.fileira-contas');
+      if (fileira) {
+        fileira.querySelectorAll('.conta-terco').forEach(c => {
+          const cIdx = parseInt(c.dataset.contaIdx, 10);
+          c.classList.toggle('concluida', cIdx <= item.contaIdx);
+          if (cIdx === item.contaIdx) c.classList.remove('ativa');
+        });
+      }
+    }
+
     indiceFalaAtual++;
     // Auto-marca a seção quando a voz termina todas as linhas dela
     if(oracaoAtualId && secaoIdxAtual >= 0 && secaoCtxAtual){
@@ -1282,6 +1452,7 @@ function pararFala(){
   }
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
   document.querySelectorAll('.linha-falando').forEach(el => el.classList.remove('linha-falando'));
+  document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
   atualizarBotaoFala();
 }
 
