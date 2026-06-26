@@ -1209,81 +1209,75 @@ function obterLinhasParaFalar(){
   const container = document.getElementById('rezar-texto');
   const linhas = [];
 
-  // Função recursiva para varrer os nós do DOM no container de rezar
-  function varrerEl(el) {
-    if (el.classList && el.classList.contains('bloco-ref')) {
-      const secaoIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : -1;
+  // Função recursiva para extrair as falas.
+  // Se ela encontrar um bloco repetido, ela repete todo o fluxo dos filhos daquele bloco.
+  // Se encontrar um parágrafo de fala direta (em grupo-texto-secao), adiciona à lista.
+  // secaoIdx: índice da seção raiz (para salvar progresso principal).
+  // infoRepeticao: array com informações das repetições pai [{ blocoEl, contaIdx, repetido: true }, ...]
+  function extrairElemento(el, secaoIdx, infoRepeticao) {
+    if (!el || !el.classList) return;
+
+    if (el.classList.contains('bloco-ref')) {
+      const secaoAtualIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : secaoIdx;
       const fileira = el.querySelector(':scope > .bloco-ref-conteudo > .fileira-contas');
-      
-      if (fileira) {
-        // Bloco repetido! Pegamos o número de contas (quantidade)
+      const conteudoDiv = el.querySelector(':scope > .bloco-ref-conteudo');
+
+      if (fileira && conteudoDiv) {
+        // Bloco repetido!
         const contas = fileira.querySelectorAll('.conta-terco');
         const quantidade = contas.length;
-        
-        // Coletamos todos os parágrafos filhos diretos ou internos desse bloco que seriam lidos
-        const conteudoDiv = el.querySelector(':scope > .bloco-ref-conteudo');
-        
-        // Pegamos as linhas que estão DENTRO do conteúdo, mas EXCLUINDO outros sub-blocos ou repetidos (serão lidos em sua própria vez se houverem, mas simplificando, pegamos parágrafos que pertencem a este escopo de repetição)
-        // Vamos extrair apenas os parágrafos válidos dentro desse bloco de forma sequencial
-        const pInternos = [];
-        conteudoDiv.querySelectorAll('p').forEach(p => {
-          // Garante que o parágrafo pertence a este bloco e não a um sub-bloco interno
-          if (p.closest('.bloco-ref') === el) {
-            pInternos.push(p);
-          }
-        });
 
-        // Repete o bloco inteiro de parágrafos 'quantidade' de vezes
+        // Para cada repetição do bloco...
         for (let i = 1; i <= quantidade; i++) {
-          pInternos.forEach(p => {
-            if (p.classList.contains('linha-ref')) return;
-            let texto = p.textContent.replace(/^V\.\s*/,'').replace(/^R\.\s*/,'').trim();
-            if(!texto) return;
-            linhas.push({
-              elemento: p,
-              texto,
-              voz2: p.classList.contains('linha-r'),
-              secaoIdx,
-              repetido: true,
-              contaIdx: i,
-              blocoEl: el
-            });
-          });
-        }
-      } else {
-        // Bloco normal
-        const conteudoDiv = el.querySelector(':scope > .bloco-ref-conteudo');
-        if (conteudoDiv) {
+          const novaInfo = [...infoRepeticao, { blocoEl: el, contaIdx: i, repetido: true }];
+          
+          // Processa os filhos do conteúdo de forma recursiva mantendo a ordem sequencial dos elementos
           Array.from(conteudoDiv.children).forEach(filho => {
-            varrerEl(filho);
+            // Ignoramos a própria fileira de contas durante a leitura das falas
+            if (filho.classList.contains('fileira-contas')) return;
+            extrairElemento(filho, secaoAtualIdx, novaInfo);
           });
         }
+      } else if (conteudoDiv) {
+        // Bloco normal
+        Array.from(conteudoDiv.children).forEach(filho => {
+          extrairElemento(filho, secaoAtualIdx, infoRepeticao);
+        });
       }
-    } else if (el.classList && el.classList.contains('grupo-texto-secao')) {
-      const secaoIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : -1;
+    } else if (el.classList.contains('grupo-texto-secao')) {
+      const secaoAtualIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : secaoIdx;
       el.querySelectorAll('p').forEach(p => {
+        if (p.classList.contains('linha-ref')) return;
         let texto = p.textContent.replace(/^V\.\s*/,'').replace(/^R\.\s*/,'').trim();
         if(!texto) return;
+
+        // Se houver repetições ativas, associamos as informações da repetição mais interna (última do array)
+        const infoMaisInterna = infoRepeticao[infoRepeticao.length - 1];
+        
         linhas.push({
           elemento: p,
           texto,
           voz2: p.classList.contains('linha-r'),
-          secaoIdx,
-          repetido: false
+          secaoIdx: secaoAtualIdx,
+          repetido: infoRepeticao.length > 0,
+          contaIdx: infoMaisInterna ? infoMaisInterna.contaIdx : 1,
+          blocoEl: infoMaisInterna ? infoMaisInterna.blocoEl : null,
+          historicoRepeticoes: infoRepeticao // Guardamos a pilha de repetições ativas para controle posterior
         });
       });
     } else {
-      // Outros elementos ou filhos normais
+      // Caso seja outro container (ex: div wrapper ou conteúdo direto)
       if (el.children) {
         Array.from(el.children).forEach(filho => {
-          varrerEl(filho);
+          extrairElemento(filho, secaoIdx, infoRepeticao);
         });
       }
     }
   }
 
+  // Inicializa varredura na raiz do container principal
   Array.from(container.children).forEach(filho => {
-    varrerEl(filho);
+    extrairElemento(filho, -1, []);
   });
 
   return linhas;
@@ -1376,14 +1370,16 @@ function falarProximaLinha(){
   item.elemento.classList.add('linha-falando');
   item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
 
-  // Pulsar conta ativa se for bloco repetido
+  // Pulsar conta ativa se for bloco repetido (suporta aninhadas)
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
-  if (item.repetido && item.blocoEl) {
-    const fileira = item.blocoEl.querySelector('.fileira-contas');
-    if (fileira) {
-      const contaAtiva = fileira.querySelector(`.conta-terco[data-conta-idx="${item.contaIdx}"]`);
-      if (contaAtiva) contaAtiva.classList.add('ativa');
-    }
+  if (item.repetido && item.historicoRepeticoes) {
+    item.historicoRepeticoes.forEach(rep => {
+      const fileira = rep.blocoEl.querySelector('.fileira-contas');
+      if (fileira) {
+        const contaAtiva = fileira.querySelector(`.conta-terco[data-conta-idx="${rep.contaIdx}"]`);
+        if (contaAtiva) contaAtiva.classList.add('ativa');
+      }
+    });
   }
 
   const utterancia = new SpeechSynthesisUtterance(item.texto);
@@ -1406,20 +1402,32 @@ function falarProximaLinha(){
     if(!falando || pausado) return;
     const secaoIdxAtual = item.secaoIdx;
     
-    // Se for repetido e chegamos ao final de uma repetição desta conta (verificamos se a próxima linha é da próxima conta ou se mudou de seção)
+    // Se for repetido, atualizar o progresso de cada bloco da pilha que concluiu uma repetição
     const proximoItem = filaFala[indiceFalaAtual + 1];
-    if (item.repetido && item.blocoEl && (!proximoItem || proximoItem.contaIdx !== item.contaIdx || proximoItem.secaoIdx !== secaoIdxAtual)) {
-      const chaveContas = `contas_${oracaoAtualId}_${secaoIdxAtual}`;
-      localStorage.setItem(chaveContas, item.contaIdx);
-      
-      const fileira = item.blocoEl.querySelector('.fileira-contas');
-      if (fileira) {
-        fileira.querySelectorAll('.conta-terco').forEach(c => {
-          const cIdx = parseInt(c.dataset.contaIdx, 10);
-          c.classList.toggle('concluida', cIdx <= item.contaIdx);
-          if (cIdx === item.contaIdx) c.classList.remove('ativa');
-        });
-      }
+    if (item.repetido && item.historicoRepeticoes) {
+      item.historicoRepeticoes.forEach(rep => {
+        // Encontra no próximo item a mesma repetição (mesmo bloco)
+        const proxRep = proximoItem && proximoItem.historicoRepeticoes 
+          ? proximoItem.historicoRepeticoes.find(r => r.blocoEl === rep.blocoEl)
+          : null;
+        
+        // Se mudou de conta ou acabou a repetição deste bloco específico
+        if (!proxRep || proxRep.contaIdx !== rep.contaIdx) {
+          // Identifica o índice de seção do bloco para salvar progresso
+          const blocoSecaoIdx = rep.blocoEl.dataset.secaoIdx;
+          const chaveContas = `contas_${oracaoAtualId}_${blocoSecaoIdx != null ? blocoSecaoIdx : secaoIdxAtual}`;
+          localStorage.setItem(chaveContas, rep.contaIdx);
+          
+          const fileira = rep.blocoEl.querySelector('.fileira-contas');
+          if (fileira) {
+            fileira.querySelectorAll('.conta-terco').forEach(c => {
+              const cIdx = parseInt(c.dataset.contaIdx, 10);
+              c.classList.toggle('concluida', cIdx <= rep.contaIdx);
+              if (cIdx === rep.contaIdx) c.classList.remove('ativa');
+            });
+          }
+        }
+      });
     }
 
     indiceFalaAtual++;
