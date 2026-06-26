@@ -133,6 +133,11 @@
     <label class="campo-label" for="input-oficial-titulo">Título</label>
     <input id="input-oficial-titulo" type="text" placeholder="Ex: Pai Nosso" autocomplete="off">
 
+    <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 8px;">
+      <input id="checkbox-oficial-oculta" type="checkbox" style="width: 20px; height: 20px; cursor: pointer;">
+      <label for="checkbox-oficial-oculta" class="dica" style="margin: 0; cursor: pointer; user-select: none; font-size: 1rem; color: var(--texto);">Ocultar esta oração na lista principal do aplicativo</label>
+    </div>
+
     <div class="editor-toolbar">
       <label class="campo-label" for="input-oficial-texto">Texto</label>
       <button id="btn-inserir-oracao-admin" class="btn-secundario" type="button">+ Inserir oração</button>
@@ -239,7 +244,7 @@
       card.innerHTML = `
         <div class="card-inicial">${(o.titulo || '?')[0].toUpperCase()}</div>
         <div class="card-corpo">
-          <h3>${o.titulo}</h3>
+          <h3>${o.titulo} ${o.oculta ? '<span style="font-size:0.75em; font-weight:normal; font-style:italic; color:var(--perigo); margin-left:4px;">(oculta)</span>' : ''}</h3>
           <p>${primeiraLinhaUtil(o.texto)}</p>
         </div>
         <div class="card-acoes">
@@ -272,6 +277,7 @@
     editandoId = id || null;
     const inputTitulo = document.getElementById('input-oficial-titulo');
     const inputTexto = document.getElementById('input-oficial-texto');
+    const checkOculta = document.getElementById('checkbox-oficial-oculta');
     const cabecalho = document.getElementById('admin-form-cabecalho');
 
     if (editandoId) {
@@ -279,10 +285,12 @@
       cabecalho.textContent = 'Editar Oração Oficial';
       inputTitulo.value = o ? o.titulo : '';
       inputTexto.value = o ? o.texto : '';
+      checkOculta.checked = o ? !!o.oculta : false;
     } else {
       cabecalho.textContent = 'Nova Oração Oficial';
       inputTitulo.value = '';
       inputTexto.value = '';
+      checkOculta.checked = false;
     }
 
     mostrarView('view-admin-form');
@@ -310,6 +318,7 @@
   document.getElementById('btn-salvar-oficial').addEventListener('click', () => {
     const titulo = document.getElementById('input-oficial-titulo').value.trim();
     const texto = document.getElementById('input-oficial-texto').value;
+    const oculta = document.getElementById('checkbox-oficial-oculta').checked;
 
     if (!titulo) {
       alert('Dê um título para a oração.');
@@ -330,10 +339,11 @@
       if (o) {
         o.titulo = titulo;
         o.texto = texto;
+        o.oculta = oculta;
       }
     } else {
       const novoId = 'oficial_' + Date.now().toString(36);
-      oracoesOficiais.push({ id: novoId, titulo, texto });
+      oracoesOficiais.push({ id: novoId, titulo, texto, oculta });
     }
 
     renderizarListaAdmin();

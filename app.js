@@ -250,11 +250,15 @@ function renderizarOficiais(){
   const lista = document.getElementById('lista-oficiais');
   const vazio = document.getElementById('empty-oficiais');
   lista.innerHTML = '';
-  if(ORACOES_OFICIAIS.length === 0){
+  
+  // Filtra as orações oficiais para ocultar as intermediárias/auxiliares
+  const visiveis = ORACOES_OFICIAIS.filter(o => !o.oculta);
+  
+  if(visiveis.length === 0){
     vazio.classList.remove('hidden');
   }else{
     vazio.classList.add('hidden');
-    ORACOES_OFICIAIS.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'))
+    visiveis.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'))
       .forEach(o => lista.appendChild(criarCardOracao(o, 'oficiais', 'oficial')));
   }
 }
