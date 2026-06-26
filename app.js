@@ -1317,16 +1317,19 @@ async function iniciarFala(){
 
 function pausarFala(){
   if(!falando || pausado) return;
-  window.speechSynthesis.pause();
+  // No Chrome e Android, o pause/resume nativo do speechSynthesis é instável e buga frequentemente.
+  // A forma robusta de pausar é parar a fala física, mas manter a flag 'pausado = true'.
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
   pausado = true;
   atualizarBotaoFala();
 }
 
 function continuarFala(){
   if(!falando || !pausado) return;
-  window.speechSynthesis.resume();
   pausado = false;
   atualizarBotaoFala();
+  // Retoma a leitura recomeçando a partir do índice de fala que estava ativo
+  falarProximaLinha();
 }
 
 function atualizarBotaoFala(){
@@ -1376,6 +1379,24 @@ function falarProximaLinha(){
     item.historicoRepeticoes.forEach(rep => {
       const fileira = rep.blocoEl.querySelector('.fileira-contas');
       if (fileira) {
+        // Se a contaIdx atual é 1, significa que iniciamos um novo ciclo deste bloco de repetição.
+        // Se este bloco tiver sub-blocos repetidos internos (filhos), devemos limpar as contas deles.
+        if (rep.contaIdx === 1) {
+          rep.blocoEl.querySelectorAll('.fileira-contas').forEach(subFileira => {
+            if (subFileira !== fileira) {
+              subFileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
+              // Limpa também do localStorage o progresso daquele sub-bloco
+              const subBlocoRef = subFileira.closest('.bloco-ref');
+              if (subBlocoRef) {
+                const subSecaoIdx = subBlocoRef.dataset.secaoIdx;
+                if (subSecaoIdx != null) {
+                  localStorage.removeItem(`contas_${oracaoAtualId}_${subSecaoIdx}`);
+                }
+              }
+            }
+          });
+        }
+
         const contaAtiva = fileira.querySelector(`.conta-terco[data-conta-idx="${rep.contaIdx}"]`);
         if (contaAtiva) contaAtiva.classList.add('ativa');
       }
