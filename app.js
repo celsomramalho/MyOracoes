@@ -274,7 +274,7 @@ function atualizarProgressoDiario(){
     const oficiaisFav = (ORACOES_OFICIAIS || []).filter(o => o && (favoritasOficiaisIds || []).includes(o.id));
     const todasFav = [
       ...pessoaisFav.map(o => ({ ...o, _tipo: 'pessoal' })),
-      ...oficaisFav.map(o => ({ ...o, _tipo: 'oficial' })),
+      ...oficiaisFav.map(o => ({ ...o, _tipo: 'oficial' })),
     ];
 
     const total = todasFav.length > 0 ? todasFav.length : ((ORACOES || []).length + (ORACOES_OFICIAIS || []).length);
@@ -825,17 +825,33 @@ function atualizarVisuaisProgresso(oracaoId, elementos){
   });
 }
 
-// Expande todos os blocos-ref ancestrais de um elemento (usado pela fala em voz alta)
+// Expande todos os blocos-ref ancestrais de um elemento e fecha os que não são
 function expandirParaElemento(el){
+  // 1. Identifica os blocos que devem ficar abertos (ancestrais de el)
+  const ancestrais = new Set();
   let pai = el.parentElement;
   while(pai && pai.id !== 'rezar-texto'){
-    if(pai.classList.contains('bloco-ref') && !pai.classList.contains('aberto')){
-      pai.classList.add('aberto');
-      const icone = pai.querySelector(':scope > .bloco-ref-titulo > .bloco-ref-icone');
-      if(icone) icone.textContent = '▾';
+    if(pai.classList.contains('bloco-ref')){
+      ancestrais.add(pai);
     }
     pai = pai.parentElement;
   }
+
+  // 2. Controla o estado de todos os blocos-ref no container
+  document.querySelectorAll('#rezar-texto .bloco-ref').forEach(bloco => {
+    const deveAbrir = ancestrais.has(bloco);
+    const estaAberto = bloco.classList.contains('aberto');
+
+    if (deveAbrir && !estaAberto) {
+      bloco.classList.add('aberto');
+      const icone = bloco.querySelector(':scope > .bloco-ref-titulo > .bloco-ref-icone');
+      if(icone) icone.textContent = '▾';
+    } else if (!deveAbrir && estaAberto) {
+      bloco.classList.remove('aberto');
+      const icone = bloco.querySelector(':scope > .bloco-ref-titulo > .bloco-ref-icone');
+      if(icone) icone.textContent = '▸';
+    }
+  });
 }
 
 // ===================== EXPORTAR / IMPORTAR ORAÇÕES PESSOAIS =====================
@@ -1176,7 +1192,7 @@ function atualizarBotaoFala(){
   const btn = document.getElementById('btn-falar');
   if(!btn) return;
   if(!falando){
-    btn.textContent = '🔊 Testar fala';
+    btn.textContent = '🔊 Rezar em voz alta';
     btn.classList.remove('tocando');
   }else if(pausado){
     btn.textContent = '▶ Continuar';
