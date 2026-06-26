@@ -87,8 +87,18 @@
 <div id="app">
 
   <header class="topbar">
-    <div class="flame" aria-hidden="true"><span></span></div>
+    <svg class="admin-topbar-shield" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--ouro)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      <polyline points="9 11 11 13 15 9"></polyline>
+    </svg>
     <h1>Painel Admin - Orações Oficiais</h1>
+    <button id="btn-admin-logout" class="btn-topbar-home hidden" title="Sair do painel e voltar ao app" aria-label="Sair do painel e voltar ao app">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+    </button>
   </header>
 
   <!-- TELA DE LOGIN -->
@@ -105,16 +115,7 @@
 
   <!-- TELA PRINCIPAL: LISTAR ORAÇÕES OFICIAIS -->
   <main id="view-admin-list" class="view">
-    <div class="instrucoes-box">
-      <h4>Como atualizar o app no ar:</h4>
-      <ol>
-        <li>Crie, edite ou remova as orações oficiais abaixo.</li>
-        <li>Clique em <strong>"Baixar arquivo atualizado"</strong> para fazer o download do <code>oracoes-oficiais.json</code>.</li>
-        <li>Vá no seu GitHub, acesse a pasta do repositório <code>MyOracoes</code>.</li>
-        <li>Faça o upload/substitua o arquivo <code>oracoes-oficiais.json</code> antigo pelo que você acabou de baixar.</li>
-        <li>A Vercel atualizará o site automaticamente em segundos!</li>
-      </ol>
-    </div>
+    <button id="btn-criar-nova-oficial" class="btn-primario" style="margin-top: 10px; margin-bottom: 20px; width: 100%;">+ Criar Nova Oração Oficial</button>
 
     <div class="nav-header">
       <h2 class="titulo-secao" style="margin: 0;">Orações Oficiais Atuais</h2>
@@ -122,9 +123,6 @@
     </div>
 
     <div id="lista-admin-oficiais" class="lista-oracoes" style="margin-bottom: 30px;"></div>
-
-    <button id="btn-criar-nova-oficial" class="btn-primario" style="margin-top: 10px;">+ Criar Nova Oração Oficial</button>
-    <a href="index.html" class="btn-link" style="display: block; text-align: center; margin-top: 20px;">← Voltar para o Aplicativo</a>
   </main>
 
   <!-- TELA: FORMULÁRIO CRIAR / EDITAR OFICIAL -->
@@ -169,10 +167,16 @@
     liberarAdmin();
   }
 
-  // Ações de Login
+  // Ações de Login e Logout
   document.getElementById('btn-entrar').addEventListener('click', tentarLogin);
   document.getElementById('input-senha').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') tentarLogin();
+  });
+
+  const btnLogout = document.getElementById('btn-admin-logout');
+  btnLogout.addEventListener('click', () => {
+    sessionStorage.removeItem(CHAVE_SESSION);
+    window.location.href = 'index.html';
   });
 
   function tentarLogin() {
@@ -188,6 +192,7 @@
   }
 
   function liberarAdmin() {
+    btnLogout.classList.remove('hidden');
     mostrarView('view-admin-list');
     carregarDadosIniciais();
   }
@@ -195,6 +200,10 @@
   function mostrarView(id) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('view-active'));
     document.getElementById(id).classList.add('view-active');
+    // Esconde o botão de logout se estiver na tela de login
+    if (id === 'view-login') {
+      btnLogout.classList.add('hidden');
+    }
     window.scrollTo(0,0);
   }
 
