@@ -167,6 +167,8 @@
   let oracoesOficiais = [];
   let editandoId = null;
 
+  const btnLogout = document.getElementById('btn-admin-logout');
+
   // Verificação de autenticação na sessão
   if (sessionStorage.getItem(CHAVE_SESSION) === 'true') {
     liberarAdmin();
@@ -178,7 +180,6 @@
     if (e.key === 'Enter') tentarLogin();
   });
 
-  const btnLogout = document.getElementById('btn-admin-logout');
   btnLogout.addEventListener('click', () => {
     sessionStorage.removeItem(CHAVE_SESSION);
     window.location.href = 'index.html';
