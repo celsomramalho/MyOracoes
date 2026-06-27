@@ -65,26 +65,26 @@ Cada passo é independente e testável. ✅ = concluído, [ ] = pendente.
 
 #### Passo 2 — `js/utils.js` *(NOVO — antes não existia no plano)*
 
-- [ ] Criar arquivo `js/utils.js`
-- [ ] Mover `escaparHTML(texto)` *(usada por card.js, render-tree.js e outros)*
-- [ ] Mover `obterInicial(titulo)` *(usada por card.js)*
-- [ ] Mover `primeiraLinhaUtil(texto)` *(usada por card.js)*
-- [ ] Ajustar referências em app.js (remover as definições locais)
-- [ ] **Teste:** home, todas e oficiais renderizarem cards corretamente, sem erros de "função não definida"
+- [x] Criar arquivo `js/utils.js`
+- [x] Mover `escaparHTML(texto)` *(usada por card.js, render-tree.js e outros)*
+- [x] Mover `obterInicial(titulo)` *(usada por card.js)*
+- [x] Mover `primeiraLinhaUtil(texto)` *(usada por card.js)*
+- [x] Ajustar referências em app.js (remover as definições locais)
+- [x] **Teste:** home, todas e oficiais renderizarem cards corretamente, sem erros de "função não definida"
 
 ---
 
 #### Passo 3 — `js/oracoes-data.js`
 
-- [ ] Criar arquivo `js/oracoes-data.js`
-- [ ] Mover `alternarFavorito()` e `alternarFavoritoOficial()`
-- [ ] Mover `exportarOracoes()` e `importarOracoesDeArquivo()`
-- [ ] Mover `compartilharOracao()` e `copiarParaClipboard()`
-- [ ] Mover `verificarLinkImportacao()`, `exibirModalImportacaoLink()`, `importarUmaOracao()`
-- [ ] Mover `carregarOficiais()` *(faz fetch do JSON; chama renderizarOficiais + renderizarFavoritas — manter chamadas no app.js por ora e chamar após o fetch)*
-- [ ] ⚠️ **Atenção:** `gerarId()` já foi para `state.js` — NÃO duplicar aqui
-- [ ] Ajustar e salvar app.js
-- [ ] **Teste:** exportar, importar, favoritar, compartilhar; recarregar app e ver se oficiais carregam
+- [x] Criar arquivo `js/oracoes-data.js`
+- [x] Mover `alternarFavorito()` e `alternarFavoritoOficial()`
+- [x] Mover `exportarOracoes()` e `importarOracoesDeArquivo()`
+- [x] Mover `compartilharOracao()` e `copiarParaClipboard()`
+- [x] Mover `verificarLinkImportacao()`, `exibirModalImportacaoLink()`, `importarUmaOracao()`
+- [v] Mover `carregarOficiais()` *(faz fetch do JSON; chama renderizarOficiais + renderizarFavoritas — manter chamadas no app.js por ora e chamar após o fetch)*
+- [x] ⚠️ **Atenção:** `gerarId()` já foi para `state.js` — NÃO duplicar aqui
+- [x] Ajustar e salvar app.js
+- [v] **Teste:** exportar, importar, favoritar, compartilhar; recarregar app e ver se oficiais carregam
 
 ---
 
