@@ -1319,8 +1319,9 @@ function pausarFala(){
   if(!falando || pausado) return;
   // No Chrome e Android, o pause/resume nativo do speechSynthesis é instável e buga frequentemente.
   // A forma robusta de pausar é parar a fala física, mas manter a flag 'pausado = true'.
-  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  // IMPORTANTE: definir pausado=true ANTES de cancel() para que o evento 'onend' não avance o índice.
   pausado = true;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
   atualizarBotaoFala();
 }
 
@@ -1380,12 +1381,21 @@ function falarProximaLinha(){
       const fileira = rep.blocoEl.querySelector('.fileira-contas');
       if (fileira) {
         // Se a contaIdx atual é 1, significa que iniciamos um novo ciclo deste bloco de repetição.
-        // Se este bloco tiver sub-blocos repetidos internos (filhos), devemos limpar as contas deles.
+        // Quando é o início de um novo ciclo, precisamos limpar:
+        //   1. As contas da própria fileira (este bloco começa do zero novamente)
+        //   2. As contas de sub-blocos repetidos internos (filhos aninhados)
         if (rep.contaIdx === 1) {
+          // Limpa as contas da própria fileira deste bloco
+          fileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
+          // Limpa localStorage da própria fileira
+          const blocoSecaoIdxProprio = rep.blocoEl.dataset.secaoIdx;
+          if (blocoSecaoIdxProprio != null) {
+            localStorage.removeItem(`contas_${oracaoAtualId}_${blocoSecaoIdxProprio}`);
+          }
+          // Limpa também sub-fileiras (blocos repetidos internos/filhos)
           rep.blocoEl.querySelectorAll('.fileira-contas').forEach(subFileira => {
             if (subFileira !== fileira) {
               subFileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
-              // Limpa também do localStorage o progresso daquele sub-bloco
               const subBlocoRef = subFileira.closest('.bloco-ref');
               if (subBlocoRef) {
                 const subSecaoIdx = subBlocoRef.dataset.secaoIdx;
