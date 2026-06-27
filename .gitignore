@@ -9,6 +9,9 @@ lerna-debug.log*
 
 *.zip
 
+anexos
+Backups
+
 # Editor directories and files
 
 .vercel
