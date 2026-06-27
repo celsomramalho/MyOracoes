@@ -1,6 +1,4 @@
 // js/oracoes-data.js — CRUD, fetch de oficiais, export/import, compartilhamento
-// Depende de: state.js (ORACOES, ORACOES_OFICIAIS, favoritasOficiaisIds, gerarId, salvar*)
-// Chama funções de render definidas em app.js (renderizarFavoritas, renderizarTodas, etc.)
 
 // ===================== CARREGAMENTO DAS OFICIAIS =====================
 async function carregarOficiais(){
@@ -173,8 +171,6 @@ function verificarLinkImportacao(){
       return;
     }
 
-    // Aguarda ORACOES_OFICIAIS ser carregado antes de exibir o modal
-    // (pode já estar carregado ou não; o modal lida com isso)
     exibirModalImportacaoLink(dados.titulo, dados.texto || '');
   }catch(e){
     mostrarToast('Não foi possível ler os dados do link de compartilhamento.');

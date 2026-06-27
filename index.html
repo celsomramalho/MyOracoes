@@ -15,11 +15,14 @@
 </head>
 <body>
 
-<div id="app">
+<div id="app" data-tela="home">
 
   <header class="topbar">
-    <div class="flame" aria-hidden="true"><span></span></div>
-    <h1 id="topbar-titulo">Minhas Orações</h1>
+    <div id="topbar-icone" class="topbar-icone" aria-hidden="true">
+      <div class="flame"><span></span></div>
+      <span id="topbar-icone-tela" class="icone-tela"></span>
+    </div>
+    <h1 id="topbar-titulo" title="Minhas Orações">Minhas Orações</h1>
     <button id="btn-topbar-home" class="btn-topbar-home hidden" title="Voltar para a Home" aria-label="Voltar para a Home">
       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -83,28 +86,30 @@
 
   <!-- TELA: REZAR -->
   <main id="view-rezar" class="view">
-    <div class="rezar-cabecalho">
-      <h2 id="rezar-titulo"></h2>
-      <button id="btn-favoritar-rezar" class="btn-estrela" aria-label="Favoritar">☆</button>
-    </div>
+    <div id="rezar-fixo" class="rezar-fixo">
+      <div class="rezar-cabecalho">
+        <h2 id="rezar-titulo"></h2>
+        <button id="btn-favoritar-rezar" class="btn-estrela" aria-label="Favoritar">☆</button>
+      </div>
 
-    <div class="rezar-acoes">
-      <button id="btn-ler" class="btn-secundario apenas-home">📖 Ler</button>
-      <button id="btn-falar" class="btn-secundario">🔊 Rezar em voz alta</button>
-      <button id="btn-marcar-rezada" class="btn-secundario">✓ Marcar como rezada</button>
-      <button id="btn-reiniciar-progresso" class="btn-secundario" title="Apagar marcações de progresso desta oração">🔄 Reiniciar progresso</button>
-      <button id="btn-velocidade" class="btn-secundario">⚡ 1.0x</button>
-      <button id="btn-config-vozes" class="btn-secundario oculto-home">⚙️ Vozes</button>
-      <button id="btn-compartilhar-atual" class="btn-secundario editar-excluir">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
-          <circle cx="18" cy="5" r="3"></circle>
-          <circle cx="6" cy="12" r="3"></circle>
-          <circle cx="18" cy="19" r="3"></circle>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-        </svg>
-        Compartilhar
-      </button>
+      <div class="rezar-acoes">
+        <button id="btn-ler" class="btn-secundario btn-icone apenas-home" title="Ler" aria-label="Ler">📖</button>
+        <button id="btn-falar" class="btn-secundario btn-icone" title="Ouvir" aria-label="Ouvir">🔊</button>
+        <button id="btn-marcar-rezada" class="btn-secundario btn-icone" title="Marcar como rezada" aria-label="Marcar como rezada">✓</button>
+        <button id="btn-reiniciar-progresso" class="btn-secundario btn-icone" title="Reiniciar progresso" aria-label="Reiniciar progresso">🔄</button>
+        <button id="btn-velocidade" class="btn-secundario">⚡ 1.0x</button>
+        <button id="btn-config-vozes" class="btn-secundario btn-icone oculto-home" title="Vozes" aria-label="Vozes">⚙️</button>
+        <button id="btn-compartilhar-atual" class="btn-secundario editar-excluir">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Compartilhar
+        </button>
+      </div>
     </div>
 
     <div id="rezar-texto" class="texto-oracao"></div>
@@ -157,9 +162,14 @@
 
 </div>
 
-<script src="state.js"></script>                  <!-- Passo 1 -->
-<script src="js/utils.js"></script>               <!-- Passo 2 -->
-<script src="js/oracoes-data.js"></script>        <!-- Passo 3 -->
+<script src="state.js"></script>             <!-- Passo 1 -->
+<script src="js/utils.js"></script>          <!-- Passo 2 -->
+<script src="js/oracoes-data.js"></script>   <!-- Passo 3 -->
+<script src="js/components/card.js"></script>   <!-- Passo 4 -->
+<script src="js/components/toast.js"></script> <!-- Passo 5 -->
+<script src="js/render-tree.js"></script>       <!-- Passo 6 -->
+<script src="js/speech.js"></script>            <!-- Passo 7 -->
+<script src="js/components/progresso.js"></script> <!-- Passo 8 -->
 <script src="app.js"></script>
 </body>
 </html>

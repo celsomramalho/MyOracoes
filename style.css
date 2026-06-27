@@ -8,9 +8,9 @@
   --texto-suave: #B9B6CC;
   --ouro: #D7AA56;
   --ouro-suave: #E6C988;
-  --voz1: #D7AA56; /* V. - dourado, vela */
+  --voz1: #D7AA56; /* V. / Oremos. - dourado, vela */
   --voz2: #D9695F; /* R. - vermelho, como nos missais tradicionais */
-  --voz2-fundo: rgba(217, 105, 95, 0.14); /* destaque leve por trás das linhas de R. */
+  --fala-destaque: #6FA8DC; /* azul - linha sendo narrada no momento */
   --perigo: #C9756B;
   --raio: 14px;
 }
@@ -59,15 +59,33 @@ html,body{
   letter-spacing: 0.02em;
   margin: 0;
   color: var(--texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Vela: elemento de assinatura visual do app */
+/* Slot de ícone da topbar: troca de conteúdo conforme a tela ativa */
+.topbar-icone{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+/* Vela: assinatura visual exclusiva da tela Home */
 .flame{
   width: 22px;
   height: 30px;
   position: relative;
   flex-shrink: 0;
 }
+#app:not([data-tela="home"]) .flame{ display: none; }
+
+/* Ícone simples (emoji) usado em todas as telas, exceto a Home */
+.icone-tela{ display:none; }
+#app:not([data-tela="home"]) .icone-tela{ display: inline-block; }
 .flame span{
   position:absolute;
   bottom:0;
@@ -324,6 +342,16 @@ html,body{
 }
 .btn-secundario:hover{ border-color: var(--ouro); }
 
+/* Botão secundário em versão ícone-only (sem texto), compacto */
+.btn-icone{
+  padding: 8px 13px;
+  font-size: 1.05rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .btn-perigo{ color: var(--perigo); }
 .btn-perigo:hover{ border-color: var(--perigo); }
 
@@ -352,6 +380,21 @@ html,body{
 }
 
 /* ---------- TELA REZAR ---------- */
+
+/* Bloco fixo: título + estrela + fileira de ações ficam parados
+   imediatamente abaixo da topbar; só o texto da oração rola. */
+.rezar-fixo{
+  position: sticky;
+  top: var(--topbar-altura, 78px);
+  z-index: 4;
+  background: var(--bg);
+  margin: 0 -20px;
+  padding: 4px 20px 14px;
+}
+.rezar-fixo.com-sombra{
+  box-shadow: 0 8px 14px -10px rgba(0,0,0,0.45);
+}
+
 .rezar-cabecalho{
   display:flex;
   align-items:flex-start;
@@ -365,6 +408,11 @@ html,body{
   font-size: 1.6rem;
   color: var(--ouro-suave);
   margin: 0;
+  /* título de uma linha só, com "..." se for muito longo */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 .btn-estrela{
   background:none;
@@ -373,6 +421,7 @@ html,body{
   color: var(--ouro);
   cursor: pointer;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .rezar-acoes{
@@ -381,9 +430,13 @@ html,body{
   gap: 8px;
   margin-bottom: 18px;
 }
-.rezar-acoes button.tocando{
+.rezar-acoes button.btn-falar-tocando{
   border-color: var(--voz2);
   color: var(--voz2);
+}
+.rezar-acoes button.btn-falar-pausado{
+  border-color: #66bb6a;
+  color: #81c784;
 }
 
 /* Visibilidade condicional de acordo com a origem da tela "Rezar" */
@@ -403,17 +456,17 @@ html,body{
   border-radius: var(--raio);
   padding: 20px 18px;
   font-size: 1.12rem;
-  line-height: 2;
+  line-height: 1.3;
 }
 .texto-oracao p{
-  margin: 0 0 6px;
+  margin: 0 0 4px;
 }
-.linha-v{ color: var(--voz1); }
 .linha-r{
-  color: var(--voz2);
   padding-left: 18px;
-  margin: 0 0 6px;
+  margin: 0 0 4px;
 }
+.rubrica{ color: var(--voz1); }   /* "V." e "Oremos." */
+.resposta{ color: var(--voz2); }  /* "R." */
 .linha-ref{
   font-style: italic;
   color: var(--texto-suave);
@@ -468,18 +521,11 @@ html,body{
 }
 
 
-/* Destaque de fundo: aparece só na linha que está sendo narrada no momento */
+/* Destaque de fala: aparece só na linha sendo narrada no momento.
+   Sem bloco/fundo — só o texto "neutro" da linha vira azul; "V."/"Oremos."
+   e "R." mantêm a cor própria (dourado/vermelho) mesmo durante a fala. */
 .linha-falando{
-  background: rgba(241,233,218,0.10);
-  border-radius: 8px;
-  margin: 0 -12px 6px;
-  padding: 4px 12px;
-}
-.linha-v.linha-falando{
-  background: rgba(215,170,86,0.16);
-}
-.linha-r.linha-falando{
-  background: var(--voz2-fundo);
+  color: var(--fala-destaque);
 }
 
 /* ---------- MODAL ---------- */
@@ -707,13 +753,13 @@ html,body{
 /* Botão de check por seção */
 .btn-check-secao{
   flex-shrink: 0;
-  width: 26px;
-  height: 26px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
-  border: 1.5px solid rgba(215, 170, 86, 0.25);
+  border: 1px solid rgba(215, 170, 86, 0.25);
   background: transparent;
   color: rgba(215, 170, 86, 0.3);
-  font-size: 0.8rem;
+  font-size: 0.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -757,16 +803,16 @@ html,body{
 .fileira-contas {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin: 8px 0 12px;
   padding: 4px 0;
 }
 
 .conta-terco {
-  width: 22px;
-  height: 22px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  border: 1.5px solid rgba(215, 170, 86, 0.4);
+  border: 1px solid rgba(215, 170, 86, 0.4);
   background: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -781,7 +827,7 @@ html,body{
 .conta-terco.concluida {
   background: #2e7d32;
   border-color: #81c784;
-  box-shadow: 0 0 6px rgba(129, 199, 132, 0.4);
+  box-shadow: 0 0 3px rgba(129, 199, 132, 0.4);
 }
 
 .conta-terco.ativa {
