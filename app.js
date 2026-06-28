@@ -58,9 +58,20 @@ function mostrarView(id){
     if (topbarIconeTela) topbarIconeTela.textContent = ICONES_TELA[id] || '';
   }
 
+  // Botões de ação do Modo Rezar (Ouvir / Velocidade) só aparecem na topbar
+  // quando a tela ativa é o próprio Modo Rezar
+  const topbarAcoesRezar = document.getElementById('topbar-acoes-rezar');
+  if (topbarAcoesRezar) {
+    topbarAcoesRezar.classList.toggle('hidden', id !== 'view-rezar');
+  }
+
   // Cabeçalho fixo do Modo Rezar: começa sem sombra ao entrar na tela
   const rezarFixo = document.getElementById('rezar-fixo');
   if (rezarFixo) rezarFixo.classList.remove('com-sombra');
+
+  // A altura da topbar pode mudar de tela pra tela (ex: Modo Rezar tem 2 botões
+  // extras), então remedimos depois que o navegador aplicar a troca de tela
+  requestAnimationFrame(atualizarAlturaTopbar);
 }
 
 // Mede a altura real da topbar e guarda numa variável CSS, para o

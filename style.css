@@ -62,7 +62,34 @@ html,body{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* sem isso, um item flex não encolhe abaixo do seu conteúdo,
+     e o "..." acima nunca chega a entrar em ação */
+  flex: 1 1 auto;
+  min-width: 0;
 }
+
+/* Botões de ação do Modo Rezar exibidos na própria topbar (Ouvir / Velocidade) */
+.topbar-acoes-rezar{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.topbar-acoes-rezar.hidden{ display:none; }
+
+.btn-topbar-acao{
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  border-radius: 8px;
+  padding: 7px 11px;
+  font-size: 0.88rem;
+  font-family: 'EB Garamond', serif;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.btn-topbar-acao:hover{ border-color: var(--ouro); }
 
 /* Slot de ícone da topbar: troca de conteúdo conforme a tela ativa */
 .topbar-icone{
@@ -257,6 +284,19 @@ html,body{
   padding: 4px;
 }
 
+.btn-compartilhar-card{
+  background:none;
+  border:none;
+  color: var(--texto);
+  cursor: pointer;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 4px;
+}
+.btn-compartilhar-card:hover{ color: var(--ouro-suave); }
+
 .empty-state{
   color: var(--texto-suave);
   text-align:center;
@@ -400,7 +440,6 @@ html,body{
   align-items:flex-start;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 14px;
 }
 .rezar-cabecalho h2{
   font-family: 'Cormorant Garamond', serif;
@@ -428,13 +467,14 @@ html,body{
   display:flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-top: 14px;
   margin-bottom: 18px;
 }
-.rezar-acoes button.btn-falar-tocando{
+#btn-falar.btn-falar-tocando{
   border-color: var(--voz2);
   color: var(--voz2);
 }
-.rezar-acoes button.btn-falar-pausado{
+#btn-falar.btn-falar-pausado{
   border-color: #66bb6a;
   color: #81c784;
 }
