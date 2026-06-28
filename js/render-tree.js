@@ -1,14 +1,37 @@
 // ===================== ÁRVORE DE NÓS PARA RENDERIZAÇÃO =====================
 
-function adicionarLinhas(nos, texto){
-  texto.split('\n').forEach(linhaBruta => {
-    const linha = linhaBruta.trim();
-    if(!linha) return;
+function adicionarLinhas(nos, texto, estado){
+  const linhas = (texto || '').split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+  for(let i = 0; i < linhas.length; i++){
+    const linha = linhas[i];
+
+    // Diretiva de resposta automática para ladainhas: uma linha sozinha
+    // entre chaves, ex: "{R. rogai por nós.}", liga o modo automático —
+    // toda linha "V." seguinte ganha essa resposta sem precisar escrevê-la.
+    // "{}" (vazio) desliga o modo automático.
+    const diretiva = linha.match(/^\{(.*)\}$/);
+    if(diretiva){
+      estado.respostaAuto = diretiva[1].trim() || null;
+      continue;
+    }
+
     let classe = '';
     if(linha.startsWith('V.'))       classe = 'linha-v';
     else if(linha.startsWith('R.')) classe = 'linha-r';
     nos.push({ tipo: 'linha', texto: linha, classe });
-  });
+
+    // Se o modo automático está ligado e a próxima linha não é uma
+    // resposta explícita, insere a resposta automática depois da linha V.
+    if(classe === 'linha-v' && estado.respostaAuto){
+      const proxima = linhas[i + 1];
+      const proximaEhResposta = proxima && proxima.startsWith('R.');
+      if(!proximaEhResposta){
+        const classeAuto = estado.respostaAuto.startsWith('V.') ? 'linha-v' : 'linha-r';
+        nos.push({ tipo: 'linha', texto: estado.respostaAuto, classe: classeAuto });
+      }
+    }
+  }
 }
 
 // Divide uma linha em partes para colorir só o prefixo ("V."/"R.") e a
@@ -43,7 +66,8 @@ function criarPartesLinha(linha, classe){
   return partes;
 }
 
-function construirArvore(texto, titulosVisitados){
+function construirArvore(texto, titulosVisitados, estado){
+  if(!estado) estado = { respostaAuto: null };
   const nos = [];
   const regex = /\[([^\[\]]+)\](?:\{(\d+)\})?/g;
   let ultimoIndice = 0;
@@ -51,7 +75,7 @@ function construirArvore(texto, titulosVisitados){
 
   while((match = regex.exec(texto || '')) !== null){
     const textoBefore = texto.slice(ultimoIndice, match.index);
-    if(textoBefore) adicionarLinhas(nos, textoBefore);
+    if(textoBefore) adicionarLinhas(nos, textoBefore, estado);
 
     const tituloRef = match[1].trim();
     const nomeLower = tituloRef.toLowerCase();
@@ -69,6 +93,8 @@ function construirArvore(texto, titulosVisitados){
       }else{
         const novosVisitados = new Set(titulosVisitados);
         novosVisitados.add(nomeLower);
+        // Oração referenciada ganha seu próprio estado de resposta automática,
+        // independente do que estiver ligado na oração que a referencia.
         if(quantidade > 1){
           const filhos = construirArvore(encontrada.texto, novosVisitados);
           nos.push({ tipo: 'repetido', rotulo: encontrada.titulo, quantidade, filhos });
@@ -83,7 +109,7 @@ function construirArvore(texto, titulosVisitados){
   }
 
   const textoFinal = texto ? texto.slice(ultimoIndice) : '';
-  if(textoFinal) adicionarLinhas(nos, textoFinal);
+  if(textoFinal) adicionarLinhas(nos, textoFinal, estado);
 
   return nos;
 }
