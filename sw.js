@@ -1,4 +1,4 @@
-const CACHE_NOME = 'minhas-oracoes-v2';
+const CACHE_NOME = 'minhas-oracoes-v3';
 const ARQUIVOS_PARA_CACHE = [
   './',
   './index.html',
@@ -35,12 +35,21 @@ self.addEventListener('fetch', (evento) => {
     return;
   }
 
-  // Estratégia: rede primeiro para os arquivos principais, cache como fallback
-  // Isso garante que atualizações cheguem sem precisar limpar cache manualmente
-  const ehArquivoPrincipal = ARQUIVOS_PARA_CACHE.some(a =>
-    evento.request.url.endsWith(a.replace('./', '/')) ||
-    evento.request.url.endsWith('/')
-  );
+  // Estratégia: rede primeiro para os arquivos principais, para qualquer
+  // .js / .css do app, e para QUALQUER navegação de página (ex: "/", "/admin",
+  // ou futuras páginas). Isso garante que o HTML servido nunca fique
+  // "preso" numa versão antiga em cache — mesmo em rotas que não estão
+  // na lista fixa abaixo.
+  const url = new URL(evento.request.url);
+  const ehNavegacaoDePagina = evento.request.mode === 'navigate';
+  const ehArquivoPrincipal =
+    ehNavegacaoDePagina ||
+    ARQUIVOS_PARA_CACHE.some(a =>
+      evento.request.url.endsWith(a.replace('./', '/')) ||
+      evento.request.url.endsWith('/')
+    ) ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.css');
 
   if (ehArquivoPrincipal) {
     evento.respondWith(
