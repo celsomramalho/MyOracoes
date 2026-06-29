@@ -121,7 +121,7 @@ function importarOracoesDeArquivo(){
 const LINK_APP_MYORACOES = 'https://myoracoes.vercel.app/';
 
 function compartilharApp(){
-  const texto = `Quero compartilhar este aplicativo que estou usando para rezar e criar orações personalizadas chamado MyOrações.\n\n${LINK_APP_MYORACOES}`;
+  const texto = `Quero compartilhar este aplicativo que estou usando para rezar e criar orações personalizadas.\n\n${LINK_APP_MYORACOES}`;
 
   try{
     if(navigator.share){
@@ -148,7 +148,7 @@ function compartilharOracao(id){
     const base64 = btoa(unescape(encodeURIComponent(dadosStr)));
     const link = `${window.location.origin}${window.location.pathname}?importar=${base64}`;
 
-    const texto = `Quero compartilhar esta oração com você pelo app MyOrações:\n\n"${o.titulo}"\n\n${link}`;
+    const texto = `Quero compartilhar esta oração com você pelo app Minhas Orações:\n\n"${o.titulo}"\n\n${link}`;
 
     if(navigator.share){
       navigator.share({ title: o.titulo, text: texto }).catch(() => {

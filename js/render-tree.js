@@ -97,10 +97,10 @@ function construirArvore(texto, titulosVisitados, estado){
         // independente do que estiver ligado na oração que a referencia.
         if(quantidade > 1){
           const filhos = construirArvore(encontrada.texto, novosVisitados);
-          nos.push({ tipo: 'repetido', rotulo: encontrada.titulo, quantidade, filhos });
+          nos.push({ tipo: 'repetido', rotulo: encontrada.titulo, quantidade, filhos, colapsarNaFala: !!encontrada.colapsarNaFala });
         }else{
           const filhos = construirArvore(encontrada.texto, novosVisitados);
-          nos.push({ tipo: 'bloco', rotulo: encontrada.titulo, filhos });
+          nos.push({ tipo: 'bloco', rotulo: encontrada.titulo, filhos, colapsarNaFala: !!encontrada.colapsarNaFala });
         }
       }
     }
@@ -259,10 +259,8 @@ function renderizarNos(nos, container, ctx){
       container.appendChild(wrapper);
 
     }else if(g.tipo === 'bloco' || g.tipo === 'repetido'){
-      const idx = ctx ? ctx.n++ : -1;
       const divBloco = document.createElement('div');
       divBloco.className = 'bloco-ref';
-      if(idx >= 0) divBloco.dataset.secaoIdx = idx;
 
       const divTitulo = document.createElement('div');
       divTitulo.className = 'bloco-ref-titulo';
@@ -277,19 +275,21 @@ function renderizarNos(nos, container, ctx){
       textoSpan.textContent = ' ' + g.rotulo + (g.tipo === 'repetido' ? ` x${g.quantidade}` : '');
       divTitulo.appendChild(textoSpan);
 
-      if(ctx){
-        const btn = criarBtnCheck(idx, ctx);
-        divTitulo.appendChild(btn);
-        ctx.elementos.push({ idx, el: divBloco, btn });
-      }
-
       const divConteudo = document.createElement('div');
       divConteudo.className = 'bloco-ref-conteudo';
 
+      let idx;
+
       if(g.tipo === 'repetido'){
+        // Repetido: o índice precisa existir ANTES das contas, pois o clique
+        // numa conta usa "idx" pra marcar/desmarcar a seção imediatamente.
+        // O conteúdo interno (a oração repetida) continua sem checks próprios
+        // — o progresso dele é o contador de contas abaixo, não checks por linha.
+        idx = ctx ? ctx.n++ : -1;
+
         const fileira = document.createElement('div');
         fileira.className = 'fileira-contas';
-        
+
         const chaveContas = `contas_${oracaoAtualId}_${idx}`;
         let contasConcluidas = parseInt(localStorage.getItem(chaveContas) || '0', 10);
 
@@ -303,15 +303,15 @@ function renderizarNos(nos, container, ctx){
           conta.addEventListener('click', (e) => {
             e.stopPropagation();
             const atual = parseInt(conta.dataset.contaIdx, 10);
-            
+
             if(atual === contasConcluidas){
               contasConcluidas = atual - 1;
             } else {
               contasConcluidas = atual;
             }
-            
+
             localStorage.setItem(chaveContas, contasConcluidas);
-            
+
             fileira.querySelectorAll('.conta-terco').forEach(c => {
               const cIdx = parseInt(c.dataset.contaIdx, 10);
               c.classList.toggle('concluida', cIdx <= contasConcluidas);
@@ -328,6 +328,27 @@ function renderizarNos(nos, container, ctx){
           fileira.appendChild(conta);
         }
         divConteudo.appendChild(fileira);
+        renderizarNos(g.filhos, divConteudo, null);
+
+      }else{
+        // Bloco simples (referência sem repetição): renderiza os filhos
+        // PRIMEIRO, propagando o mesmo ctx — assim cada linha/sub-bloco
+        // interno ganha seu próprio check individual. Só depois alocamos o
+        // índice do cabeçalho deste bloco (numeração pós-fixa): como
+        // marcarSecao() preenche tudo de 0 até o índice clicado, marcar o
+        // cabeçalho do bloco passa a marcar automaticamente tudo que está
+        // dentro dele também.
+        renderizarNos(g.filhos, divConteudo, ctx);
+        idx = ctx ? ctx.n++ : -1;
+      }
+
+      if(idx >= 0) divBloco.dataset.secaoIdx = idx;
+      if(g.colapsarNaFala && g.tipo !== 'repetido') divBloco.dataset.colapsarNaFala = '1';
+
+      if(ctx){
+        const btn = criarBtnCheck(idx, ctx);
+        divTitulo.appendChild(btn);
+        ctx.elementos.push({ idx, el: divBloco, btn });
       }
 
       divTitulo.addEventListener('click', (e) => {
@@ -336,7 +357,6 @@ function renderizarNos(nos, container, ctx){
         icone.textContent = aberto ? '▾' : '▸';
       });
 
-      renderizarNos(g.filhos, divConteudo, null);
       divBloco.appendChild(divTitulo);
       divBloco.appendChild(divConteudo);
       container.appendChild(divBloco);
@@ -439,17 +459,35 @@ function atualizarVisuaisProgresso(oracaoId, elementos){
   });
 }
 
+// Acha o bloco-ref ancestral mais próximo que está marcado como "não abrir
+// na fala" E que esteja fechado no momento (se o usuário abriu manualmente
+// pra acompanhar o texto, respeita e não redireciona o destaque).
+function encontrarBlocoColapsadoNaFala(el){
+  let pai = el.parentElement;
+  while(pai && pai.id !== 'rezar-texto'){
+    if(pai.classList.contains('bloco-ref') && pai.dataset.colapsarNaFala === '1' && !pai.classList.contains('aberto')){
+      return pai;
+    }
+    pai = pai.parentElement;
+  }
+  return null;
+}
+
 function expandirParaElemento(el){
   const ancestrais = new Set();
   let pai = el.parentElement;
   while(pai && pai.id !== 'rezar-texto'){
-    if(pai.classList.contains('bloco-ref')){
+    if(pai.classList.contains('bloco-ref') && pai.dataset.colapsarNaFala !== '1'){
       ancestrais.add(pai);
     }
     pai = pai.parentElement;
   }
 
   document.querySelectorAll('#rezar-texto .bloco-ref').forEach(bloco => {
+    // Orações marcadas como "já conhecidas" (ex: Ave Maria) ficam fora do
+    // controle automático da fala — o estado aberto/fechado é só manual.
+    if(bloco.dataset.colapsarNaFala === '1') return;
+
     const deveAbrir = ancestrais.has(bloco);
     const estaAberto = bloco.classList.contains('aberto');
 

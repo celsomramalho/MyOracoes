@@ -568,6 +568,20 @@ html,body{
   color: var(--fala-destaque);
 }
 
+/* Destaque do CABEÇALHO do bloco (ex: "Ave Maria"), usado quando a oração
+   está marcada como "já conhecida" e está fechada: a fala continua narrando
+   o texto, mas em vez de abrir o bloco e destacar a linha lá dentro, só o
+   título acende — sinalizando "tô rezando isso agora" sem expandir. */
+.titulo-falando{
+  color: var(--fala-destaque) !important;
+  border-left-color: var(--fala-destaque) !important;
+  background: rgba(111,168,220,0.12);
+  box-shadow: 0 0 0 1px rgba(111,168,220,0.35);
+}
+.titulo-falando .bloco-ref-icone{
+  color: var(--fala-destaque);
+}
+
 /* ---------- MODAL ---------- */
 .modal{
   position: fixed;

@@ -242,7 +242,7 @@ function atualizarBotaoFala(){
 }
 
 function falarProximaLinha(){
-  document.querySelectorAll('.linha-falando').forEach(el => el.classList.remove('linha-falando'));
+  document.querySelectorAll('.linha-falando, .titulo-falando').forEach(el => el.classList.remove('linha-falando', 'titulo-falando'));
 
   if(!falando || indiceFalaAtual >= filaFala.length){
     if(falando && oracaoAtualId && !rezadasDiarias[oracaoAtualId]){
@@ -263,8 +263,18 @@ function falarProximaLinha(){
 
   const item = filaFala[indiceFalaAtual];
   expandirParaElemento(item.elemento);
-  item.elemento.classList.add('linha-falando');
-  item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
+
+  const blocoFechado = encontrarBlocoColapsadoNaFala(item.elemento);
+  if(blocoFechado){
+    // Oração conhecida (Ave Maria, Pai Nosso...) e está fechada: destaca o
+    // cabeçalho do bloco em vez de abrir e destacar a linha lá dentro.
+    const titulo = blocoFechado.querySelector(':scope > .bloco-ref-titulo');
+    if(titulo) titulo.classList.add('titulo-falando');
+    blocoFechado.scrollIntoView({ behavior:'smooth', block:'center' });
+  }else{
+    item.elemento.classList.add('linha-falando');
+    item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
 
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
   if (item.repetido && item.historicoRepeticoes) {
@@ -382,7 +392,7 @@ function pararFala(){
     utteranciaAtual.onerror = null;
   }
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
-  document.querySelectorAll('.linha-falando').forEach(el => el.classList.remove('linha-falando'));
+  document.querySelectorAll('.linha-falando, .titulo-falando').forEach(el => el.classList.remove('linha-falando', 'titulo-falando'));
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
   atualizarBotaoFala();
 }

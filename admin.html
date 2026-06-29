@@ -146,6 +146,11 @@
   <main id="view-admin-list" class="view">
     <button id="btn-criar-nova-oficial" class="btn-primario" style="margin-top: 10px; margin-bottom: 20px; width: 100%;">+ Criar Nova Oração Oficial</button>
 
+    <div id="aviso-alteracoes-pendentes" class="instrucoes-box hidden" style="border-color: var(--perigo); background: rgba(204,80,80,0.08);">
+      <h4 style="color: var(--perigo);">⚠️ Alterações não exportadas</h4>
+      <p class="dica" style="margin: 0;">Você criou, editou ou excluiu orações oficiais nesta sessão. Essas mudanças só existem aqui no painel — clique em <strong>"📥 Baixar arquivo atualizado"</strong> abaixo e suba esse arquivo no projeto pra elas valerem de fato no aplicativo.</p>
+    </div>
+
     <div class="nav-header">
       <h2 class="titulo-secao" style="margin: 0;">Orações Oficiais Atuais</h2>
       <button id="btn-exportar-json" class="btn-secundario" style="border-color: var(--ouro); color: var(--ouro-suave);">📥 Baixar arquivo atualizado</button>
@@ -165,6 +170,11 @@
     <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 8px;">
       <input id="checkbox-oficial-oculta" type="checkbox" style="width: 20px; height: 20px; cursor: pointer;">
       <label for="checkbox-oficial-oculta" class="dica" style="margin: 0; cursor: pointer; user-select: none; font-size: 1rem; color: var(--texto);">Ocultar esta oração na lista principal do aplicativo</label>
+    </div>
+
+    <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 8px;">
+      <input id="checkbox-oficial-colapsar-fala" type="checkbox" style="width: 20px; height: 20px; cursor: pointer;">
+      <label for="checkbox-oficial-colapsar-fala" class="dica" style="margin: 0; cursor: pointer; user-select: none; font-size: 1rem; color: var(--texto);">Não abrir automaticamente durante a fala (oração já conhecida, ex: Ave Maria)</label>
     </div>
 
     <div class="editor-toolbar">
@@ -195,6 +205,13 @@
   
   let oracoesOficiais = [];
   let editandoId = null;
+  let alteracoesNaoExportadas = false; // true assim que algo é criado/editado/excluído e ainda não foi baixado
+
+  function atualizarAvisoAlteracoes(){
+    const aviso = document.getElementById('aviso-alteracoes-pendentes');
+    if(!aviso) return;
+    aviso.classList.toggle('hidden', !alteracoesNaoExportadas);
+  }
 
   const btnLogout = document.getElementById('btn-admin-logout');
 
@@ -276,6 +293,7 @@
   }
 
   function renderizarListaAdmin() {
+    atualizarAvisoAlteracoes();
     const lista = document.getElementById('lista-admin-oficiais');
     lista.innerHTML = '';
 
@@ -293,7 +311,7 @@
       card.innerHTML = `
         <div class="card-inicial">${(o.titulo || '?')[0].toUpperCase()}</div>
         <div class="card-corpo">
-          <h3>${o.titulo} ${o.oculta ? '<span style="font-size:0.75em; font-weight:normal; font-style:italic; color:var(--perigo); margin-left:4px;">(oculta)</span>' : ''}</h3>
+          <h3>${o.titulo} ${o.oculta ? '<span style="font-size:0.75em; font-weight:normal; font-style:italic; color:var(--perigo); margin-left:4px;">(oculta)</span>' : ''} ${o.colapsarNaFala ? '<span style="font-size:0.75em; font-weight:normal; font-style:italic; color:var(--ouro-suave); margin-left:4px;">(fala: fechada)</span>' : ''}</h3>
           <p>${primeiraLinhaUtil(o.texto)}</p>
         </div>
         <div class="card-acoes">
@@ -327,6 +345,7 @@
     const inputTitulo = document.getElementById('input-oficial-titulo');
     const inputTexto = document.getElementById('input-oficial-texto');
     const checkOculta = document.getElementById('checkbox-oficial-oculta');
+    const checkColapsarFala = document.getElementById('checkbox-oficial-colapsar-fala');
     const cabecalho = document.getElementById('admin-form-cabecalho');
 
     if (editandoId) {
@@ -335,11 +354,13 @@
       inputTitulo.value = o ? o.titulo : '';
       inputTexto.value = o ? o.texto : '';
       checkOculta.checked = o ? !!o.oculta : false;
+      checkColapsarFala.checked = o ? !!o.colapsarNaFala : false;
     } else {
       cabecalho.textContent = 'Nova Oração Oficial';
       inputTitulo.value = '';
       inputTexto.value = '';
       checkOculta.checked = false;
+      checkColapsarFala.checked = false;
     }
 
     mostrarView('view-admin-form');
@@ -351,6 +372,7 @@
     if (!o) return;
     if (confirm(`Excluir a oração oficial "${o.titulo}"?`)) {
       oracoesOficiais = oracoesOficiais.filter(x => x.id !== id);
+      alteracoesNaoExportadas = true;
       renderizarListaAdmin();
     }
   }
@@ -368,6 +390,7 @@
     const titulo = document.getElementById('input-oficial-titulo').value.trim();
     const texto = document.getElementById('input-oficial-texto').value;
     const oculta = document.getElementById('checkbox-oficial-oculta').checked;
+    const colapsarNaFala = document.getElementById('checkbox-oficial-colapsar-fala').checked;
 
     if (!titulo) {
       alert('Dê um título para a oração.');
@@ -389,12 +412,14 @@
         o.titulo = titulo;
         o.texto = texto;
         o.oculta = oculta;
+        o.colapsarNaFala = colapsarNaFala;
       }
     } else {
       const novoId = 'oficial_' + Date.now().toString(36);
-      oracoesOficiais.push({ id: novoId, titulo, texto, oculta });
+      oracoesOficiais.push({ id: novoId, titulo, texto, oculta, colapsarNaFala });
     }
 
+    alteracoesNaoExportadas = true;
     renderizarListaAdmin();
     mostrarView('view-admin-list');
   });
@@ -406,6 +431,9 @@
     dlAnchorElem.setAttribute("href",     dataStr     );
     dlAnchorElem.setAttribute("download", "oracoes-oficiais.json");
     dlAnchorElem.click();
+
+    alteracoesNaoExportadas = false;
+    atualizarAvisoAlteracoes();
   });
 
   // Modal Inserir Oração
