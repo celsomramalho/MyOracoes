@@ -33,15 +33,18 @@ function mostrarView(id){
   const topbarTitulo = document.getElementById('topbar-titulo');
   const topbarIconeTela = document.getElementById('topbar-icone-tela');
   const btnTopbarHome = document.getElementById('btn-topbar-home');
+  const btnCompartilharApp = document.getElementById('btn-compartilhar-app');
 
   if (topbarTitulo && btnTopbarHome) {
     let textoTitulo = 'Minhas Orações';
 
     if (id === 'view-home') {
-      textoTitulo = 'Minhas Orações';
+      textoTitulo = 'MyOrações';
       btnTopbarHome.classList.add('hidden');
+      if (btnCompartilharApp) btnCompartilharApp.classList.remove('hidden');
     } else {
       btnTopbarHome.classList.remove('hidden');
+      if (btnCompartilharApp) btnCompartilharApp.classList.add('hidden');
       if (id === 'view-todas') {
         textoTitulo = 'Minhas Orações';
       } else if (id === 'view-oficiais') {
@@ -49,7 +52,7 @@ function mostrarView(id){
       } else if (id === 'view-editor') {
         textoTitulo = editandoId ? 'Editar oração' : 'Nova oração';
       } else if (id === 'view-rezar') {
-        textoTitulo = 'Modo Rezar';
+        textoTitulo = 'Rezar';
       }
     }
 
@@ -406,6 +409,8 @@ document.getElementById('btn-topbar-home').addEventListener('click', () => {
     mostrarView('view-home');
   }
 });
+
+document.getElementById('btn-compartilhar-app').addEventListener('click', compartilharApp);
 
 document.getElementById('fab-nova').addEventListener('click', () => abrirEditor(null));
 document.getElementById('btn-salvar').addEventListener('click', salvarEditor);

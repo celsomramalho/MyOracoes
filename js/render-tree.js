@@ -133,20 +133,93 @@ function criarBtnCheck(idx, ctx){
 }
 
 function agruparNos(nos){
+  // Regras de agrupamento:
+  // 1. V. + R. imediatamente seguinte → um grupo só (par inseparável)
+  // 2. R. sozinho (sem V. antes, ex: "R. Amém" de fechamento) → grupo próprio
+  // 3. Parágrafo livre (nem V. nem R.) → cada parágrafo é um grupo;
+  //    linha que começa com minúscula cola com a linha anterior (continuação de frase)
+  // 4. Blocos (bloco-ref, repetido) não são tocados — saem como estão
+
   const grupos = [];
-  let linhasAtm = [];
-  for(const no of nos){
-    if(no.tipo === 'linha'){
-      linhasAtm.push(no);
-    }else{
-      if(linhasAtm.length > 0){
-        grupos.push({ tipo: 'grupo-linhas', linhas: linhasAtm });
-        linhasAtm = [];
-      }
-      grupos.push(no);
+  let linhasAtm = []; // acumula linhas do grupo atual
+
+  function fecharGrupo() {
+    if (linhasAtm.length > 0) {
+      grupos.push({ tipo: 'grupo-linhas', linhas: linhasAtm });
+      linhasAtm = [];
     }
   }
-  if(linhasAtm.length > 0) grupos.push({ tipo: 'grupo-linhas', linhas: linhasAtm });
+
+  function continuacaoDeFrase(texto) {
+    // Linha é continuação se começa com letra minúscula (ignorando prefixos V./R.)
+    const s = texto.replace(/^[VR]\.\s*/, '').trimStart();
+    const c = s.charAt(0);
+    return c !== '' && c === c.toLowerCase() && c !== c.toUpperCase();
+  }
+
+  for (let i = 0; i < nos.length; i++) {
+    const no = nos[i];
+
+    if (no.tipo !== 'linha') {
+      // Bloco/repetido: fecha o grupo atual e emite o bloco
+      fecharGrupo();
+      grupos.push(no);
+      continue;
+    }
+
+    const ehV = no.classe === 'linha-v';
+    const ehR = no.classe === 'linha-r';
+    const proximo = nos[i + 1];
+    const proximoEhR = proximo && proximo.tipo === 'linha' && proximo.classe === 'linha-r';
+
+    if (ehV) {
+      // V. sempre inicia um grupo novo
+      fecharGrupo();
+      linhasAtm.push(no);
+      // Absorve linhas de continuação (começam com minúscula) que fazem parte da mesma frase do V.
+      while (i + 1 < nos.length && nos[i + 1].tipo === 'linha' &&
+             nos[i + 1].classe !== 'linha-v' && nos[i + 1].classe !== 'linha-r' &&
+             continuacaoDeFrase(nos[i + 1].texto)) {
+        i++;
+        linhasAtm.push(nos[i]);
+      }
+      // Se o próximo for R., puxa junto (par V.+R.)
+      const proximoAgoraEhR = nos[i + 1] && nos[i + 1].tipo === 'linha' && nos[i + 1].classe === 'linha-r';
+      if (proximoAgoraEhR) {
+        i++;
+        linhasAtm.push(nos[i]);
+      }
+      fecharGrupo();
+      continue;
+    }
+
+    if (ehR) {
+      // R. sozinho (não foi consumido pelo V. acima) → grupo próprio
+      fecharGrupo();
+      linhasAtm.push(no);
+      fecharGrupo();
+      continue;
+    }
+
+    // Parágrafo livre
+    if (linhasAtm.length === 0) {
+      // Inicia novo grupo de parágrafo
+      linhasAtm.push(no);
+    } else {
+      const ultimaLinha = linhasAtm[linhasAtm.length - 1];
+      const ultimaEhParagrafo = ultimaLinha.classe !== 'linha-v' && ultimaLinha.classe !== 'linha-r';
+      if (ultimaEhParagrafo && continuacaoDeFrase(no.texto)) {
+        // Continuação de frase (começa com minúscula) — cola com a linha anterior
+        linhasAtm.push(no);
+      } else {
+        // Nova frase/parágrafo — fecha o atual e abre novo
+        fecharGrupo();
+        linhasAtm.push(no);
+      }
+    }
+  }
+
+  fecharGrupo();
   return grupos;
 }
 

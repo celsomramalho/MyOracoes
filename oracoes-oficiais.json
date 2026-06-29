@@ -48,7 +48,8 @@
   {
     "id": "oficial_mqv9fuo3",
     "titulo": "Santíssimos corações de Jesus e Maria",
-    "texto": "V. Santíssimos corações de Jesus e Maria, unidos no amor perfeito,\ncomo nos olhais com carinho e misericórdia, consagramos nossos corações, nossas vidas, e nossas famílias a Vós.\nConhecemos que o belo exemplo de Vosso lar em Nazaré foi um modelo\npara cada uma de nossas famílias.\nEsperamos obter, com Vossa ajuda, a união e o amor forte e perdurável\nque vos destes.\nQue nosso lar seja cheio de alegria. Que o afeto sincero, a paciência, a tolerância, e o respeito mútuo sejam dados livremente a todos.\nQue nossas orações incluam as necessidades dos outros,\nnão somente as nossas. E que sempre estejamos próximos dos sacramentos.\nAbençoai a todos os presentes e também aos ausentes,\ntantos os vivos como os defuntos; que a paz estejam conosco,\ne quando formos provados, concedei a resignação cristã\nà vontade de Deus.\nMantende nossas famílias perto de Vossos Corações;\nque Vossa proteção especial esteja sempre conosco.\nSagrados Corações de Jesus e Maria, escutai nossa oração.\nR. Amém."
+    "texto": "V. Santíssimos corações de Jesus e Maria, unidos no amor perfeito,\ncomo nos olhais com carinho e misericórdia, consagramos nossos corações, nossas vidas, e nossas famílias a Vós.\nConhecemos que o belo exemplo de Vosso lar em Nazaré foi um modelo\npara cada uma de nossas famílias.\nEsperamos obter, com Vossa ajuda, a união e o amor forte e perdurável\nque vos destes.\nQue nosso lar seja cheio de alegria. Que o afeto sincero, a paciência, a tolerância, e o respeito mútuo sejam dados livremente a todos.\nQue nossas orações incluam as necessidades dos outros, não somente as nossas. E que sempre estejamos próximos dos sacramentos.\nAbençoai a todos os presentes e também aos ausentes, tantos os vivos como os defuntos; que a paz estejam conosco, e quando formos provados, concedei a resignação cristã à vontade de Deus.\nMantende nossas famílias perto de Vossos Corações; que Vossa proteção especial esteja sempre conosco.\nSagrados Corações de Jesus e Maria, escutai nossa oração.\nR. Amém.",
+    "oculta": false
   },
   {
     "id": "oficial_mqv9rxby",
@@ -74,33 +75,9 @@
     "oculta": true
   },
   {
-    "id": "oficial_mqxnr1f5",
-    "titulo": "Sinal da cruz",
-    "texto": "V. Pelo sinal da santa cruz, livrai-nos, Deus nosso Senhor, dos nossos inimigos. Em nome do Pai e do Filho e do Espírito Santo. \nR. Amém.",
-    "oculta": false
-  },
-  {
-    "id": "oficial_mqxnswvx",
-    "titulo": "Ato de contrição",
-    "texto": "Ato de contrição:\nSenhor Jesus, Filho de Deus, tende piedade de mim por que sou um\npecador.",
-    "oculta": false
-  },
-  {
-    "id": "oficial_mqxnusrv",
-    "titulo": "Credo (Símbolo dos Apóstolos)",
-    "texto": "V. Creio em Deus Pai todo-poderoso, criador do céu e da terra. E em Jesus Cristo, seu único Filho, nosso Senhor, que foi concebido pelo poder do Espírito Santo, nasceu da Virgem Maria, padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado, desceu à mansão dos mortos, ressuscitou ao terceiro dia, subiu aos céus; está sentado à direita de Deus Pai todo-poderoso, donde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo, na santa Igreja católica, na comunhão dos santos, na remissão dos pecados, na ressurreição da carne e na vida eterna. \nR. Amém.",
-    "oculta": false
-  },
-  {
-    "id": "oficial_mqxnw5xt",
-    "titulo": "Adoção Espiritual",
-    "texto": "Oremos.\nSenhor Jesus, pela intercessão de Maria, Vossa Mãe, que Vos acolheu\ncom amor, e pela intercessão de São José, homem de confiança que cuidou de Vós após o nascimento, peço-Vos por esta criança concebida, adotada espiritualmente por mim, que corre o perigo de ser abortada. Dai a sua mãe e aos outros familiares o amor e a coragem de deixá-la viver, Vós, que lhe concedestes a vida.\nR. Amém.",
-    "oculta": false
-  },
-  {
-    "id": "oficial_mqxobyog",
-    "titulo": "Ladainha do rosário",
-    "texto": "V/. Senhor, tende piedade de nós,\nR/. Senhor, tende piedade de nós,\nV/. Jesus Cristo, tende piedade de nós,\nR/. Jesus Cristo, tende piedade de nós.\nV/. Senhor, tende piedade de nós,\nR/. Senhor, tende piedade de nós.\nV/. Jesus Cristo, ouvi-nos,\nR/. Jesus Cristo, ouvi-nos.\nV/. Jesus Cristo, atendei-nos,\nR/. Jesus Cristo, atendei-nos.\nV/. Deus Pai do céus,\nR/. Tende piedade de nós.\nV/. Deus Filho Redentor do mundo,\nR/. Tende piedade de nós.\nV/. Deus Espírito Santo,\nR/. Tende piedade de nós.\nV/. Santíssima Trindade, que sois um só\nDeus,\nR/. Tende piedade de nós.\nV/. Santa Maria, rogai por nós. (R/.)\nV/. Santa Mãe de Deus,\nV/. Santa Virgem das virgens,\nV/. Mãe de Jesus Cristo,\nV/. Mãe da Igreja,\nV/. Mãe da Misericórdia,\nV/. Mãe da divina graça,\nV/. Mãe da Esperança,\nV/. Mãe puríssima,\nV/. Mãe castíssima,\nV/. Mãe intacta,\nV/. Mãe amável,\nV/. Mãe admirável,\nV/. Mãe do bom conselho,\nV/. Mãe do Criador,\nV/. Mãe do Salvador,\nV/. Virgem prudentíssima,\nV/. Virgem veneranda,\nV/. Virgem digna de louvor,\nV/. Virgem poderosa,\nV/. Virgem clemente,\nV/. Virgem fiel,\nV/. Espelho da justiça,\nV/. Sede da Sabedoria,\nV/. Causa da nossa alegria,\nV/. Vaso espiritual,\nV/. Vaso honorável,\nV/. Vaso insigne de devoção,\nV/. Rosa mística,\nV/. Torre de Davi,\nV/. Torre de marfim,\nV/. Casa de ouro,\nV/. Arca da aliança,\nV/. Porta do céu,\nV/. Estrela da manhã,\nV/. Saúde dos enfermos,\nV/. Refúgio dos pecadores,\nV/. Conforto dos Migrantes\nV/. Consoladora dos aflitos,\nV/. Auxílio dos cristãos,\nV/. Rainha dos Anjos,\nV/. Rainha dos Patriarcas,\nV/. Rainha dos Profetas,\nV/. Rainha dos Apóstolos,\nV/. Rainha dos Mártires,\nV/. Rainha dos Confessores,\nV/. Rainha das Virgens,\nV/. Rainha de todos os Santos,\nV/. Rainha concebida sem pecado\noriginal,\nV/. Rainha assunta aos céus,\nV/. Rainha do Santíssimo Rosário,\nV/. Rainha da Família,\nV/. Rainha da Paz",
+    "id": "oficial_mqy7tofl",
+    "titulo": "Ladainha do rosario",
+    "texto": "V. Senhor, tende piedade de nós,\nR. Senhor, tende piedade de nós.\nV. Jesus Cristo, tende piedade de nós,\nR. Jesus Cristo, tende piedade de nós.\nV. Senhor, tende piedade de nós,\nR. Senhor, tende piedade de nós.\nV. Jesus Cristo, ouvi-nos,\nR. Jesus Cristo, ouvi-nos.\nV. Jesus Cristo, atendei-nos,\nR. Jesus Cristo, atendei-nos.\nV. Deus Pai do céus,\nR. Tende piedade de nós.\nV. Deus Filho Redentor do mundo,\nR. Tende piedade de nós.\nV. Deus Espírito Santo,\nR. Tende piedade de nós.\nV. Santíssima Trindade, que sois um só Deus,\nR. Tende piedade de nós.\n\nV. Santa Maria, \n{R. Rogai por nós}\nV. Santa Mãe de Deus,\nV. Santa Virgem das virgens,\nV. Mãe de Jesus Cristo,\nV. Mãe da Igreja,\nV. Mãe da Misericórdia,\nV. Mãe da divina graça,\nV. Mãe da Esperança,\nV. Mãe puríssima,\nV. Mãe castíssima,\nV. Mãe intacta,\nV. Mãe amável,\nV. Mãe admirável,\nV. Mãe do bom conselho,\nV. Mãe do Criador,\nV. Mãe do Salvador,\nV. Virgem prudentíssima,\nV. Virgem veneranda,\nV. Virgem digna de louvor,\nV. Virgem poderosa,\nV. Virgem clemente,\nV. Virgem fiel,\nV. Espelho da justiça,\nV. Sede da Sabedoria,\nV. Causa da nossa alegria,\nV. Vaso espiritual,\nV. Vaso honorável,\nV. Vaso insigne de devoção,\nV. Rosa mística,\nV. Torre de Davi,\nV. Torre de marfim,\nV. Casa de ouro,\nV. Arca da aliança,\nV. Porta do céu,\nV. Estrela da manhã,\nV. Saúde dos enfermos,\nV. Refúgio dos pecadores,\nV. Conforto dos Migrantes\nV. Consoladora dos aflitos,\nV. Auxílio dos cristãos,\nV. Rainha dos Anjos,\nV. Rainha dos Patriarcas,\nV. Rainha dos Profetas,\nV. Rainha dos Apóstolos,\nV. Rainha dos Mártires,\nV. Rainha dos Confessores,\nV. Rainha das Virgens,\nV. Rainha de todos os Santos,\nV. Rainha concebida sem pecado original,\nV. Rainha assunta aos céus,\nV. Rainha do Santíssimo Rosário,\nV. Rainha da Família,\nV. Rainha da Paz",
     "oculta": false
   }
 ]

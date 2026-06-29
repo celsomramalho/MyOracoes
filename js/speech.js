@@ -174,6 +174,18 @@ async function alternarFala(){
   }
 }
 
+// Calcula a partir de qual linha a fala deve começar, considerando as
+// seções que já estão marcadas como concluídas (check verde). Retorna
+// null se a oração já estiver 100% concluída (nada para continuar).
+function calcularIndiceInicialFala(fila){
+  if(!oracaoAtualId) return 0;
+  const concluidas = new Set(progressoLeitura[oracaoAtualId] || []);
+  if(concluidas.size === 0) return 0;
+
+  const idx = fila.findIndex(item => item.secaoIdx < 0 || !concluidas.has(item.secaoIdx));
+  return idx === -1 ? null : idx;
+}
+
 async function iniciarFala(){
   const vozesDisponiveis = await aguardarVozesDisponiveis();
   if(!configVozes.v && !configVozes.r && vozesDisponiveis.length){
@@ -184,7 +196,13 @@ async function iniciarFala(){
   filaFala = obterLinhasParaFalar();
   if(filaFala.length === 0) return;
 
-  indiceFalaAtual = 0;
+  const indiceInicial = calcularIndiceInicialFala(filaFala);
+  if(indiceInicial === null){
+    mostrarToast('Oração já concluída. Use "Reiniciar progresso" para ouvir de novo.');
+    return;
+  }
+
+  indiceFalaAtual = indiceInicial;
   falando = true;
   pausado = false;
   atualizarBotaoFala();
@@ -210,7 +228,7 @@ function atualizarBotaoFala(){
   if(!btn) return;
   btn.classList.remove('btn-falar-tocando', 'btn-falar-pausado');
   if(!falando){
-    btn.textContent = '🔊';
+    btn.textContent = '▶';
     btn.title = 'Ouvir';
   }else if(pausado){
     btn.textContent = '▶';
@@ -250,10 +268,19 @@ function falarProximaLinha(){
 
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
   if (item.repetido && item.historicoRepeticoes) {
+    const itemAnterior = indiceFalaAtual > 0 ? filaFala[indiceFalaAtual - 1] : null;
     item.historicoRepeticoes.forEach(rep => {
       const fileira = rep.blocoEl.querySelector('.fileira-contas');
       if (fileira) {
-        if (rep.contaIdx === 1) {
+        // Verifica se esta é a PRIMEIRA LINHA de uma nova volta deste bloco,
+        // comparando com o item anterior. Isso garante que o reset de contas
+        // acontece apenas UMA VEZ ao entrar na volta, e não a cada linha durante ela.
+        const repAnterior = itemAnterior && itemAnterior.historicoRepeticoes
+          ? itemAnterior.historicoRepeticoes.find(r => r.blocoEl === rep.blocoEl)
+          : null;
+        const entrandoNovaVolta = !repAnterior || repAnterior.contaIdx !== rep.contaIdx;
+
+        if (entrandoNovaVolta && rep.contaIdx === 1) {
           fileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
           const blocoSecaoIdxProprio = rep.blocoEl.dataset.secaoIdx;
           if (blocoSecaoIdxProprio != null) {
