@@ -279,7 +279,6 @@ function renderizarNos(nos, container, ctx){
       divConteudo.className = 'bloco-ref-conteudo';
 
       let idx;
-      let fileira = null;
 
       if(g.tipo === 'repetido'){
         // Repetido: o índice precisa existir ANTES das contas, pois o clique
@@ -288,9 +287,8 @@ function renderizarNos(nos, container, ctx){
         // — o progresso dele é o contador de contas abaixo, não checks por linha.
         idx = ctx ? ctx.n++ : -1;
 
-        fileira = document.createElement('div');
+        const fileira = document.createElement('div');
         fileira.className = 'fileira-contas';
-        fileira.addEventListener('click', (e) => e.stopPropagation());
 
         const chaveContas = `contas_${oracaoAtualId}_${idx}`;
         let contasConcluidas = parseInt(localStorage.getItem(chaveContas) || '0', 10);
@@ -329,6 +327,7 @@ function renderizarNos(nos, container, ctx){
           });
           fileira.appendChild(conta);
         }
+        divConteudo.appendChild(fileira);
         renderizarNos(g.filhos, divConteudo, null);
 
       }else{
@@ -344,7 +343,7 @@ function renderizarNos(nos, container, ctx){
       }
 
       if(idx >= 0) divBloco.dataset.secaoIdx = idx;
-      if(g.colapsarNaFala) divBloco.dataset.colapsarNaFala = '1';
+      if(g.colapsarNaFala && g.tipo !== 'repetido') divBloco.dataset.colapsarNaFala = '1';
 
       if(ctx){
         const btn = criarBtnCheck(idx, ctx);
@@ -360,7 +359,6 @@ function renderizarNos(nos, container, ctx){
 
       divBloco.appendChild(divTitulo);
       divBloco.appendChild(divConteudo);
-      if(fileira) divBloco.prepend(fileira);
       container.appendChild(divBloco);
 
     }else if(g.tipo === 'erro'){

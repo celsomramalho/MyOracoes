@@ -316,7 +316,7 @@ html,body{
   text-transform: uppercase;
 }
 
-#input-titulo, #input-texto, #input-oficial-titulo, #input-oficial-texto, #input-senha{
+#input-titulo, #input-texto, #input-oficial-titulo, #input-oficial-texto, #input-senha, #input-busca-modal-inserir, #input-busca-modal-inserir-admin{
   width:100%;
   background: var(--superficie);
   border: 1px solid var(--borda);
@@ -327,9 +327,16 @@ html,body{
   padding: 12px 14px;
   box-sizing: border-box;
 }
-#input-titulo:focus, #input-texto:focus, #input-oficial-titulo:focus, #input-oficial-texto:focus, #input-senha:focus{
+#input-titulo:focus, #input-texto:focus, #input-oficial-titulo:focus, #input-oficial-texto:focus, #input-senha:focus, #input-busca-modal-inserir:focus, #input-busca-modal-inserir-admin:focus{
   outline: none;
   border-color: var(--ouro);
+}
+
+#input-busca-modal-inserir, #input-busca-modal-inserir-admin{
+  margin-top: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 #input-texto, #input-oficial-texto{
@@ -518,8 +525,6 @@ html,body{
 /* ---------- ACORDEÃO DE REFERÊNCIAS ---------- */
 .bloco-ref{
   margin: 8px 0;
-  border-left: 2px solid var(--ouro);
-  border-radius: 0 6px 6px 0;
 }
 
 .bloco-ref-titulo{
@@ -528,8 +533,10 @@ html,body{
   gap: 6px;
   font-style: italic;
   color: var(--texto-suave);
+  border-left: 2px solid var(--ouro);
   padding: 6px 10px;
   cursor: pointer;
+  border-radius: 0 6px 6px 0;
   transition: background 0.15s, color 0.15s;
   user-select: none;
 }
@@ -573,14 +580,10 @@ html,body{
    o texto, mas em vez de abrir o bloco e destacar a linha lá dentro, só o
    título acende — sinalizando "tô rezando isso agora" sem expandir. */
 .titulo-falando{
+  color: var(--fala-destaque) !important;
+  border-left-color: var(--fala-destaque) !important;
   background: rgba(111,168,220,0.12);
   box-shadow: 0 0 0 1px rgba(111,168,220,0.35);
-  border-radius: 6px;
-  border-left: 2px solid var(--fala-destaque);
-}
-.titulo-falando > .bloco-ref-titulo{
-  color: var(--fala-destaque) !important;
-  border-left: none;
 }
 .titulo-falando .bloco-ref-icone{
   color: var(--fala-destaque);
@@ -862,8 +865,8 @@ html,body{
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 8px 0 0;
-  padding: 4px 10px;
+  margin: 8px 0 12px;
+  padding: 4px 0;
 }
 
 .conta-terco {
