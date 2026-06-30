@@ -17,3 +17,8 @@ function primeiraLinhaUtil(texto){
   const linha = (texto || '').split('\n').map(l => l.trim()).find(l => l.length > 0);
   return linha ? linha.replace(/^V\.\s*|^R\.\s*/,'') : '';
 }
+
+// ===================== BUSCA (acento/caixa-insensível) =====================
+function normalizarBusca(texto){
+  return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+}

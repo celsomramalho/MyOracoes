@@ -14,7 +14,7 @@ function criarCardOracao(oracao, origem, tipo){
 
   // Badge de oficial
   const badgeOficial = ehOficial
-    ? `<span class="badge-oficial" title="Oração Oficial">📜</span>`
+    ? `<span class="badge-oficial-card" title="Oração Oficial">📜</span>`
     : '';
 
   // Badge de rezada hoje
@@ -40,9 +40,10 @@ function criarCardOracao(oracao, origem, tipo){
   card.innerHTML = `
     <div class="card-inicial">${escaparHTML(obterInicial(oracao.titulo))}</div>
     <div class="card-corpo">
-      <h3>${escaparHTML(oracao.titulo)}${badgeOficial}${badgeRezada}</h3>
+      <h3>${escaparHTML(oracao.titulo)}${badgeRezada}</h3>
       <p>${escaparHTML(primeiraLinhaUtil(oracao.texto))}</p>
     </div>
+    ${badgeOficial}
     ${botaoCompartilhar}
     <button class="btn-estrela-card" aria-label="Favoritar">${ehFavorita ? '★' : '☆'}</button>
   `;

@@ -89,13 +89,16 @@ window.addEventListener('resize', atualizarAlturaTopbar);
 window.addEventListener('load', atualizarAlturaTopbar);
 atualizarAlturaTopbar();
 
-// Sombra no cabeçalho fixo do Modo Rezar quando o conteúdo é rolado
+// Sombra nos cabeçalhos fixos (Modo Rezar / busca de Orações Oficiais)
+// quando o conteúdo é rolado
 window.addEventListener('scroll', () => {
   const rezarFixo = document.getElementById('rezar-fixo');
-  if (!rezarFixo) return;
   const viewRezarAtiva = document.getElementById('view-rezar')?.classList.contains('view-active');
-  if (!viewRezarAtiva) return;
-  rezarFixo.classList.toggle('com-sombra', window.scrollY > 4);
+  if (rezarFixo) rezarFixo.classList.toggle('com-sombra', viewRezarAtiva && window.scrollY > 4);
+
+  const oficiaisFixo = document.getElementById('oficiais-busca-fixa');
+  const viewOficiaisAtiva = document.getElementById('view-oficiais')?.classList.contains('view-active');
+  if (oficiaisFixo) oficiaisFixo.classList.toggle('com-sombra', viewOficiaisAtiva && window.scrollY > 4);
 }, { passive: true });
 
 
@@ -134,19 +137,23 @@ function renderizarTodas(){
   }
 }
 
-function renderizarOficiais(){
+function renderizarOficiais(termo){
   const lista = document.getElementById('lista-oficiais');
   const vazio = document.getElementById('empty-oficiais');
   lista.innerHTML = '';
-  
+
   // Filtra as orações oficiais para ocultar as intermediárias/auxiliares
   const visiveis = ORACOES_OFICIAIS.filter(o => !o.oculta);
-  
-  if(visiveis.length === 0){
+
+  const norm = normalizarBusca(termo);
+  const filtradas = norm ? visiveis.filter(o => normalizarBusca(o.titulo).includes(norm)) : visiveis;
+
+  if(filtradas.length === 0){
     vazio.classList.remove('hidden');
+    vazio.textContent = norm ? 'Nenhuma oração encontrada.' : 'Nenhuma oração oficial cadastrada ainda.';
   }else{
     vazio.classList.add('hidden');
-    visiveis.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'))
+    filtradas.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'))
       .forEach(o => lista.appendChild(criarCardOracao(o, 'oficiais', 'oficial')));
   }
 }
@@ -399,7 +406,16 @@ function alternarVelocidade(){
 
 // ===================== LIGAÇÃO DOS BOTÕES =====================
 document.getElementById('btn-ver-todas').addEventListener('click', () => mostrarView('view-todas'));
-document.getElementById('btn-ver-oficiais').addEventListener('click', () => mostrarView('view-oficiais'));
+document.getElementById('btn-ver-oficiais').addEventListener('click', () => {
+  const inputBusca = document.getElementById('input-busca-oficiais');
+  inputBusca.value = '';
+  renderizarOficiais('');
+  mostrarView('view-oficiais');
+});
+
+document.getElementById('input-busca-oficiais').addEventListener('input', (e) => {
+  renderizarOficiais(e.target.value);
+});
 
 document.getElementById('btn-topbar-home').addEventListener('click', () => {
   const activeView = document.querySelector('.view-active');

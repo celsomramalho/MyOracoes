@@ -435,6 +435,39 @@ html,body{
   box-shadow: 0 8px 14px -10px rgba(0,0,0,0.45);
 }
 
+/* ---------- BUSCA FIXA (ex: Orações Oficiais) ----------
+   Mesmo padrão de cabeçalho fixo do Modo Rezar (sticky logo
+   abaixo da topbar), com o input no estilo dos campos de
+   busca do painel Admin. */
+.busca-fixa{
+  position: sticky;
+  top: var(--topbar-altura, 78px);
+  z-index: 4;
+  background: var(--bg);
+  margin: 0 -20px;
+  padding: 4px 20px 14px;
+  border-bottom: 1px solid var(--borda);
+}
+.busca-fixa.com-sombra{
+  box-shadow: 0 8px 14px -10px rgba(0,0,0,0.45);
+}
+.busca-fixa input{
+  width: 100%;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  color: var(--texto);
+  font-family: 'EB Garamond', serif;
+  font-size: 1.08rem;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+.busca-fixa input:focus{
+  outline: none;
+  border-color: var(--ouro);
+}
+
 .rezar-cabecalho{
   display:flex;
   align-items:flex-start;
@@ -654,11 +687,14 @@ html,body{
 ::selection{ background: rgba(215,170,86,0.35); }
 
 /* ---------- BADGE OFICIAL (card e tela rezar) ---------- */
-.badge-oficial{
-  font-size: 0.8em;
-  margin-left: 5px;
-  vertical-align: middle;
+.badge-oficial-card{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  font-size: 1rem;
   opacity: 0.8;
+  padding: 4px;
 }
 
 .badge-oficial-rezar{

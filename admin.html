@@ -101,6 +101,70 @@
     padding: 6px;
   }
   .btn-ver-senha:hover{ color: var(--ouro); }
+
+  /* ── Preview na tela de edição ── */
+  .form-acoes-topo {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  #preview-area {
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  /* ── Modais com cabeçalho fixo e lista rolável ── */
+  .modal-conteudo-fixo {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;        /* impede o container inteiro de rolar */
+    padding: 0 !important;   /* o padding vai para os filhos individualmente */
+  }
+  .modal-cabecalho {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 20px 12px;
+    flex-shrink: 0;
+  }
+  .modal-cabecalho > div { flex: 1; }
+  .modal-cabecalho h3   { margin: 0 0 4px; }
+  .modal-cabecalho .dica { margin: 0; }
+  .modal-busca {
+    padding: 0 20px 12px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--borda);
+  }
+  .modal-lista-rolavel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 20px 20px;
+    margin: 0 !important;
+  }
+
+  #input-busca-editar,
+  #input-busca-inserir {
+    width: 100%;
+    background: var(--superficie);
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    color: var(--texto);
+    font-family: 'EB Garamond', serif;
+    font-size: 1.08rem;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    margin-bottom: 0;
+  }
+  #input-busca-editar:focus,
+  #input-busca-inserir:focus {
+    outline: none;
+    border-color: var(--ouro);
+  }
 </style>
 </head>
 <body>
@@ -152,7 +216,7 @@
     </div>
 
     <div class="nav-header">
-      <h2 class="titulo-secao" style="margin: 0;">Orações Oficiais Atuais</h2>
+      <button id="btn-buscar-editar" class="btn-secundario">🔎 Buscar oração para editar</button>
       <button id="btn-exportar-json" class="btn-secundario" style="border-color: var(--ouro); color: var(--ouro-suave);">📥 Baixar arquivo atualizado</button>
     </div>
 
@@ -161,8 +225,17 @@
 
   <!-- TELA: FORMULÁRIO CRIAR / EDITAR OFICIAL -->
   <main id="view-admin-form" class="view">
-    <button class="btn-voltar" id="btn-cancelar-admin-form">← Cancelar</button>
+    <div class="form-acoes-topo">
+      <button id="btn-preview-ler"       class="btn-secundario btn-icone" type="button" title="Ler (sem narrar)" disabled>📖</button>
+      <button id="btn-falar"             class="btn-secundario btn-icone" type="button" title="Ouvir narração"   disabled>▶</button>
+      <button id="btn-preview-reiniciar" class="btn-secundario btn-icone" type="button" title="Reiniciar narração" disabled>🔄</button>
+      <button class="btn-secundario" id="btn-cancelar-admin-form" style="margin: 0;">← Cancelar</button>
+    </div>
     <h2 class="titulo-secao" id="admin-form-cabecalho">Nova Oração Oficial</h2>
+
+    <div id="preview-area" class="hidden">
+      <div id="rezar-texto"></div>
+    </div>
 
     <label class="campo-label" for="input-oficial-titulo">Título</label>
     <input id="input-oficial-titulo" type="text" placeholder="Ex: Pai Nosso" autocomplete="off">
@@ -189,23 +262,73 @@
 
   <!-- MODAL: INSERIR ORAÇÃO -->
   <div id="modal-inserir-admin" class="modal hidden">
-    <div class="modal-conteudo">
-      <h3>Inserir oração</h3>
-      <p class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
-      <div id="lista-modal-inserir-admin" class="lista-modal"></div>
-      <button id="btn-fechar-modal-admin" class="btn-secundario">Cancelar</button>
+    <div class="modal-conteudo modal-conteudo-fixo">
+      <div class="modal-cabecalho">
+        <div>
+          <h3>Inserir oração</h3>
+          <p class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
+        </div>
+        <button id="btn-fechar-modal-admin" class="btn-secundario">Cancelar</button>
+      </div>
+      <div class="modal-busca">
+        <input id="input-busca-inserir" type="text" placeholder="🔎 Buscar oração..." autocomplete="off">
+      </div>
+      <div id="lista-modal-inserir-admin" class="lista-modal modal-lista-rolavel"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: BUSCAR ORAÇÃO PARA EDITAR -->
+  <div id="modal-buscar-editar" class="modal hidden">
+    <div class="modal-conteudo modal-conteudo-fixo">
+      <div class="modal-cabecalho">
+        <div>
+          <h3>Buscar oração para editar</h3>
+          <p class="dica">Toque em uma oração para abrir a edição.</p>
+        </div>
+        <button id="btn-fechar-modal-buscar-editar" class="btn-secundario">Cancelar</button>
+      </div>
+      <div class="modal-busca">
+        <input id="input-busca-editar" type="text" placeholder="🔎 Buscar..." autocomplete="off">
+      </div>
+      <div id="lista-modal-buscar-editar" class="lista-modal modal-lista-rolavel"></div>
     </div>
   </div>
 
 </div>
 
+<!-- Globais que render-tree.js / speech.js precisam no nível de módulo.
+     DEVEM vir ANTES dos <script src> para evitar ReferenceError. -->
+<script>
+  const ORACOES         = [];
+  const CHAVE_VOZES     = 'minhas_oracoes_vozes_v1';
+  const ID_PREVIEW      = '__preview_admin__';
+  let ORACOES_OFICIAIS  = [];   // também usado pelo admin; preenchido em carregarDadosIniciais()
+  let oracaoAtualId     = null;
+  let progressoLeitura  = {};
+  let rezadasDiarias    = {};
+  let secaoCtxAtual     = null;
+  let velocidadeAtual   = 1;
+
+  function obterDataLocalHoje(){
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function salvarProgressoLeitura(){}
+  function salvarRezadasDiarias(){}
+  function renderizarTudo(){}
+  function atualizarProgressoDiario(){}
+  function atualizarBotaoMarcarRezada(){}
+</script>
+
+<script src="js/components/toast.js"></script>
+<script src="js/render-tree.js"></script>
+<script src="js/speech.js"></script>
 <script>
   const SENHA_CORRETA = 'storosario';
   const CHAVE_SESSION = 'myoracoes_admin_autenticado';
   
-  let oracoesOficiais = [];
   let editandoId = null;
-  let alteracoesNaoExportadas = false; // true assim que algo é criado/editado/excluído e ainda não foi baixado
+  let alteracoesNaoExportadas = false;
 
   function atualizarAvisoAlteracoes(){
     const aviso = document.getElementById('aviso-alteracoes-pendentes');
@@ -283,11 +406,11 @@
       // Carrega o arquivo oficial atual que já está na Vercel / localmente
       const res = await fetch('./oracoes-oficiais.json');
       if (res.ok) {
-        oracoesOficiais = await res.json();
+        ORACOES_OFICIAIS = await res.json();
       }
     } catch(e) {
       console.log("Não foi possível carregar orações oficiais existentes, inicializando vazio.", e);
-      oracoesOficiais = [];
+      ORACOES_OFICIAIS = [];
     }
     renderizarListaAdmin();
   }
@@ -297,13 +420,13 @@
     const lista = document.getElementById('lista-admin-oficiais');
     lista.innerHTML = '';
 
-    if (oracoesOficiais.length === 0) {
+    if (ORACOES_OFICIAIS.length === 0) {
       lista.innerHTML = '<p class="empty-state">Nenhuma oração oficial cadastrada ainda.</p>';
       return;
     }
 
     // Ordenar em ordem alfabética
-    const ordenadas = oracoesOficiais.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+    const ordenadas = ORACOES_OFICIAIS.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
 
     ordenadas.forEach(o => {
       const card = document.createElement('div');
@@ -349,7 +472,7 @@
     const cabecalho = document.getElementById('admin-form-cabecalho');
 
     if (editandoId) {
-      const o = oracoesOficiais.find(x => x.id === editandoId);
+      const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
       cabecalho.textContent = 'Editar Oração Oficial';
       inputTitulo.value = o ? o.titulo : '';
       inputTexto.value = o ? o.texto : '';
@@ -364,14 +487,16 @@
     }
 
     mostrarView('view-admin-form');
+    resetarPreview();
+    if(editandoId) habilitarBotoesPreview();
     inputTitulo.focus();
   }
 
   function excluirOficial(id) {
-    const o = oracoesOficiais.find(x => x.id === id);
+    const o = ORACOES_OFICIAIS.find(x => x.id === id);
     if (!o) return;
     if (confirm(`Excluir a oração oficial "${o.titulo}"?`)) {
-      oracoesOficiais = oracoesOficiais.filter(x => x.id !== id);
+      ORACOES_OFICIAIS = ORACOES_OFICIAIS.filter(x => x.id !== id);
       alteracoesNaoExportadas = true;
       renderizarListaAdmin();
     }
@@ -382,6 +507,7 @@
 
   // Botão Cancelar Formulário
   document.getElementById('btn-cancelar-admin-form').addEventListener('click', () => {
+    resetarPreview();
     mostrarView('view-admin-list');
   });
 
@@ -398,7 +524,7 @@
     }
 
     // Verificar duplicidade de título no conjunto de oficiais
-    const duplicada = oracoesOficiais.find(o => 
+    const duplicada = ORACOES_OFICIAIS.find(o => 
       o.titulo.trim().toLowerCase() === titulo.toLowerCase() && o.id !== editandoId
     );
     if (duplicada) {
@@ -407,7 +533,7 @@
     }
 
     if (editandoId) {
-      const o = oracoesOficiais.find(x => x.id === editandoId);
+      const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
       if (o) {
         o.titulo = titulo;
         o.texto = texto;
@@ -416,17 +542,18 @@
       }
     } else {
       const novoId = 'oficial_' + Date.now().toString(36);
-      oracoesOficiais.push({ id: novoId, titulo, texto, oculta, colapsarNaFala });
+      ORACOES_OFICIAIS.push({ id: novoId, titulo, texto, oculta, colapsarNaFala });
     }
 
     alteracoesNaoExportadas = true;
     renderizarListaAdmin();
+    resetarPreview();
     mostrarView('view-admin-list');
   });
 
   // Botão Baixar arquivo JSON atualizado
   document.getElementById('btn-exportar-json').addEventListener('click', () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(oracoesOficiais, null, 2));
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(ORACOES_OFICIAIS, null, 2));
     const dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href",     dataStr     );
     dlAnchorElem.setAttribute("download", "oracoes-oficiais.json");
@@ -439,17 +566,18 @@
   // Modal Inserir Oração
   let posicaoCursorSalva = null;
 
-  function renderizarListaModalInserirAdmin(){
+  function renderizarListaModalInserirAdmin(termo){
     const lista = document.getElementById('lista-modal-inserir-admin');
     if(!lista) return;
 
     lista.innerHTML = '';
-
-    const disponiveis = oracoesOficiais.filter(o => o.id !== editandoId)
+    const norm = normalizarBusca(termo || '');
+    let disponiveis = ORACOES_OFICIAIS.filter(o => o.id !== editandoId)
       .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+    if(norm) disponiveis = disponiveis.filter(o => normalizarBusca(o.titulo).includes(norm));
 
     if(disponiveis.length === 0){
-      lista.innerHTML = '<p class="dica">Nenhuma outra oração oficial cadastrada para inserir como referência.</p>';
+      lista.innerHTML = '<p class="dica">Nenhuma oração encontrada.</p>';
     }else{
       disponiveis.forEach(o => {
         const item = document.createElement('div');
@@ -464,8 +592,10 @@
   function abrirModalInserirAdmin(){
     const inputTexto = document.getElementById('input-oficial-texto');
     posicaoCursorSalva = inputTexto.selectionStart;
-    renderizarListaModalInserirAdmin();
+    document.getElementById('input-busca-inserir').value = '';
+    renderizarListaModalInserirAdmin('');
     document.getElementById('modal-inserir-admin').classList.remove('hidden');
+    document.getElementById('input-busca-inserir').focus();
   }
 
   function fecharModalInserirAdmin(){
@@ -495,6 +625,159 @@
 
   document.getElementById('btn-inserir-oracao-admin').addEventListener('click', abrirModalInserirAdmin);
   document.getElementById('btn-fechar-modal-admin').addEventListener('click', fecharModalInserirAdmin);
+  document.getElementById('input-busca-inserir').addEventListener('input', e => {
+    renderizarListaModalInserirAdmin(e.target.value);
+  });
+
+  // ── MODAL: BUSCAR ORAÇÃO PARA EDITAR ────────────────────────────────────────
+  function normalizarBusca(texto){
+    return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  }
+
+  function renderizarListaModalBuscarEditar(termo){
+    const lista = document.getElementById('lista-modal-buscar-editar');
+    lista.innerHTML = '';
+    const norm = normalizarBusca(termo);
+    const ordenadas = ORACOES_OFICIAIS.slice().sort((a,b) => a.titulo.localeCompare(b.titulo,'pt-BR'));
+    const filtradas = norm ? ordenadas.filter(o => normalizarBusca(o.titulo).includes(norm)) : ordenadas;
+
+    if(filtradas.length === 0){
+      lista.innerHTML = '<p class="dica">Nenhuma oração encontrada.</p>';
+      return;
+    }
+    filtradas.forEach(o => {
+      const item = document.createElement('div');
+      item.className = 'item-modal';
+      item.textContent = o.titulo;
+      item.addEventListener('click', () => {
+        fecharModalBuscarEditar();
+        abrirForm(o.id);
+      });
+      lista.appendChild(item);
+    });
+  }
+
+  function abrirModalBuscarEditar(){
+    if(ORACOES_OFICIAIS.length === 0){
+      mostrarToast('Nenhuma oração oficial cadastrada ainda.');
+      return;
+    }
+    document.getElementById('input-busca-editar').value = '';
+    renderizarListaModalBuscarEditar('');
+    document.getElementById('modal-buscar-editar').classList.remove('hidden');
+    document.getElementById('input-busca-editar').focus();
+  }
+
+  function fecharModalBuscarEditar(){
+    document.getElementById('modal-buscar-editar').classList.add('hidden');
+  }
+
+  document.getElementById('btn-buscar-editar').addEventListener('click', abrirModalBuscarEditar);
+  document.getElementById('btn-fechar-modal-buscar-editar').addEventListener('click', fecharModalBuscarEditar);
+  document.getElementById('input-busca-editar').addEventListener('input', e => {
+    renderizarListaModalBuscarEditar(e.target.value);
+  });
+
+  // ── PREVIEW (📖 Ler / ▶ Play / 🔄 Reiniciar) ─────────────────────────────
+  let previewNarracaoAtiva = false; // true após o primeiro Play nessa sessão de edição
+
+  function limparContasPreview(){
+    for(let i = localStorage.length - 1; i >= 0; i--){
+      const chave = localStorage.key(i);
+      if(chave && chave.startsWith(`contas_${ID_PREVIEW}_`)) localStorage.removeItem(chave);
+    }
+  }
+
+  function resetarPreview(){
+    pararFala();
+    oracaoAtualId  = null;
+    secaoCtxAtual  = null;
+    previewNarracaoAtiva = false;
+    limparContasPreview();
+
+    document.getElementById('preview-area').classList.add('hidden');
+    document.getElementById('rezar-texto').innerHTML = '';
+
+    // Botões de preview: só habilitados quando há uma oração sendo editada
+    const temOracaoSalva = !!editandoId;
+    document.getElementById('btn-preview-ler').disabled       = !temOracaoSalva;
+    document.getElementById('btn-falar').disabled             = !temOracaoSalva;
+    document.getElementById('btn-preview-reiniciar').disabled = true; // sempre desabilitado até o Play rodar
+  }
+
+  // Habilita os botões Ler/Play assim que abrirForm() carrega uma oração salva
+  function habilitarBotoesPreview(){
+    document.getElementById('btn-preview-ler').disabled = false;
+    document.getElementById('btn-falar').disabled       = false;
+  }
+
+  // Retorna true se o textarea tem conteúdo diferente do texto salvo
+  function previewHaAlteracaoNaoSalva(){
+    if(!editandoId) return false;
+    const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
+    const textoSalvo  = o ? o.texto : '';
+    const textoAtual  = document.getElementById('input-oficial-texto').value;
+    return textoSalvo !== textoAtual;
+  }
+
+  function previewRenderizarTexto(textoSalvo){
+    const container = document.getElementById('rezar-texto');
+    container.innerHTML = '';
+    const arvore = construirArvore(textoSalvo, new Set());
+    // ctx = null → sem checks (✓), sem progresso, pura leitura visual
+    renderizarNos(arvore, container, null);
+    if(!container.innerHTML.trim()){
+      container.innerHTML = '<p class="dica">Esta oração ainda não tem texto.</p>';
+    }
+  }
+
+  function previewAbrir(comNarracao){
+    if(!editandoId){
+      mostrarToast('Salve a oração antes de pré-visualizar.');
+      return;
+    }
+    if(previewHaAlteracaoNaoSalva()){
+      mostrarToast('Para visualizar, salve a oração antes.');
+      return;
+    }
+
+    const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
+
+    pararFala();
+    // Fixa o id de preview → isola "contas" de terço sem tocar ids reais
+    oracaoAtualId = ID_PREVIEW;
+    secaoCtxAtual = null; // sem progresso/checks no preview
+
+    document.getElementById('preview-area').classList.remove('hidden');
+    previewRenderizarTexto(o.texto);
+
+    if(comNarracao){
+      iniciarFala();
+      previewNarracaoAtiva = true;
+      document.getElementById('btn-preview-reiniciar').disabled = false;
+    }
+  }
+
+  document.getElementById('btn-preview-ler').addEventListener('click', () => previewAbrir(false));
+  document.getElementById('btn-falar').addEventListener('click', () => {
+    if(!editandoId){ mostrarToast('Salve a oração antes de pré-visualizar.'); return; }
+    if(previewHaAlteracaoNaoSalva()){ mostrarToast('Para visualizar, salve a oração antes.'); return; }
+    // Se já está narrando, o btn-falar pausa/continua normalmente via alternarFala()
+    if(previewNarracaoAtiva){
+      alternarFala();
+    } else {
+      previewAbrir(true);
+    }
+  });
+  document.getElementById('btn-preview-reiniciar').addEventListener('click', () => {
+    if(!previewNarracaoAtiva) return;
+    pararFala();
+    // Rerenderiza para garantir que os blocos estão fechados antes de reler
+    const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
+    if(o) previewRenderizarTexto(o.texto);
+    iniciarFala();
+  });
+
 </script>
 </body>
 </html>
