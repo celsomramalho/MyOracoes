@@ -225,62 +225,42 @@ function salvarEditor(){
 
 // ===================== INSERIR REFERÊNCIA [Título] =====================
 let posicaoCursorSalva = null;
-let listaCompletaModalInserir = [];
 
-function renderizarListaModalInserir(termoBusca){
+function renderizarListaModalInserir(){
   const lista = document.getElementById('lista-modal-inserir');
   if(!lista) return;
 
   lista.innerHTML = '';
 
-  if(listaCompletaModalInserir.length === 0){
+  const pessoais = ORACOES.filter(o => o.id !== editandoId)
+    .map(o => ({ ...o, _tipo: 'pessoal' }));
+  const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
+  const disponiveis = [...pessoais, ...oficiais]
+    .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+
+  if(disponiveis.length === 0){
     lista.innerHTML = '<p class="dica">Você ainda não tem outras orações salvas para inserir aqui.</p>';
-    return;
+  }else{
+    disponiveis.forEach(o => {
+      const item = document.createElement('div');
+      item.className = 'item-modal';
+      item.innerHTML = `${escaparHTML(o.titulo)}${o._tipo === 'oficial' ? ' <span style="color:var(--texto-suave);font-size:0.8em;">📜 oficial</span>' : ''}`;
+      item.addEventListener('click', () => inserirReferencia(o.titulo));
+      lista.appendChild(item);
+    });
   }
-
-  const termo = normalizarBusca(termoBusca);
-  const filtradas = termo
-    ? listaCompletaModalInserir.filter(o => normalizarBusca(o.titulo).includes(termo))
-    : listaCompletaModalInserir;
-
-  if(filtradas.length === 0){
-    lista.innerHTML = '<p class="dica">Nenhuma oração encontrada com esse nome.</p>';
-    return;
-  }
-
-  filtradas.forEach(o => {
-    const item = document.createElement('div');
-    item.className = 'item-modal';
-    item.innerHTML = `${escaparHTML(o.titulo)}${o._tipo === 'oficial' ? ' <span style="color:var(--texto-suave);font-size:0.8em;">📜 oficial</span>' : ''}`;
-    item.addEventListener('click', () => inserirReferencia(o.titulo));
-    lista.appendChild(item);
-  });
 }
 
 function abrirModalInserir(){
   const inputTexto = document.getElementById('input-texto');
   posicaoCursorSalva = inputTexto.selectionStart;
-
-  const pessoais = ORACOES.filter(o => o.id !== editandoId)
-    .map(o => ({ ...o, _tipo: 'pessoal' }));
-  const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
-  listaCompletaModalInserir = [...pessoais, ...oficiais]
-    .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
-
-  const inputBusca = document.getElementById('input-busca-modal-inserir');
-  inputBusca.value = '';
-  renderizarListaModalInserir('');
+  renderizarListaModalInserir();
   document.getElementById('modal-inserir').classList.remove('hidden');
-  inputBusca.focus();
 }
 
 function fecharModalInserir(){
   document.getElementById('modal-inserir').classList.add('hidden');
 }
-
-document.getElementById('input-busca-modal-inserir').addEventListener('input', (e) => {
-  renderizarListaModalInserir(e.target.value);
-});
 
 function inserirReferencia(titulo){
   const respostaQuantidade = prompt(

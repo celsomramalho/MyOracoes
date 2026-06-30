@@ -1,3 +1,13 @@
+// ===================== SCROLL INTELIGENTE =====================
+
+// Retorna true se o elemento já está inteiramente visível dentro da viewport
+// com uma margem de conforto, evitando rolagens desnecessárias entre linhas
+// consecutivas que já aparecem juntas na tela (ex: V. + R. da Ave Maria).
+function estaVisivel(el, margem = 80) {
+  const r = el.getBoundingClientRect();
+  return r.top >= margem && r.bottom <= (window.innerHeight - margem);
+}
+
 // ===================== VOZES (uma para V., outra para R.) =====================
 let configVozes = JSON.parse(localStorage.getItem(CHAVE_VOZES) || 'null') || { v: null, r: null };
 
@@ -103,7 +113,7 @@ function obterLinhasParaFalar(){
 
     if (el.classList.contains('bloco-ref')) {
       const secaoAtualIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : secaoIdx;
-      const fileira = el.querySelector(':scope > .bloco-ref-conteudo > .fileira-contas');
+      const fileira = el.querySelector(':scope > .fileira-contas');
       const conteudoDiv = el.querySelector(':scope > .bloco-ref-conteudo');
 
       if (fileira && conteudoDiv) {
@@ -180,9 +190,25 @@ async function alternarFala(){
 function calcularIndiceInicialFala(fila){
   if(!oracaoAtualId) return 0;
   const concluidas = new Set(progressoLeitura[oracaoAtualId] || []);
-  if(concluidas.size === 0) return 0;
 
-  const idx = fila.findIndex(item => item.secaoIdx < 0 || !concluidas.has(item.secaoIdx));
+  const idx = fila.findIndex(item => {
+    // Seção totalmente concluída → pula
+    if(item.secaoIdx >= 0 && concluidas.has(item.secaoIdx)) return false;
+
+    // Item de bloco repetido: verifica quantas voltas já foram concluídas
+    if(item.repetido && item.blocoEl){
+      const secaoIdxBloco = item.blocoEl.dataset.secaoIdx
+        ? parseInt(item.blocoEl.dataset.secaoIdx, 10)
+        : item.secaoIdx;
+      const contasConcluidas = parseInt(
+        localStorage.getItem(`contas_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
+      );
+      if(item.contaIdx <= contasConcluidas) return false; // volta já feita → pula
+    }
+
+    return true; // este item ainda não foi feito → começa aqui
+  });
+
   return idx === -1 ? null : idx;
 }
 
@@ -212,6 +238,10 @@ async function iniciarFala(){
 function pausarFala(){
   if(!falando || pausado) return;
   pausado = true;
+  if(utteranciaAtual){
+    utteranciaAtual.onend = null;
+    utteranciaAtual.onerror = null;
+  }
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
   atualizarBotaoFala();
 }
@@ -267,13 +297,12 @@ function falarProximaLinha(){
   const blocoFechado = encontrarBlocoColapsadoNaFala(item.elemento);
   if(blocoFechado){
     // Oração conhecida (Ave Maria, Pai Nosso...) e está fechada: destaca o
-    // cabeçalho do bloco em vez de abrir e destacar a linha lá dentro.
-    const titulo = blocoFechado.querySelector(':scope > .bloco-ref-titulo');
-    if(titulo) titulo.classList.add('titulo-falando');
-    blocoFechado.scrollIntoView({ behavior:'smooth', block:'center' });
+    // bloco inteiro (inclui contas) em vez de abrir e destacar a linha lá dentro.
+    blocoFechado.classList.add('titulo-falando');
+    if(!estaVisivel(blocoFechado)) blocoFechado.scrollIntoView({ behavior:'smooth', block:'center' });
   }else{
     item.elemento.classList.add('linha-falando');
-    item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
+    if(!estaVisivel(item.elemento)) item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
   }
 
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));

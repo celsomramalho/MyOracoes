@@ -192,7 +192,6 @@
     <div class="modal-conteudo">
       <h3>Inserir oração</h3>
       <p class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
-      <input id="input-busca-modal-inserir-admin" type="text" placeholder="🔎 Buscar oração..." autocomplete="off">
       <div id="lista-modal-inserir-admin" class="lista-modal"></div>
       <button id="btn-fechar-modal-admin" class="btn-secundario">Cancelar</button>
     </div>
@@ -439,57 +438,34 @@
 
   // Modal Inserir Oração
   let posicaoCursorSalva = null;
-  let listaCompletaModalInserirAdmin = [];
 
-  function normalizarBuscaAdmin(texto){
-    return (texto || '')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
-      .toLowerCase()
-      .trim();
-  }
-
-  function renderizarListaModalInserirAdmin(termoBusca){
+  function renderizarListaModalInserirAdmin(){
     const lista = document.getElementById('lista-modal-inserir-admin');
     if(!lista) return;
 
     lista.innerHTML = '';
 
-    if(listaCompletaModalInserirAdmin.length === 0){
+    const disponiveis = oracoesOficiais.filter(o => o.id !== editandoId)
+      .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+
+    if(disponiveis.length === 0){
       lista.innerHTML = '<p class="dica">Nenhuma outra oração oficial cadastrada para inserir como referência.</p>';
-      return;
+    }else{
+      disponiveis.forEach(o => {
+        const item = document.createElement('div');
+        item.className = 'item-modal';
+        item.textContent = o.titulo;
+        item.addEventListener('click', () => inserirReferenciaAdmin(o.titulo));
+        lista.appendChild(item);
+      });
     }
-
-    const termo = normalizarBuscaAdmin(termoBusca);
-    const filtradas = termo
-      ? listaCompletaModalInserirAdmin.filter(o => normalizarBuscaAdmin(o.titulo).includes(termo))
-      : listaCompletaModalInserirAdmin;
-
-    if(filtradas.length === 0){
-      lista.innerHTML = '<p class="dica">Nenhuma oração encontrada com esse nome.</p>';
-      return;
-    }
-
-    filtradas.forEach(o => {
-      const item = document.createElement('div');
-      item.className = 'item-modal';
-      item.textContent = o.titulo;
-      item.addEventListener('click', () => inserirReferenciaAdmin(o.titulo));
-      lista.appendChild(item);
-    });
   }
 
   function abrirModalInserirAdmin(){
     const inputTexto = document.getElementById('input-oficial-texto');
     posicaoCursorSalva = inputTexto.selectionStart;
-
-    listaCompletaModalInserirAdmin = oracoesOficiais.filter(o => o.id !== editandoId)
-      .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
-
-    const inputBusca = document.getElementById('input-busca-modal-inserir-admin');
-    inputBusca.value = '';
-    renderizarListaModalInserirAdmin('');
+    renderizarListaModalInserirAdmin();
     document.getElementById('modal-inserir-admin').classList.remove('hidden');
-    inputBusca.focus();
   }
 
   function fecharModalInserirAdmin(){
@@ -519,9 +495,6 @@
 
   document.getElementById('btn-inserir-oracao-admin').addEventListener('click', abrirModalInserirAdmin);
   document.getElementById('btn-fechar-modal-admin').addEventListener('click', fecharModalInserirAdmin);
-  document.getElementById('input-busca-modal-inserir-admin').addEventListener('input', (e) => {
-    renderizarListaModalInserirAdmin(e.target.value);
-  });
 </script>
 </body>
 </html>

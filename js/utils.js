@@ -7,14 +7,6 @@ function escaparHTML(texto){
   return div.innerHTML;
 }
 
-// ===================== BUSCA (ignora acentos e maiúsculas/minúsculas) =====================
-function normalizarBusca(texto){
-  return (texto || '')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
-    .toLowerCase()
-    .trim();
-}
-
 // ===================== HELPERS DE CARD =====================
 function obterInicial(titulo){
   const t = (titulo || '').trim();
