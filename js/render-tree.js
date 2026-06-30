@@ -393,12 +393,96 @@ function renderizarTextoRezar(textoOriginal){
 
 // ===================== MARCAÇÃO DE PROGRESSO POR SEÇÃO =====================
 
+// Acha o índice do bloco-pai DIRETO de um elemento (o bloco-ref mais próximo
+// que tenha seu próprio check, ou seja, dataset.secaoIdx definido). Usado
+// para sincronizar o check do título do bloco com os checks das linhas
+// internas (ex: "Pai Nosso", "Glória ao Pai").
+function encontrarIdxPaiDireto(el){
+  let pai = el.parentElement;
+  while(pai && pai.id !== 'rezar-texto'){
+    if(pai.classList.contains('bloco-ref') && pai.dataset.secaoIdx !== undefined && pai.dataset.secaoIdx !== ''){
+      return parseInt(pai.dataset.secaoIdx, 10);
+    }
+    pai = pai.parentElement;
+  }
+  return null;
+}
+
+// Depois de marcar uma linha/bloco como concluído, verifica se isso
+// completou TODOS os irmãos diretos de algum bloco-pai (ex: todas as linhas
+// de "Pai Nosso") — se sim, marca o título do bloco-pai também, subindo
+// recursivamente caso haja mais níveis aninhados.
+function tentarMarcarBlocosPaiAutomaticamente(oracaoId, idxAlterado){
+  if(!secaoCtxAtual || secaoCtxAtual.oracaoId !== oracaoId) return false;
+  const elementos = secaoCtxAtual.elementos;
+  let entradaAtual = elementos.find(e => e.idx === idxAlterado);
+  if(!entradaAtual) return false;
+
+  let mudou = false;
+
+  while(true){
+    const idxPai = encontrarIdxPaiDireto(entradaAtual.el);
+    if(idxPai == null) break;
+    const entradaPai = elementos.find(e => e.idx === idxPai);
+    if(!entradaPai) break;
+
+    const concluidas = new Set(progressoLeitura[oracaoId] || []);
+    if(concluidas.has(idxPai)){
+      entradaAtual = entradaPai;
+      continue; // pai já marcado, mas tenta subir mais um nível
+    }
+
+    const filhosDiretos = elementos.filter(e => e.idx !== idxPai && encontrarIdxPaiDireto(e.el) === idxPai);
+    const todosConcluidos = filhosDiretos.length > 0 && filhosDiretos.every(f => concluidas.has(f.idx));
+    if(!todosConcluidos) break;
+
+    concluidas.add(idxPai);
+    progressoLeitura[oracaoId] = [...concluidas].sort((a,b) => a-b);
+    mudou = true;
+    entradaAtual = entradaPai;
+  }
+
+  if(mudou) salvarProgressoLeitura();
+  return mudou;
+}
+
+// Inverso da função acima: ao desmarcar uma linha, se o bloco-pai estava
+// marcado como concluído, ele deixa de estar (já que nem todas as linhas
+// internas estão mais concluídas), e isso sobe pelos níveis aninhados.
+function tentarDesmarcarBlocosPaiAutomaticamente(oracaoId, idxAlterado){
+  if(!secaoCtxAtual || secaoCtxAtual.oracaoId !== oracaoId) return false;
+  const elementos = secaoCtxAtual.elementos;
+  let entradaAtual = elementos.find(e => e.idx === idxAlterado);
+  if(!entradaAtual) return false;
+
+  let mudou = false;
+
+  while(true){
+    const idxPai = encontrarIdxPaiDireto(entradaAtual.el);
+    if(idxPai == null) break;
+    const entradaPai = elementos.find(e => e.idx === idxPai);
+    if(!entradaPai) break;
+
+    const concluidas = new Set(progressoLeitura[oracaoId] || []);
+    if(!concluidas.has(idxPai)) break; // pai já não estava marcado, nada a propagar
+
+    concluidas.delete(idxPai);
+    progressoLeitura[oracaoId] = [...concluidas].sort((a,b) => a-b);
+    mudou = true;
+    entradaAtual = entradaPai;
+  }
+
+  if(mudou) salvarProgressoLeitura();
+  return mudou;
+}
+
 function marcarSecao(oracaoId, idx){
   if(!progressoLeitura[oracaoId]) progressoLeitura[oracaoId] = [];
   const set = new Set(progressoLeitura[oracaoId]);
   for(let i = 0; i <= idx; i++) set.add(i);
   progressoLeitura[oracaoId] = [...set].sort((a,b) => a-b);
   salvarProgressoLeitura();
+  tentarMarcarBlocosPaiAutomaticamente(oracaoId, idx);
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
   }
@@ -410,6 +494,7 @@ function desmarcarSecao(oracaoId, idx){
   set.delete(idx);
   progressoLeitura[oracaoId] = [...set].sort((a,b) => a-b);
   salvarProgressoLeitura();
+  tentarDesmarcarBlocosPaiAutomaticamente(oracaoId, idx);
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
   }

@@ -108,7 +108,7 @@ function obterLinhasParaFalar(){
   const container = document.getElementById('rezar-texto');
   const linhas = [];
 
-  function extrairElemento(el, secaoIdx, infoRepeticao) {
+  function extrairElemento(el, secaoIdx, infoRepeticao, ancestraisBloco) {
     if (!el || !el.classList) return;
 
     if (el.classList.contains('bloco-ref')) {
@@ -125,12 +125,21 @@ function obterLinhasParaFalar(){
           
           Array.from(conteudoDiv.children).forEach(filho => {
             if (filho.classList.contains('fileira-contas')) return;
-            extrairElemento(filho, secaoAtualIdx, novaInfo);
+            extrairElemento(filho, secaoAtualIdx, novaInfo, ancestraisBloco);
           });
         }
       } else if (conteudoDiv) {
+        // Bloco simples (não repetido, ex: "Pai Nosso", "Glória ao Pai"): o
+        // índice deste bloco é alocado DEPOIS dos filhos (numeração pós-fixada),
+        // então cada linha interna ganha seu próprio índice individual,
+        // diferente do índice do bloco-pai. Guardamos o índice do bloco-pai
+        // na cadeia de ancestrais para podermos marcá-lo como concluído
+        // separadamente quando todas as linhas internas forem lidas.
+        const novosAncestrais = secaoAtualIdx >= 0
+          ? [...ancestraisBloco, secaoAtualIdx]
+          : ancestraisBloco;
         Array.from(conteudoDiv.children).forEach(filho => {
-          extrairElemento(filho, secaoAtualIdx, infoRepeticao);
+          extrairElemento(filho, secaoAtualIdx, infoRepeticao, novosAncestrais);
         });
       }
     } else if (el.classList.contains('grupo-texto-secao')) {
@@ -150,20 +159,21 @@ function obterLinhasParaFalar(){
           repetido: infoRepeticao.length > 0,
           contaIdx: infoMaisInterna ? infoMaisInterna.contaIdx : 1,
           blocoEl: infoMaisInterna ? infoMaisInterna.blocoEl : null,
-          historicoRepeticoes: infoRepeticao
+          historicoRepeticoes: infoRepeticao,
+          ancestraisBloco
         });
       });
     } else {
       if (el.children) {
         Array.from(el.children).forEach(filho => {
-          extrairElemento(filho, secaoIdx, infoRepeticao);
+          extrairElemento(filho, secaoIdx, infoRepeticao, ancestraisBloco);
         });
       }
     }
   }
 
   Array.from(container.children).forEach(filho => {
-    extrairElemento(filho, -1, []);
+    extrairElemento(filho, -1, [], []);
   });
 
   return linhas;
@@ -248,6 +258,19 @@ function pausarFala(){
 
 function continuarFala(){
   if(!falando || !pausado) return;
+
+  // Enquanto pausado, o usuário pode ter alterado o progresso na mão (marcado
+  // contas mais à frente, ou desmarcado contas pra trás para repetir um trecho).
+  // Recalcula a posição correta nos dois sentidos, em vez de simplesmente
+  // retomar do ponto onde a fala foi pausada.
+  const indiceRecalculado = calcularIndiceInicialFala(filaFala);
+  if(indiceRecalculado === null){
+    mostrarToast('Oração já concluída. Use "Reiniciar progresso" para ouvir de novo.');
+    pararFala();
+    return;
+  }
+  indiceFalaAtual = indiceRecalculado;
+
   pausado = false;
   atualizarBotaoFala();
   falarProximaLinha();
@@ -269,6 +292,21 @@ function atualizarBotaoFala(){
     btn.title = 'Pausar';
     btn.classList.add('btn-falar-tocando');
   }
+}
+
+// Marca um único índice de seção como concluído (sem preencher a faixa
+// 0..idx como marcarSecao() faz) — usado pelo modo de fala, que percorre
+// as seções na ordem em que aparecem na oração.
+function adicionarSecaoConcluida(oracaoId, idx){
+  if(idx == null || idx < 0) return false;
+  const jaConcluida = (progressoLeitura[oracaoId] || []).includes(idx);
+  if(jaConcluida) return false;
+  if(!progressoLeitura[oracaoId]) progressoLeitura[oracaoId] = [];
+  const set = new Set(progressoLeitura[oracaoId]);
+  set.add(idx);
+  progressoLeitura[oracaoId] = [...set].sort((a,b) => a-b);
+  salvarProgressoLeitura();
+  return true;
 }
 
 function falarProximaLinha(){
@@ -392,16 +430,27 @@ function falarProximaLinha(){
     indiceFalaAtual++;
     if(oracaoAtualId && secaoIdxAtual >= 0 && secaoCtxAtual){
       const proximoItem = filaFala[indiceFalaAtual];
+      let mudouAlgo = false;
+
       if(!proximoItem || proximoItem.secaoIdx !== secaoIdxAtual){
-        const jaConc = (progressoLeitura[oracaoAtualId] || []).includes(secaoIdxAtual);
-        if(!jaConc){
-          if(!progressoLeitura[oracaoAtualId]) progressoLeitura[oracaoAtualId] = [];
-          const set = new Set(progressoLeitura[oracaoAtualId]);
-          set.add(secaoIdxAtual);
-          progressoLeitura[oracaoAtualId] = [...set].sort((a,b) => a-b);
-          salvarProgressoLeitura();
-          atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
+        if(adicionarSecaoConcluida(oracaoAtualId, secaoIdxAtual)) mudouAlgo = true;
+      }
+
+      // Propaga a conclusão para blocos-pai (ex: "Pai Nosso", "Glória ao Pai")
+      // que estejam sendo encerrados nesta linha — ou seja, cujo índice não
+      // aparece mais nos ancestrais do próximo item da fila. Sem isso, o
+      // check do bloco-pai nunca era marcado pelo modo de fala, mesmo com
+      // todo o conteúdo interno já lido.
+      const ancestraisAtuais = item.ancestraisBloco || [];
+      const ancestraisProximo = proximoItem ? (proximoItem.ancestraisBloco || []) : [];
+      ancestraisAtuais.forEach(idxAncestral => {
+        if(!ancestraisProximo.includes(idxAncestral)){
+          if(adicionarSecaoConcluida(oracaoAtualId, idxAncestral)) mudouAlgo = true;
         }
+      });
+
+      if(mudouAlgo){
+        atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
       }
     }
     falarProximaLinha();
