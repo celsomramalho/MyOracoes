@@ -148,7 +148,7 @@ function compartilharOracao(id){
     const base64 = btoa(unescape(encodeURIComponent(dadosStr)));
     const link = `${window.location.origin}${window.location.pathname}?importar=${base64}`;
 
-    const texto = `Quero compartilhar esta oração com você pelo app Minhas Orações:\n\n"${o.titulo}"\n\n${link}`;
+    const texto = `Quero compartilhar esta oração com você pelo app MyOrações:\n\n"${o.titulo}"\n\n${link}`;
 
     if(navigator.share){
       navigator.share({ title: o.titulo, text: texto }).catch(() => {

@@ -1,4 +1,4 @@
-const CACHE_NOME = 'minhas-oracoes-v3';
+const CACHE_NOME = 'minhas-oracoes-v4';
 const ARQUIVOS_PARA_CACHE = [
   './',
   './index.html',
@@ -27,6 +27,13 @@ self.addEventListener('activate', (evento) => {
 });
 
 self.addEventListener('fetch', (evento) => {
+  // Ignora requisições que não sejam http/https (ex: chrome-extension://,
+  // injetadas por extensões do navegador). O Cache API não aceita esses
+  // esquemas e tentar usá-los gera erro no console sem benefício algum.
+  if (!evento.request.url.startsWith('http')) {
+    return;
+  }
+
   // Fontes do Google Fonts: tenta rede, sem quebrar offline se falhar
   if(evento.request.url.includes('fonts.googleapis.com') || evento.request.url.includes('fonts.gstatic.com')){
     evento.respondWith(

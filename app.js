@@ -36,7 +36,7 @@ function mostrarView(id){
   const btnCompartilharApp = document.getElementById('btn-compartilhar-app');
 
   if (topbarTitulo && btnTopbarHome) {
-    let textoTitulo = 'Minhas Orações';
+    let textoTitulo = 'MyOrações';
 
     if (id === 'view-home') {
       textoTitulo = 'MyOrações';
@@ -46,7 +46,7 @@ function mostrarView(id){
       btnTopbarHome.classList.remove('hidden');
       if (btnCompartilharApp) btnCompartilharApp.classList.add('hidden');
       if (id === 'view-todas') {
-        textoTitulo = 'Minhas Orações';
+        textoTitulo = 'Criar/Editar';
       } else if (id === 'view-oficiais') {
         textoTitulo = 'Orações Oficiais';
       } else if (id === 'view-editor') {
