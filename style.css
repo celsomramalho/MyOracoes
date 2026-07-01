@@ -186,6 +186,51 @@ html,body{
   display: none;
 }
 
+/* Botão de salvar (ícone) exibido na topbar da tela Editar/Nova oração */
+.btn-topbar-salvar {
+  background: none;
+  border: none;
+  color: var(--texto-suave);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.btn-topbar-salvar:hover {
+  background: var(--superficie-alta);
+  color: var(--ouro-suave);
+}
+.btn-topbar-salvar.hidden {
+  display: none;
+}
+/* Sinaliza que há alterações não salvas */
+.btn-topbar-salvar.nao-salvo {
+  color: #fff;
+  background: var(--perigo);
+  box-shadow: 0 0 0 3px rgba(201, 117, 107, 0.25);
+}
+.btn-topbar-salvar.nao-salvo:hover {
+  background: var(--perigo);
+  filter: brightness(1.08);
+}
+
+/* Mesmo estado de "alterações não salvas", em versão para botões-ícone
+   normais (ex: botão Salvar no topo do formulário do Painel Admin) */
+.btn-icone.nao-salvo {
+  background: var(--perigo);
+  border-color: var(--perigo);
+  color: #fff;
+}
+.btn-icone.nao-salvo:hover {
+  filter: brightness(1.08);
+}
+
 /* Container de navegação na Home */
 .home-nav-container {
   display: flex;
@@ -729,6 +774,57 @@ html,body{
   margin-top: 6px;
 }
 .modal-botoes .btn-primario{ margin-top:0; }
+
+/* ---------- MODAL DE ALERTA (ex: confirmar exclusão) ---------- */
+/* Diferente dos modais de lista: aparece centralizado, como um cartão
+   compacto, em vez de colado no rodapé da tela */
+.modal:has(.modal-conteudo-alerta){
+  align-items: center;
+  padding: 20px;
+}
+.modal-conteudo-alerta{
+  border-radius: var(--raio);
+  max-width: 380px;
+  text-align: center;
+  padding: 28px 24px 24px;
+}
+.modal-icone-alerta{
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: rgba(201, 117, 107, 0.14);
+  color: var(--perigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-conteudo-alerta h3{
+  font-size: 1.35rem;
+  margin: 0 0 8px;
+}
+.modal-conteudo-alerta .dica{
+  margin: 0 0 4px;
+  text-align: center;
+}
+.modal-conteudo-alerta .modal-botoes{
+  margin-top: 20px;
+}
+.btn-modal-flex{ flex: 1; }
+
+.btn-perigo-solido{
+  background: var(--perigo);
+  color: #251A06;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.98rem;
+  font-family: 'EB Garamond', serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.btn-perigo-solido:hover{ filter: brightness(1.1); }
 
 /* ---------- MODAIS COM CABEÇALHO FIXO E LISTA ROLÁVEL (ex: Inserir oração) ---------- */
 .modal-conteudo-fixo{

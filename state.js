@@ -90,6 +90,8 @@ let ORACOES = carregarOracoes();
 let ORACOES_OFICIAIS = [];       // carregado via fetch
 let favoritasOficiaisIds = carregarFavoritasOficiais();
 let editandoId = null;     // id da oração sendo editada (null = criando nova)
+let editorTituloOriginal = '';  // valor do título ao abrir o editor, para detectar alterações não salvas
+let editorTextoOriginal = '';   // valor do texto ao abrir o editor, para detectar alterações não salvas
 let oracaoAtualId = null;  // id da oração aberta na tela "Rezar"
 let oracaoAtualTipo = 'pessoal'; // 'pessoal' ou 'oficial'
 let origemRezar = 'home';  // 'home', 'todas' ou 'oficiais'

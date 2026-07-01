@@ -229,6 +229,13 @@
       <button id="btn-preview-ler"       class="btn-secundario btn-icone" type="button" title="Ler (sem narrar)" disabled>📖</button>
       <button id="btn-falar"             class="btn-secundario btn-icone" type="button" title="Ouvir narração"   disabled>▶</button>
       <button id="btn-preview-reiniciar" class="btn-secundario btn-icone" type="button" title="Reiniciar narração" disabled>🔄</button>
+      <button id="btn-salvar-oficial" class="btn-secundario btn-icone" type="button" title="Salvar oração oficial" aria-label="Salvar oração oficial">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+      </button>
       <button class="btn-secundario" id="btn-cancelar-admin-form" style="margin: 0;">← Cancelar</button>
     </div>
     <h2 class="titulo-secao" id="admin-form-cabecalho">Nova Oração Oficial</h2>
@@ -257,7 +264,6 @@
     <textarea id="input-oficial-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
     <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
 
-    <button id="btn-salvar-oficial" class="btn-primario">Salvar Oração Oficial</button>
   </main>
 
   <!-- MODAL: INSERIR ORAÇÃO -->
@@ -291,6 +297,27 @@
         <input id="input-busca-editar" type="text" placeholder="🔎 Buscar..." autocomplete="off">
       </div>
       <div id="lista-modal-buscar-editar" class="lista-modal modal-lista-rolavel"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAR EXCLUSÃO -->
+  <div id="modal-confirmar-exclusao" class="modal hidden">
+    <div class="modal-conteudo modal-conteudo-alerta">
+      <div class="modal-icone-alerta" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </div>
+      <h3>Excluir oração</h3>
+      <p class="dica" id="texto-confirmar-exclusao">Essa ação não pode ser desfeita.</p>
+      <div class="modal-botoes">
+        <button id="btn-cancelar-exclusao" class="btn-secundario btn-modal-flex">Cancelar</button>
+        <button id="btn-confirmar-exclusao" class="btn-perigo-solido btn-modal-flex">Excluir</button>
+      </div>
     </div>
   </div>
 
@@ -329,6 +356,7 @@
   
   let editandoId = null;
   let alteracoesNaoExportadas = false;
+  let formOriginal = { titulo: '', texto: '', oculta: false, colapsarNaFala: false };
 
   function atualizarAvisoAlteracoes(){
     const aviso = document.getElementById('aviso-alteracoes-pendentes');
@@ -486,21 +514,60 @@
       checkColapsarFala.checked = false;
     }
 
+    formOriginal = {
+      titulo: inputTitulo.value,
+      texto: inputTexto.value,
+      oculta: checkOculta.checked,
+      colapsarNaFala: checkColapsarFala.checked
+    };
+    atualizarEstadoBotaoSalvarOficial();
+
     mostrarView('view-admin-form');
     resetarPreview();
     if(editandoId) habilitarBotoesPreview();
     inputTitulo.focus();
   }
 
+  // Compara o formulário atual com o estado salvo/original, e sinaliza no
+  // ícone de salvar (topo) se há alterações pendentes
+  function atualizarEstadoBotaoSalvarOficial(){
+    const btnSalvar = document.getElementById('btn-salvar-oficial');
+    if(!btnSalvar) return;
+    const titulo = document.getElementById('input-oficial-titulo').value;
+    const texto = document.getElementById('input-oficial-texto').value;
+    const oculta = document.getElementById('checkbox-oficial-oculta').checked;
+    const colapsarNaFala = document.getElementById('checkbox-oficial-colapsar-fala').checked;
+    const houveAlteracao = titulo !== formOriginal.titulo || texto !== formOriginal.texto ||
+      oculta !== formOriginal.oculta || colapsarNaFala !== formOriginal.colapsarNaFala;
+    btnSalvar.classList.toggle('nao-salvo', houveAlteracao);
+  }
+
+  let idOficialParaExcluir = null;
+
   function excluirOficial(id) {
     const o = ORACOES_OFICIAIS.find(x => x.id === id);
     if (!o) return;
-    if (confirm(`Excluir a oração oficial "${o.titulo}"?`)) {
-      ORACOES_OFICIAIS = ORACOES_OFICIAIS.filter(x => x.id !== id);
-      alteracoesNaoExportadas = true;
-      renderizarListaAdmin();
-    }
+    idOficialParaExcluir = id;
+    document.getElementById('texto-confirmar-exclusao').textContent =
+      `Excluir a oração oficial "${o.titulo}"? Essa ação não pode ser desfeita.`;
+    document.getElementById('modal-confirmar-exclusao').classList.remove('hidden');
   }
+
+  function fecharModalExclusao() {
+    document.getElementById('modal-confirmar-exclusao').classList.add('hidden');
+    idOficialParaExcluir = null;
+  }
+
+  function confirmarExclusaoOficial() {
+    if (!idOficialParaExcluir) return;
+    ORACOES_OFICIAIS = ORACOES_OFICIAIS.filter(x => x.id !== idOficialParaExcluir);
+    alteracoesNaoExportadas = true;
+    renderizarListaAdmin();
+    fecharModalExclusao();
+  }
+
+  document.getElementById('btn-cancelar-exclusao').addEventListener('click', fecharModalExclusao);
+  document.getElementById('btn-confirmar-exclusao').addEventListener('click', confirmarExclusaoOficial);
 
   // Botão Criar Nova
   document.getElementById('btn-criar-nova-oficial').addEventListener('click', () => abrirForm(null));
@@ -543,13 +610,26 @@
     } else {
       const novoId = 'oficial_' + Date.now().toString(36);
       ORACOES_OFICIAIS.push({ id: novoId, titulo, texto, oculta, colapsarNaFala });
+      editandoId = novoId; // passa a editar a oração recém-criada, sem sair da tela
     }
 
     alteracoesNaoExportadas = true;
     renderizarListaAdmin();
-    resetarPreview();
-    mostrarView('view-admin-list');
+    mostrarToast('Oração oficial salva com sucesso!', 'sucesso');
+
+    // Permanece na tela do formulário; atualiza o "original" (ícone volta ao
+    // neutro), o cabeçalho (de "Nova" para "Editar") e habilita a pré-visualização
+    formOriginal = { titulo, texto, oculta, colapsarNaFala };
+    atualizarEstadoBotaoSalvarOficial();
+    document.getElementById('admin-form-cabecalho').textContent = 'Editar Oração Oficial';
+    habilitarBotoesPreview();
+    document.getElementById('btn-preview-reiniciar').disabled = true;
   });
+
+  document.getElementById('input-oficial-titulo').addEventListener('input', atualizarEstadoBotaoSalvarOficial);
+  document.getElementById('input-oficial-texto').addEventListener('input', atualizarEstadoBotaoSalvarOficial);
+  document.getElementById('checkbox-oficial-oculta').addEventListener('change', atualizarEstadoBotaoSalvarOficial);
+  document.getElementById('checkbox-oficial-colapsar-fala').addEventListener('change', atualizarEstadoBotaoSalvarOficial);
 
   // Botão Baixar arquivo JSON atualizado
   document.getElementById('btn-exportar-json').addEventListener('click', () => {
@@ -617,6 +697,7 @@
     const antes = inputTexto.value.slice(0, pos);
     const depois = inputTexto.value.slice(pos);
     inputTexto.value = antes + referencia + depois;
+    atualizarEstadoBotaoSalvarOficial();
     fecharModalInserirAdmin();
     inputTexto.focus();
     const novaPos = pos + referencia.length;

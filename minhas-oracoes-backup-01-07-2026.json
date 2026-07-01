@@ -1,0 +1,18 @@
+{
+  "versao": 1,
+  "exportadoEm": "2026-07-01T18:12:03.279Z",
+  "oracoes": [
+    {
+      "id": "o_mqu0jbay_b17p7s",
+      "titulo": "Orações da manhã",
+      "texto": "[São José dormindo]\n[Santíssimos corações de Jesus e Maria]\n[Os sete Pai Nossos de Santa Brígida]\n[Coroa das Lágrimas]\n",
+      "favorita": true
+    },
+    {
+      "id": "o_mqwxspa8_ptm817",
+      "titulo": "Orações do meio-dia",
+      "texto": "[Angelus (tempo comum)]\n[São Miguel Arcanjo, defendei-nos]\n[Nossa Senhora Auxiliadora]",
+      "favorita": true
+    }
+  ]
+}

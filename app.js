@@ -68,6 +68,12 @@ function mostrarView(id){
     topbarAcoesRezar.classList.toggle('hidden', id !== 'view-rezar');
   }
 
+  // Botão de salvar (ícone) só aparece na tela de Criar/Editar oração
+  const btnSalvarTopo = document.getElementById('btn-salvar-topo');
+  if (btnSalvarTopo) {
+    btnSalvarTopo.classList.toggle('hidden', id !== 'view-editor');
+  }
+
   // Cabeçalho fixo do Modo Rezar: começa sem sombra ao entrar na tela
   const rezarFixo = document.getElementById('rezar-fixo');
   if (rezarFixo) rezarFixo.classList.remove('com-sombra');
@@ -186,17 +192,48 @@ function abrirEditor(id){
     inputTitulo.value = '';
     inputTexto.value = '';
   }
+
+  editorTituloOriginal = inputTitulo.value;
+  editorTextoOriginal = inputTexto.value;
+  atualizarEstadoBotaoSalvar();
+
   mostrarView('view-editor');
   inputTitulo.focus();
 }
 
+// Compara o conteúdo atual do editor com o que havia ao abrir a tela e
+// sinaliza no ícone de salvar da topbar se há alterações não salvas
+function atualizarEstadoBotaoSalvar(){
+  const btnSalvarTopo = document.getElementById('btn-salvar-topo');
+  if(!btnSalvarTopo) return;
+  const inputTitulo = document.getElementById('input-titulo');
+  const inputTexto = document.getElementById('input-texto');
+  const houveAlteracao = inputTitulo.value !== editorTituloOriginal || inputTexto.value !== editorTextoOriginal;
+  btnSalvarTopo.classList.toggle('nao-salvo', houveAlteracao);
+}
+
+let idParaExcluir = null;
+
 function excluirOracao(id){
   const o = ORACOES.find(x => x.id === id);
   if(!o) return;
-  if(!confirm(`Excluir a oração "${o.titulo}"? Essa ação não pode ser desfeita.`)) return;
-  ORACOES = ORACOES.filter(x => x.id !== id);
+  idParaExcluir = id;
+  document.getElementById('texto-confirmar-exclusao').textContent =
+    `Excluir a oração "${o.titulo}"? Essa ação não pode ser desfeita.`;
+  document.getElementById('modal-confirmar-exclusao').classList.remove('hidden');
+}
+
+function fecharModalExclusao(){
+  document.getElementById('modal-confirmar-exclusao').classList.add('hidden');
+  idParaExcluir = null;
+}
+
+function confirmarExclusao(){
+  if(!idParaExcluir) return;
+  ORACOES = ORACOES.filter(x => x.id !== idParaExcluir);
   salvarOracoes(ORACOES);
   renderizarTudo();
+  fecharModalExclusao();
   mostrarView('view-todas');
 }
 
@@ -230,14 +267,22 @@ function salvarEditor(){
     o.titulo = titulo;
     o.texto = texto;
   }else{
-    ORACOES.push({ id: gerarId(), titulo, texto, favorita: false });
+    const nova = { id: gerarId(), titulo, texto, favorita: false };
+    ORACOES.push(nova);
+    editandoId = nova.id; // passa a editar a oração recém-criada, sem sair da tela
   }
 
   salvarOracoes(ORACOES);
   renderizarTudo();
   mostrarToast('Oração salva com sucesso!', 'sucesso');
 
-  mostrarView('view-todas');
+  // Permanece na tela de edição; apenas atualiza a referência do que é
+  // "original" (para o ícone de salvar voltar ao estado neutro) e o
+  // título da topbar (de "Nova oração" para "Editar oração", se for o caso)
+  editorTituloOriginal = titulo;
+  editorTextoOriginal = texto;
+  atualizarEstadoBotaoSalvar();
+  mostrarView('view-editor');
 }
 
 
@@ -302,6 +347,7 @@ function inserirReferencia(titulo){
   const antes = inputTexto.value.slice(0, pos);
   const depois = inputTexto.value.slice(pos);
   inputTexto.value = antes + referencia + depois;
+  atualizarEstadoBotaoSalvar();
   fecharModalInserir();
   inputTexto.focus();
   const novaPos = pos + referencia.length;
@@ -451,10 +497,14 @@ document.getElementById('btn-topbar-home').addEventListener('click', () => {
 document.getElementById('btn-compartilhar-app').addEventListener('click', compartilharApp);
 
 document.getElementById('fab-nova').addEventListener('click', () => abrirEditor(null));
-document.getElementById('btn-salvar').addEventListener('click', salvarEditor);
+document.getElementById('btn-salvar-topo').addEventListener('click', salvarEditor);
+document.getElementById('input-titulo').addEventListener('input', atualizarEstadoBotaoSalvar);
+document.getElementById('input-texto').addEventListener('input', atualizarEstadoBotaoSalvar);
 
 document.getElementById('btn-inserir-oracao').addEventListener('click', abrirModalInserir);
 document.getElementById('btn-fechar-modal').addEventListener('click', fecharModalInserir);
+document.getElementById('btn-cancelar-exclusao').addEventListener('click', fecharModalExclusao);
+document.getElementById('btn-confirmar-exclusao').addEventListener('click', confirmarExclusao);
 document.getElementById('input-busca-inserir').addEventListener('input', (e) => {
   renderizarListaModalInserir(e.target.value);
 });

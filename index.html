@@ -36,6 +36,13 @@
         <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
       </svg>
     </button>
+    <button id="btn-salvar-topo" class="btn-topbar-salvar hidden" title="Salvar oração" aria-label="Salvar oração" type="button">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+    </button>
     <button id="btn-topbar-home" class="btn-topbar-home hidden" title="Voltar para a Home" aria-label="Voltar para a Home">
       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -100,8 +107,6 @@
     </div>
     <textarea id="input-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
     <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
-
-    <button id="btn-salvar" class="btn-primario">Salvar oração</button>
   </main>
 
   <!-- TELA: REZAR -->
@@ -149,6 +154,27 @@
         <input id="input-busca-inserir" type="text" placeholder="🔎 Buscar oração..." autocomplete="off">
       </div>
       <div id="lista-modal-inserir" class="lista-modal modal-lista-rolavel"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAR EXCLUSÃO -->
+  <div id="modal-confirmar-exclusao" class="modal hidden">
+    <div class="modal-conteudo modal-conteudo-alerta">
+      <div class="modal-icone-alerta" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </div>
+      <h3>Excluir oração</h3>
+      <p class="dica" id="texto-confirmar-exclusao">Essa ação não pode ser desfeita.</p>
+      <div class="modal-botoes">
+        <button id="btn-cancelar-exclusao" class="btn-secundario btn-modal-flex">Cancelar</button>
+        <button id="btn-confirmar-exclusao" class="btn-perigo-solido btn-modal-flex">Excluir</button>
+      </div>
     </div>
   </div>
 
