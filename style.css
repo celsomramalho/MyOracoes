@@ -217,6 +217,42 @@ html,body{
   transform: scale(0.98);
 }
 
+/* Bloco fixo da Home: botões de navegação + contador diário + busca
+   ficam parados logo abaixo da topbar; só a lista de favoritas rola. */
+.home-fixo{
+  position: sticky;
+  top: var(--topbar-altura, 78px);
+  z-index: 4;
+  background: var(--bg);
+  margin: 0 -20px;
+  padding: 4px 20px 14px;
+  border-bottom: 1px solid var(--borda);
+}
+.home-fixo .home-nav-container{
+  margin: 12px 0 16px;
+}
+.home-busca input{
+  width: 100%;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  color: var(--texto);
+  font-family: 'EB Garamond', serif;
+  font-size: 1.08rem;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+.home-busca input:focus{
+  outline: none;
+  border-color: var(--ouro);
+}
+
+/* Espaço entre a linha do bloco fixo e a lista de favoritas que vem depois. */
+#lista-favoritas{
+  margin-top: 16px;
+}
+
 /* ---------- CARDS DE ORAÇÃO ---------- */
 .lista-oracoes{
   display:flex;

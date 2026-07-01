@@ -124,5 +124,12 @@
     "texto": "V. Sagrada Face do Senhor, \nR. Aliviai a nossa dor!",
     "oculta": true,
     "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr28kql4",
+    "titulo": "Oração de Fátima",
+    "texto": "V. Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno; levai as almas todas para o Céu, e socorrei principalmente aquelas que mais precisarem.\nR. Ó Virgem Dolorosíssima, as Vossas Lágrimas derrubaram o império infernal!",
+    "oculta": true,
+    "colapsarNaFala": false
   }
 ]

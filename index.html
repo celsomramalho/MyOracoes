@@ -46,11 +46,16 @@
 
   <!-- TELA INICIAL: HOME -->
   <main id="view-home" class="view view-active">
-    <div class="home-nav-container">
-      <button id="btn-ver-todas" class="btn-nav-home">✏️ Criar/Editar</button>
-      <button id="btn-ver-oficiais" class="btn-nav-home">📜 Orações Oficiais</button>
+    <div id="home-fixo" class="home-fixo">
+      <div class="home-nav-container">
+        <button id="btn-ver-todas" class="btn-nav-home">✏️ Criar/Editar</button>
+        <button id="btn-ver-oficiais" class="btn-nav-home">📜 Orações Oficiais</button>
+      </div>
+      <div id="progresso-diario" class="progresso-diario-container"></div>
+      <div class="home-busca">
+        <input id="input-busca-favoritas" type="text" placeholder="🔎 Buscar..." autocomplete="off">
+      </div>
     </div>
-    <div id="progresso-diario" class="progresso-diario-container"></div>
     <div id="lista-favoritas" class="lista-oracoes"></div>
     <p id="empty-favoritas" class="empty-state hidden">
       Você ainda não tem orações favoritas.<br>

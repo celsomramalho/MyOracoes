@@ -103,20 +103,26 @@ window.addEventListener('scroll', () => {
 
 
 // ===================== RENDERIZAÇÃO DAS LISTAS =====================
-function renderizarFavoritas(){
+function renderizarFavoritas(termo){
   const lista = document.getElementById('lista-favoritas');
   const vazio = document.getElementById('empty-favoritas');
   lista.innerHTML = '';
 
   const pessoaisFav = ORACOES.filter(o => o.favorita);
   const oficaisFav = ORACOES_OFICIAIS.filter(o => favoritasOficiaisIds.includes(o.id));
-  const todasFav = [
+  let todasFav = [
     ...pessoaisFav.map(o => ({ ...o, _tipo: 'pessoal' })),
     ...oficaisFav.map(o => ({ ...o, _tipo: 'oficial' })),
   ].sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
 
+  const norm = normalizarBusca(termo || '');
+  if(norm) todasFav = todasFav.filter(o => normalizarBusca(o.titulo).includes(norm));
+
   if(todasFav.length === 0){
     vazio.classList.remove('hidden');
+    vazio.innerHTML = norm
+      ? 'Nenhuma oração encontrada.'
+      : 'Você ainda não tem orações favoritas.<br>Toque na estrela de uma oração para marcá-la aqui, ou crie uma nova.';
   }else{
     vazio.classList.add('hidden');
     todasFav.forEach(o => lista.appendChild(criarCardOracao(o, 'home', o._tipo)));
@@ -427,6 +433,10 @@ document.getElementById('btn-ver-oficiais').addEventListener('click', () => {
 
 document.getElementById('input-busca-oficiais').addEventListener('input', (e) => {
   renderizarOficiais(e.target.value);
+});
+
+document.getElementById('input-busca-favoritas').addEventListener('input', (e) => {
+  renderizarFavoritas(e.target.value);
 });
 
 document.getElementById('btn-topbar-home').addEventListener('click', () => {
