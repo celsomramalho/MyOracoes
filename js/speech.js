@@ -103,6 +103,7 @@ let indiceFalaAtual = 0;
 let falando = false;
 let pausado = false;
 let utteranciaAtual = null;
+let timeoutPausaAtual = null; // timer pendente de um marcador [pausa]{n} durante a fala
 
 function obterLinhasParaFalar(){
   const container = document.getElementById('rezar-texto');
@@ -152,6 +153,7 @@ function obterLinhasParaFalar(){
         const infoMaisInterna = infoRepeticao[infoRepeticao.length - 1];
         
         linhas.push({
+          tipo: 'linha',
           elemento: p,
           texto,
           voz2: p.classList.contains('linha-r'),
@@ -163,6 +165,9 @@ function obterLinhasParaFalar(){
           ancestraisBloco
         });
       });
+    } else if (el.classList.contains('pausa-marcador')) {
+      const segundos = Math.min(Math.max(parseFloat(el.dataset.segundos) || 1, 1), 30);
+      linhas.push({ tipo: 'pausa', elemento: el, segundos, secaoIdx: -1 });
     } else {
       if (el.children) {
         Array.from(el.children).forEach(filho => {
@@ -253,6 +258,10 @@ function pausarFala(){
     utteranciaAtual.onerror = null;
   }
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if(timeoutPausaAtual){
+    clearTimeout(timeoutPausaAtual);
+    timeoutPausaAtual = null;
+  }
   atualizarBotaoFala();
 }
 
@@ -330,6 +339,12 @@ function falarProximaLinha(){
   }
 
   const item = filaFala[indiceFalaAtual];
+
+  if(item.tipo === 'pausa'){
+    falarPausa(item);
+    return;
+  }
+
   expandirParaElemento(item.elemento);
 
   const blocoFechado = encontrarBlocoColapsadoNaFala(item.elemento);
@@ -462,6 +477,22 @@ function falarProximaLinha(){
   window.speechSynthesis.speak(utterancia);
 }
 
+// Aguarda os segundos configurados em um marcador [pausa]{n} antes de
+// seguir para o próximo item da fila — sem chamar o sintetizador de voz.
+function falarPausa(item){
+  utteranciaAtual = null;
+  if(item.elemento){
+    if(!estaVisivel(item.elemento)) item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
+    item.elemento.classList.add('linha-falando');
+  }
+  timeoutPausaAtual = setTimeout(() => {
+    timeoutPausaAtual = null;
+    if(!falando || pausado) return;
+    indiceFalaAtual++;
+    falarProximaLinha();
+  }, item.segundos * 1000);
+}
+
 function pararFala(){
   falando = false;
   pausado = false;
@@ -470,6 +501,10 @@ function pararFala(){
     utteranciaAtual.onerror = null;
   }
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if(timeoutPausaAtual){
+    clearTimeout(timeoutPausaAtual);
+    timeoutPausaAtual = null;
+  }
   document.querySelectorAll('.linha-falando, .titulo-falando').forEach(el => el.classList.remove('linha-falando', 'titulo-falando'));
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
   atualizarBotaoFala();

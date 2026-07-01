@@ -332,6 +332,29 @@ function fecharModalInserir(){
   document.getElementById('modal-inserir').classList.add('hidden');
 }
 
+// Insere um marcador de pausa curta no texto, ex: "[pausa]{2}" para 2 segundos.
+// Reaproveita a mesma sintaxe de citação de oração ([Título]{n}), só que
+// com a palavra reservada "pausa" no lugar de um título.
+function inserirPausa(){
+  const inputTexto = document.getElementById('input-texto');
+  const pos = inputTexto.selectionStart;
+  const resposta = prompt(
+    'Quantos segundos de pausa?\n(Ex: 2 para uma pequena pausa entre o fim de uma oração e o início de outra.)',
+    '2'
+  );
+  if(resposta === null) return;
+
+  const segundos = Math.min(Math.max(parseInt(resposta, 10) || 1, 1), 30);
+  const marcador = `[pausa]{${segundos}}`;
+  const antes = inputTexto.value.slice(0, pos);
+  const depois = inputTexto.value.slice(pos);
+  inputTexto.value = antes + marcador + depois;
+  atualizarEstadoBotaoSalvar();
+  inputTexto.focus();
+  const novaPos = pos + marcador.length;
+  inputTexto.setSelectionRange(novaPos, novaPos);
+}
+
 function inserirReferencia(titulo){
   const respostaQuantidade = prompt(
     `Quantas vezes rezar "${titulo}" aqui?\n(Ex: 10 para uma dezena. Deixe 1 para rezar uma única vez.)`,
@@ -501,6 +524,7 @@ document.getElementById('btn-salvar-topo').addEventListener('click', salvarEdito
 document.getElementById('input-titulo').addEventListener('input', atualizarEstadoBotaoSalvar);
 document.getElementById('input-texto').addEventListener('input', atualizarEstadoBotaoSalvar);
 
+document.getElementById('btn-inserir-pausa').addEventListener('click', inserirPausa);
 document.getElementById('btn-inserir-oracao').addEventListener('click', abrirModalInserir);
 document.getElementById('btn-fechar-modal').addEventListener('click', fecharModalInserir);
 document.getElementById('btn-cancelar-exclusao').addEventListener('click', fecharModalExclusao);

@@ -81,6 +81,14 @@ function construirArvore(texto, titulosVisitados, estado){
     const nomeLower = tituloRef.toLowerCase();
     const quantidade = Math.min(Math.max(parseInt(match[2] || '1', 10) || 1, 1), 200);
 
+    if(nomeLower === 'pausa'){
+      // Palavra reservada: não é uma citação de oração, é uma pequena pausa.
+      // Reaproveita a mesma sintaxe [Título]{n}, mas "n" aqui é em segundos.
+      nos.push({ tipo: 'pausa', segundos: quantidade });
+      ultimoIndice = match.index + match[0].length;
+      continue;
+    }
+
     if(titulosVisitados.has(nomeLower)){
       nos.push({ tipo: 'erro', texto: `(referência circular: ${tituloRef})` });
     }else{
@@ -362,6 +370,14 @@ function renderizarNos(nos, container, ctx){
       divBloco.appendChild(divConteudo);
       if(fileira) divBloco.prepend(fileira);
       container.appendChild(divBloco);
+
+    }else if(g.tipo === 'pausa'){
+      const divPausa = document.createElement('div');
+      divPausa.className = 'pausa-marcador';
+      divPausa.dataset.segundos = g.segundos;
+      divPausa.title = `Pausa de ${g.segundos}s`;
+      divPausa.textContent = '· · ·';
+      container.appendChild(divPausa);
 
     }else if(g.tipo === 'erro'){
       const p = document.createElement('p');

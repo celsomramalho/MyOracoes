@@ -426,6 +426,12 @@ html,body{
   gap: 10px;
 }
 .editor-toolbar .campo-label{ margin:16px 0 6px; }
+.editor-toolbar-botoes{
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 
 .dica{
   font-size: 0.85rem;
@@ -653,6 +659,17 @@ html,body{
   border-left: 2px solid var(--ouro);
   padding-left: 10px;
   margin: 4px 0 10px;
+}
+
+/* Marcador visual de uma pequena pausa entre orações (ex: [pausa]{2}) */
+.pausa-marcador{
+  text-align: center;
+  color: var(--texto-suave);
+  letter-spacing: 4px;
+  font-size: 0.9rem;
+  opacity: 0.5;
+  margin: 10px 0;
+  cursor: default;
 }
 
 /* ---------- ACORDEÃO DE REFERÊNCIAS ---------- */

@@ -102,12 +102,22 @@
   }
   .btn-ver-senha:hover{ color: var(--ouro); }
 
-  /* ── Preview na tela de edição ── */
+  /* ── Preview na tela de edição ──
+     Fica fixo (sticky) logo abaixo da topbar ao rolar, mesmo padrão
+     usado em .rezar-fixo / .busca-fixa no app principal. */
   .form-acoes-topo {
     display: flex;
     gap: 8px;
     align-items: center;
-    margin-bottom: 20px;
+    position: sticky;
+    top: var(--topbar-altura, 78px);
+    z-index: 4;
+    background: var(--bg);
+    margin: 0 -20px 20px;
+    padding: 4px 20px 14px;
+  }
+  .form-acoes-topo.com-sombra {
+    box-shadow: 0 8px 14px -10px rgba(0,0,0,0.45);
   }
   #preview-area {
     border: 1px solid var(--borda);
@@ -176,7 +186,7 @@
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
       <polyline points="9 11 11 13 15 9"></polyline>
     </svg>
-    <h1>Painel Admin - Orações Oficiais</h1>
+    <h1 id="admin-topbar-titulo">Orações Oficiais</h1>
     <button id="btn-admin-logout" class="btn-topbar-home hidden" title="Sair do painel e voltar ao app" aria-label="Sair do painel e voltar ao app">
       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -236,7 +246,12 @@
           <polyline points="7 3 7 8 15 8"></polyline>
         </svg>
       </button>
-      <button class="btn-secundario" id="btn-cancelar-admin-form" style="margin: 0;">← Cancelar</button>
+      <button id="btn-cancelar-admin-form" class="btn-secundario btn-icone" type="button" title="Voltar" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </button>
     </div>
     <h2 class="titulo-secao" id="admin-form-cabecalho">Nova Oração Oficial</h2>
 
@@ -259,10 +274,13 @@
 
     <div class="editor-toolbar">
       <label class="campo-label" for="input-oficial-texto">Texto</label>
-      <button id="btn-inserir-oracao-admin" class="btn-secundario" type="button">+ Inserir oração</button>
+      <div class="editor-toolbar-botoes">
+        <button id="btn-inserir-pausa-admin" class="btn-secundario" type="button">+ Inserir pausa</button>
+        <button id="btn-inserir-oracao-admin" class="btn-secundario" type="button">+ Inserir oração</button>
+      </div>
     </div>
     <textarea id="input-oficial-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
-    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
+    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
 
   </main>
 
@@ -426,8 +444,38 @@
     if (id === 'view-login') {
       btnLogout.classList.add('hidden');
     }
+    // Título da topbar varia conforme a tela ativa
+    const topbarTitulo = document.getElementById('admin-topbar-titulo');
+    if (topbarTitulo) {
+      topbarTitulo.textContent = (id === 'view-admin-form') ? 'Orações Oficiais - Admin' : 'Orações Oficiais';
+    }
+    // Fileira de ações do formulário começa sem sombra ao entrar na tela
+    const formAcoesTopo = document.querySelector('.form-acoes-topo');
+    if (formAcoesTopo) formAcoesTopo.classList.remove('com-sombra');
     window.scrollTo(0,0);
+    // A altura da topbar pode variar (ex: botão de logout aparecendo/sumindo),
+    // então remedimos depois que o navegador aplicar a troca de tela
+    requestAnimationFrame(atualizarAlturaTopbarAdmin);
   }
+
+  // Mede a altura real da topbar do admin e guarda numa variável CSS, para a
+  // fileira de ações fixa (.form-acoes-topo) encaixar exatamente abaixo dela
+  // (mesmo mecanismo usado em app.js para .rezar-fixo / .busca-fixa)
+  function atualizarAlturaTopbarAdmin(){
+    const topbar = document.querySelector('.topbar');
+    if (!topbar) return;
+    document.documentElement.style.setProperty('--topbar-altura', topbar.offsetHeight + 'px');
+  }
+  window.addEventListener('resize', atualizarAlturaTopbarAdmin);
+  window.addEventListener('load', atualizarAlturaTopbarAdmin);
+  atualizarAlturaTopbarAdmin();
+
+  // Sombra na fileira de ações fixa quando o conteúdo é rolado
+  window.addEventListener('scroll', () => {
+    const formAcoesTopo = document.querySelector('.form-acoes-topo');
+    const viewFormAtiva = document.getElementById('view-admin-form')?.classList.contains('view-active');
+    if (formAcoesTopo) formAcoesTopo.classList.toggle('com-sombra', viewFormAtiva && window.scrollY > 4);
+  }, { passive: true });
 
   async function carregarDadosIniciais() {
     try {
@@ -704,6 +752,30 @@
     inputTexto.setSelectionRange(novaPos, novaPos);
   }
 
+  // Insere um marcador de pausa curta no texto, ex: "[pausa]{2}" para 2 segundos.
+  // Reaproveita a mesma sintaxe de citação de oração ([Título]{n}), só que
+  // com a palavra reservada "pausa" no lugar de um título.
+  function inserirPausaAdmin(){
+    const inputTexto = document.getElementById('input-oficial-texto');
+    const pos = inputTexto.selectionStart;
+    const resposta = prompt(
+      'Quantos segundos de pausa?\n(Ex: 2 para uma pequena pausa entre o fim de uma oração e o início de outra.)',
+      '2'
+    );
+    if(resposta === null) return;
+
+    const segundos = Math.min(Math.max(parseInt(resposta, 10) || 1, 1), 30);
+    const marcador = `[pausa]{${segundos}}`;
+    const antes = inputTexto.value.slice(0, pos);
+    const depois = inputTexto.value.slice(pos);
+    inputTexto.value = antes + marcador + depois;
+    atualizarEstadoBotaoSalvarOficial();
+    inputTexto.focus();
+    const novaPos = pos + marcador.length;
+    inputTexto.setSelectionRange(novaPos, novaPos);
+  }
+
+  document.getElementById('btn-inserir-pausa-admin').addEventListener('click', inserirPausaAdmin);
   document.getElementById('btn-inserir-oracao-admin').addEventListener('click', abrirModalInserirAdmin);
   document.getElementById('btn-fechar-modal-admin').addEventListener('click', fecharModalInserirAdmin);
   document.getElementById('input-busca-inserir').addEventListener('input', e => {
