@@ -97,7 +97,6 @@
     <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
 
     <button id="btn-salvar" class="btn-primario">Salvar oração</button>
-    <button id="btn-excluir-editor" class="btn-secundario btn-perigo" style="margin-top: 10px; width: 100%;">Excluir oração</button>
   </main>
 
   <!-- TELA: REZAR -->
@@ -133,11 +132,18 @@
 
   <!-- MODAL: INSERIR ORAÇÃO -->
   <div id="modal-inserir" class="modal hidden">
-    <div class="modal-conteudo">
-      <h3>Inserir oração</h3>
-      <p class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
-      <div id="lista-modal-inserir" class="lista-modal"></div>
-      <button id="btn-fechar-modal" class="btn-secundario">Cancelar</button>
+    <div class="modal-conteudo modal-conteudo-fixo">
+      <div class="modal-cabecalho">
+        <div>
+          <h3>Inserir oração</h3>
+          <p class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
+        </div>
+        <button id="btn-fechar-modal" class="btn-secundario">Cancelar</button>
+      </div>
+      <div class="modal-busca">
+        <input id="input-busca-inserir" type="text" placeholder="🔎 Buscar oração..." autocomplete="off">
+      </div>
+      <div id="lista-modal-inserir" class="lista-modal modal-lista-rolavel"></div>
     </div>
   </div>
 

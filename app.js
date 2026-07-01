@@ -172,19 +172,26 @@ function abrirEditor(id){
   const inputTitulo = document.getElementById('input-titulo');
   const inputTexto = document.getElementById('input-texto');
 
-  const btnExcluir = document.getElementById('btn-excluir-editor');
   if(editandoId){
     const o = ORACOES.find(x => x.id === editandoId);
     inputTitulo.value = o ? o.titulo : '';
     inputTexto.value = o ? o.texto : '';
-    if(btnExcluir) btnExcluir.style.display = '';
   }else{
     inputTitulo.value = '';
     inputTexto.value = '';
-    if(btnExcluir) btnExcluir.style.display = 'none';
   }
   mostrarView('view-editor');
   inputTitulo.focus();
+}
+
+function excluirOracao(id){
+  const o = ORACOES.find(x => x.id === id);
+  if(!o) return;
+  if(!confirm(`Excluir a oração "${o.titulo}"? Essa ação não pode ser desfeita.`)) return;
+  ORACOES = ORACOES.filter(x => x.id !== id);
+  salvarOracoes(ORACOES);
+  renderizarTudo();
+  mostrarView('view-todas');
 }
 
 function salvarEditor(){
@@ -233,7 +240,7 @@ function salvarEditor(){
 // ===================== INSERIR REFERÊNCIA [Título] =====================
 let posicaoCursorSalva = null;
 
-function renderizarListaModalInserir(){
+function renderizarListaModalInserir(termo){
   const lista = document.getElementById('lista-modal-inserir');
   if(!lista) return;
 
@@ -242,11 +249,14 @@ function renderizarListaModalInserir(){
   const pessoais = ORACOES.filter(o => o.id !== editandoId)
     .map(o => ({ ...o, _tipo: 'pessoal' }));
   const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
-  const disponiveis = [...pessoais, ...oficiais]
+  let disponiveis = [...pessoais, ...oficiais]
     .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
 
+  const norm = normalizarBusca(termo || '');
+  if(norm) disponiveis = disponiveis.filter(o => normalizarBusca(o.titulo).includes(norm));
+
   if(disponiveis.length === 0){
-    lista.innerHTML = '<p class="dica">Você ainda não tem outras orações salvas para inserir aqui.</p>';
+    lista.innerHTML = '<p class="dica">Nenhuma oração encontrada.</p>';
   }else{
     disponiveis.forEach(o => {
       const item = document.createElement('div');
@@ -261,8 +271,10 @@ function renderizarListaModalInserir(){
 function abrirModalInserir(){
   const inputTexto = document.getElementById('input-texto');
   posicaoCursorSalva = inputTexto.selectionStart;
-  renderizarListaModalInserir();
+  document.getElementById('input-busca-inserir').value = '';
+  renderizarListaModalInserir('');
   document.getElementById('modal-inserir').classList.remove('hidden');
+  document.getElementById('input-busca-inserir').focus();
 }
 
 function fecharModalInserir(){
@@ -433,6 +445,9 @@ document.getElementById('btn-salvar').addEventListener('click', salvarEditor);
 
 document.getElementById('btn-inserir-oracao').addEventListener('click', abrirModalInserir);
 document.getElementById('btn-fechar-modal').addEventListener('click', fecharModalInserir);
+document.getElementById('input-busca-inserir').addEventListener('input', (e) => {
+  renderizarListaModalInserir(e.target.value);
+});
 
 document.getElementById('btn-favoritar-rezar').addEventListener('click', () => {
   if(!oracaoAtualId) return;
@@ -454,16 +469,6 @@ document.getElementById('btn-salvar-vozes').addEventListener('click', salvarConf
 
 document.getElementById('btn-exportar-oracoes').addEventListener('click', exportarOracoes);
 document.getElementById('btn-importar-oracoes').addEventListener('click', importarOracoesDeArquivo);
-document.getElementById('btn-excluir-editor').addEventListener('click', () => {
-  if(!editandoId) return;
-  const o = ORACOES.find(x => x.id === editandoId);
-  if(!o) return;
-  if(!confirm(`Excluir a oração "${o.titulo}"? Essa ação não pode ser desfeita.`)) return;
-  ORACOES = ORACOES.filter(x => x.id !== editandoId);
-  salvarOracoes(ORACOES);
-  renderizarTudo();
-  mostrarView('view-todas');
-});
 
 // ===================== INICIALIZAÇÃO =====================
 renderizarTodas();

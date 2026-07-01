@@ -393,6 +393,26 @@ html,body{
 }
 
 .btn-perigo{ color: var(--perigo); }
+
+/* Ações (Editar/Excluir) dentro do card, ex: tela Criar/Editar */
+.card-acoes{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.btn-excluir{
+  background: none;
+  border: 1px solid var(--perigo);
+  color: var(--perigo);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: 'EB Garamond', serif;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.btn-excluir:hover{ background: var(--voz2-fundo); }
 .btn-perigo:hover{ border-color: var(--perigo); }
 
 /* ---------- BOTÃO FLUTUANTE ---------- */
@@ -466,6 +486,12 @@ html,body{
 .busca-fixa input:focus{
   outline: none;
   border-color: var(--ouro);
+}
+
+/* Espaço entre a linha do campo de busca fixo e a lista que vem depois
+   (ex: tela Orações Oficiais), evitando que o primeiro card encoste na borda. */
+#lista-oficiais{
+  margin-top: 16px;
 }
 
 .rezar-cabecalho{
@@ -667,6 +693,52 @@ html,body{
   margin-top: 6px;
 }
 .modal-botoes .btn-primario{ margin-top:0; }
+
+/* ---------- MODAIS COM CABEÇALHO FIXO E LISTA ROLÁVEL (ex: Inserir oração) ---------- */
+.modal-conteudo-fixo{
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 !important;
+}
+.modal-cabecalho{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 20px 12px;
+  flex-shrink: 0;
+}
+.modal-cabecalho > div{ flex: 1; }
+.modal-cabecalho h3{ margin: 0 0 4px; }
+.modal-cabecalho .dica{ margin: 0; }
+.modal-busca{
+  padding: 0 20px 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--borda);
+}
+.modal-lista-rolavel{
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 20px 20px;
+  margin: 0 !important;
+}
+#input-busca-inserir{
+  width: 100%;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  color: var(--texto);
+  font-family: 'EB Garamond', serif;
+  font-size: 1.08rem;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+#input-busca-inserir:focus{
+  outline: none;
+  border-color: var(--ouro);
+}
 
 #select-voz-v, #select-voz-r{
   width:100%;
