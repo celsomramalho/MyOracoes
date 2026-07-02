@@ -66,10 +66,49 @@ function criarPartesLinha(linha, classe){
   return partes;
 }
 
+function interpretarReferencia(rawRef){
+  const partes = rawRef.split('|');
+  if(partes.length < 2){
+    return {
+      titulo: rawRef.trim(),
+      id: null
+    };
+  }
+
+  const id = partes.pop().trim();
+  const titulo = partes.join('|').trim();
+  return { titulo, id: id || null };
+}
+
+function encontrarOracaoReferenciada(ref){
+  if(ref.id){
+    const porId =
+      ORACOES.find(o => o.id === ref.id) ||
+      ORACOES_OFICIAIS.find(o => o.id === ref.id);
+    if(porId) return porId;
+  }
+
+  const nomeLower = ref.titulo.toLowerCase();
+  return (
+    ORACOES.find(o => o.titulo.trim().toLowerCase() === nomeLower) ||
+    ORACOES_OFICIAIS.find(o => o.titulo.trim().toLowerCase() === nomeLower)
+  );
+}
+
+function extrairUrlReferenciaLink(tituloRef){
+  const match = tituloRef.match(/^link:(.+)$/i);
+  if(!match) return null;
+  const url = match[1].trim();
+  if(!/^https?:\/\//i.test(url)) return null;
+  return url;
+}
+
 function construirArvore(texto, titulosVisitados, estado){
   if(!estado) estado = { respostaAuto: null };
   const nos = [];
-  const regex = /\[([^\[\]]+)\](?:\{(\d+)\})?/g;
+  // O modificador entre chaves aceita um número (repetição) ou a palavra
+  // reservada "opcional" (leitura opcional, oculta por padrão).
+  const regex = /\[([^\[\]]+)\](?:\{(\d+|opcional)\})?/gi;
   let ultimoIndice = 0;
   let match;
 
@@ -77,9 +116,19 @@ function construirArvore(texto, titulosVisitados, estado){
     const textoBefore = texto.slice(ultimoIndice, match.index);
     if(textoBefore) adicionarLinhas(nos, textoBefore, estado);
 
-    const tituloRef = match[1].trim();
+    const ref = interpretarReferencia(match[1].trim());
+    const tituloRef = ref.titulo;
     const nomeLower = tituloRef.toLowerCase();
-    const quantidade = Math.min(Math.max(parseInt(match[2] || '1', 10) || 1, 1), 200);
+    const modificador = match[2] ? match[2].toLowerCase() : null;
+    const ehOpcional = modificador === 'opcional';
+    const quantidade = ehOpcional ? 1 : Math.min(Math.max(parseInt(modificador || '1', 10) || 1, 1), 200);
+
+    const urlLink = extrairUrlReferenciaLink(tituloRef);
+    if(urlLink){
+      nos.push({ tipo: 'link', url: urlLink });
+      ultimoIndice = match.index + match[0].length;
+      continue;
+    }
 
     if(nomeLower === 'pausa'){
       // Palavra reservada: não é uma citação de oração, é uma pequena pausa.
@@ -89,21 +138,28 @@ function construirArvore(texto, titulosVisitados, estado){
       continue;
     }
 
-    if(titulosVisitados.has(nomeLower)){
-      nos.push({ tipo: 'erro', texto: `(referência circular: ${tituloRef})` });
-    }else{
-      const encontrada =
-        ORACOES.find(o => o.titulo.trim().toLowerCase() === nomeLower) ||
-        ORACOES_OFICIAIS.find(o => o.titulo.trim().toLowerCase() === nomeLower);
+    const encontrada = encontrarOracaoReferenciada(ref);
 
-      if(!encontrada){
-        nos.push({ tipo: 'erro', texto: `(oração "${tituloRef}" não encontrada)` });
+    if(!encontrada){
+      nos.push({ tipo: 'erro', texto: `(oração "${tituloRef}" não encontrada)` });
+    }else{
+      const chaveIdEncontrada = `id:${encontrada.id}`;
+      const chaveTituloEncontrada = `titulo:${encontrada.titulo.trim().toLowerCase()}`;
+
+      if(titulosVisitados.has(chaveIdEncontrada) || titulosVisitados.has(chaveTituloEncontrada)){
+        nos.push({ tipo: 'erro', texto: `(referência circular: ${encontrada.titulo})` });
       }else{
         const novosVisitados = new Set(titulosVisitados);
-        novosVisitados.add(nomeLower);
+        novosVisitados.add(chaveIdEncontrada);
+        novosVisitados.add(chaveTituloEncontrada);
         // Oração referenciada ganha seu próprio estado de resposta automática,
         // independente do que estiver ligado na oração que a referencia.
-        if(quantidade > 1){
+        if(ehOpcional){
+          // Leitura opcional: começa sempre oculta e fora da fala; o usuário
+          // decide, na hora, se quer abrir/ouvir (não é lembrado depois).
+          const filhos = construirArvore(encontrada.texto, novosVisitados);
+          nos.push({ tipo: 'opcional', rotulo: encontrada.titulo, filhos });
+        }else if(quantidade > 1){
           const filhos = construirArvore(encontrada.texto, novosVisitados);
           nos.push({ tipo: 'repetido', rotulo: encontrada.titulo, quantidade, filhos, colapsarNaFala: !!encontrada.colapsarNaFala });
         }else{
@@ -370,6 +426,71 @@ function renderizarNos(nos, container, ctx){
       divBloco.appendChild(divConteudo);
       if(fileira) divBloco.prepend(fileira);
       container.appendChild(divBloco);
+
+    }else if(g.tipo === 'opcional'){
+      // Leitura opcional: citação de outra oração, oculta e fora da fala por
+      // padrão. O usuário liga um interruptor para mostrar/ouvir na hora —
+      // essa escolha não é lembrada; ao reabrir a oração, volta a ficar oculta.
+      const divBloco = document.createElement('div');
+      divBloco.className = 'bloco-opcional';
+
+      const divTitulo = document.createElement('div');
+      divTitulo.className = 'bloco-opcional-titulo';
+
+      const icone = document.createElement('span');
+      icone.className = 'bloco-opcional-icone';
+      icone.textContent = '📖';
+      divTitulo.appendChild(icone);
+
+      const textoSpan = document.createElement('span');
+      textoSpan.className = 'bloco-opcional-texto';
+      textoSpan.textContent = `Leitura opcional: ${g.rotulo}`;
+      divTitulo.appendChild(textoSpan);
+
+      const switchEl = document.createElement('span');
+      switchEl.className = 'bloco-opcional-switch';
+      switchEl.setAttribute('role', 'switch');
+      switchEl.setAttribute('aria-checked', 'false');
+      divTitulo.appendChild(switchEl);
+
+      const divConteudo = document.createElement('div');
+      divConteudo.className = 'bloco-opcional-conteudo';
+      // Conteúdo opcional não recebe checks de progresso (ctx: null) —
+      // não é obrigatório para considerar a oração concluída.
+      renderizarNos(g.filhos, divConteudo, null);
+
+      divTitulo.addEventListener('click', () => {
+        const ativo = divBloco.classList.toggle('aberto');
+        switchEl.setAttribute('aria-checked', String(ativo));
+      });
+
+      divBloco.appendChild(divTitulo);
+      divBloco.appendChild(divConteudo);
+      container.appendChild(divBloco);
+
+    }else if(g.tipo === 'link'){
+      const divLink = document.createElement('div');
+      divLink.className = 'link-marcador';
+
+      const anchor = document.createElement('a');
+      anchor.className = 'link-marcador-anchor';
+      anchor.href = g.url;
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+      anchor.title = g.url;
+
+      const icone = document.createElement('span');
+      icone.className = 'link-marcador-icone';
+      icone.textContent = '🔗';
+      anchor.appendChild(icone);
+
+      const texto = document.createElement('span');
+      texto.className = 'link-marcador-texto';
+      texto.textContent = g.url;
+      anchor.appendChild(texto);
+
+      divLink.appendChild(anchor);
+      container.appendChild(divLink);
 
     }else if(g.tipo === 'pausa'){
       const divPausa = document.createElement('div');

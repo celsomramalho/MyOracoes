@@ -298,13 +298,15 @@
           <button id="btn-inserir-admin" class="btn-secundario" type="button" aria-haspopup="true" aria-expanded="false">+ Inserir</button>
           <div id="menu-inserir-admin" class="menu-inserir hidden" role="menu">
             <button id="btn-inserir-oracao-admin" class="item-menu-inserir" type="button" role="menuitem">📜 Oração</button>
+            <button id="btn-inserir-opcional-admin" class="item-menu-inserir" type="button" role="menuitem">📖 Leitura opcional</button>
+            <button id="btn-inserir-link-admin" class="item-menu-inserir" type="button" role="menuitem">🔗 Link</button>
             <button id="btn-inserir-pausa-admin" class="item-menu-inserir" type="button" role="menuitem">⏸ Pausa</button>
           </div>
         </div>
       </div>
     </div>
     <textarea id="input-oficial-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
-    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use <strong>+ Inserir → Oração</strong> — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir → Pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
+    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use <strong>+ Inserir → Oração</strong> — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir → Pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Use <strong>+ Inserir → Leitura opcional</strong> para citar uma oração salva como texto complementar que fica oculto e fora da fala até o usuário decidir mostrar na hora de rezar. Use <strong>+ Inserir → Link</strong> para inserir uma URL que aparece para abrir, mas não entra na narração. Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
 
   </main>
 
@@ -313,8 +315,8 @@
     <div class="modal-conteudo modal-conteudo-fixo">
       <div class="modal-cabecalho">
         <div>
-          <h3>Inserir oração</h3>
-          <p class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
+          <h3 id="modal-inserir-admin-titulo">Inserir oração</h3>
+          <p id="modal-inserir-admin-dica" class="dica">Toque em uma oração para inserir a referência a ela no texto.</p>
         </div>
         <button id="btn-fechar-modal-admin" class="btn-secundario">Cancelar</button>
       </div>
@@ -322,6 +324,32 @@
         <input id="input-busca-inserir" type="text" placeholder="🔎 Buscar oração..." autocomplete="off">
       </div>
       <div id="lista-modal-inserir-admin" class="lista-modal modal-lista-rolavel"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: INSERIR LINK -->
+  <div id="modal-link-admin" class="modal hidden">
+    <div class="modal-conteudo modal-conteudo-alerta">
+      <h3>Inserir link</h3>
+      <p class="dica">Cole a URL que ficará disponível para abrir, mas fora da narração.</p>
+      <input id="input-link-url-admin" type="url" placeholder="https://exemplo.com" autocomplete="off">
+      <div class="modal-botoes">
+        <button id="btn-cancelar-link-admin" class="btn-secundario btn-modal-flex" type="button">Cancelar</button>
+        <button id="btn-confirmar-link-admin" class="btn-primario btn-modal-flex" type="button">Inserir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NÚMERO (repetições / pausa) -->
+  <div id="modal-numero-admin" class="modal hidden">
+    <div class="modal-conteudo modal-conteudo-alerta">
+      <h3 id="modal-numero-admin-titulo">Inserir</h3>
+      <p id="modal-numero-admin-dica" class="dica"></p>
+      <input id="input-numero-admin" type="number" min="1" max="200" step="1" inputmode="numeric">
+      <div class="modal-botoes">
+        <button id="btn-cancelar-numero-admin" class="btn-secundario btn-modal-flex" type="button">Cancelar</button>
+        <button id="btn-confirmar-numero-admin" class="btn-primario btn-modal-flex" type="button">Inserir</button>
+      </div>
     </div>
   </div>
 
@@ -728,6 +756,8 @@
 
   // Modal Inserir Oração
   let posicaoCursorSalva = null;
+  let modoInserirOpcionalAdmin = false;
+  let aoConfirmarNumeroAdmin = null;
 
   // Guarda a posição do cursor continuamente enquanto o usuário está DENTRO
   // do textarea (não só no momento do clique de um botão externo). Em mobile,
@@ -759,13 +789,31 @@
         const item = document.createElement('div');
         item.className = 'item-modal';
         item.textContent = o.titulo;
-        item.addEventListener('click', () => inserirReferenciaAdmin(o.titulo));
+        item.addEventListener('click', () => {
+          if(modoInserirOpcionalAdmin){
+            inserirReferenciaOpcionalAdmin(o);
+          }else{
+            inserirReferenciaAdmin(o);
+          }
+        });
         lista.appendChild(item);
       });
     }
   }
 
-  function abrirModalInserirAdmin(){
+  function abrirModalInserirAdmin(opcional){
+    modoInserirOpcionalAdmin = !!opcional;
+
+    const titulo = document.getElementById('modal-inserir-admin-titulo');
+    const dica = document.getElementById('modal-inserir-admin-dica');
+    if(modoInserirOpcionalAdmin){
+      titulo.textContent = 'Inserir leitura opcional';
+      dica.textContent = 'Toque em uma oração para inseri-la como leitura opcional: fica oculta e fora da fala até o usuário decidir mostrar na hora de rezar.';
+    }else{
+      titulo.textContent = 'Inserir oração';
+      dica.textContent = 'Toque em uma oração para inserir a referência a ela no texto.';
+    }
+
     const inputTexto = document.getElementById('input-oficial-texto');
     if(posicaoCursorSalva == null) posicaoCursorSalva = inputTexto.value.length;
     document.getElementById('input-busca-inserir').value = '';
@@ -778,18 +826,105 @@
     document.getElementById('modal-inserir-admin').classList.add('hidden');
   }
 
-  function inserirReferenciaAdmin(titulo){
-    const respostaQuantidade = prompt(
-      `Quantas vezes rezar "${titulo}" aqui?\n(Ex: 10 para uma dezena. Deixe 1 para rezar uma única vez.)`,
-      '1'
-    );
-    if(respostaQuantidade === null) return;
+  function abrirModalNumeroAdmin({ titulo, dica, valorInicial, min, max, aoConfirmar }){
+    const modal = document.getElementById('modal-numero-admin');
+    const input = document.getElementById('input-numero-admin');
+    document.getElementById('modal-numero-admin-titulo').textContent = titulo;
+    document.getElementById('modal-numero-admin-dica').textContent = dica;
+    input.min = String(min);
+    input.max = String(max);
+    input.value = String(valorInicial);
+    aoConfirmarNumeroAdmin = () => {
+      const valor = Math.min(Math.max(parseInt(input.value, 10) || valorInicial, min), max);
+      fecharModalNumeroAdmin();
+      aoConfirmar(valor);
+    };
+    modal.classList.remove('hidden');
+    input.focus({ preventScroll: true });
+    input.select();
+  }
 
-    const quantidade = Math.min(Math.max(parseInt(respostaQuantidade, 10) || 1, 1), 200);
+  function fecharModalNumeroAdmin(){
+    document.getElementById('modal-numero-admin').classList.add('hidden');
+    aoConfirmarNumeroAdmin = null;
+  }
+
+  function normalizarUrlInseridaAdmin(url){
+    const limpa = (url || '').trim();
+    if(!limpa) return '';
+    if(/^https?:\/\//i.test(limpa)) return limpa;
+    return `https://${limpa}`;
+  }
+
+  function abrirModalLinkAdmin(){
+    const inputTexto = document.getElementById('input-oficial-texto');
+    if(posicaoCursorSalva == null) posicaoCursorSalva = inputTexto.value.length;
+    const inputUrl = document.getElementById('input-link-url-admin');
+    inputUrl.value = '';
+    document.getElementById('modal-link-admin').classList.remove('hidden');
+    inputUrl.focus({ preventScroll: true });
+  }
+
+  function fecharModalLinkAdmin(){
+    document.getElementById('modal-link-admin').classList.add('hidden');
+  }
+
+  function inserirLinkAdmin(){
+    const url = normalizarUrlInseridaAdmin(document.getElementById('input-link-url-admin').value);
+    if(!url){
+      mostrarToast('Informe uma URL para inserir o link.');
+      return;
+    }
 
     const inputTexto = document.getElementById('input-oficial-texto');
     const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
-    const referencia = (quantidade > 1 ? `[${titulo}]{${quantidade}}` : `[${titulo}]`) + '\n';
+    const marcador = `[link:${url}]\n`;
+    const antes = inputTexto.value.slice(0, pos);
+    const depois = inputTexto.value.slice(pos);
+    inputTexto.value = antes + marcador + depois;
+    atualizarEstadoBotaoSalvarOficial();
+    fecharModalLinkAdmin();
+    inputTexto.focus({ preventScroll: true });
+    const novaPos = pos + marcador.length;
+    inputTexto.setSelectionRange(novaPos, novaPos);
+    posicaoCursorSalva = novaPos;
+  }
+
+  function criarMarcadorReferenciaAdmin(oracao){
+    return `[${oracao.titulo}|${oracao.id}]`;
+  }
+
+  function inserirReferenciaAdminComQuantidade(oracao, quantidade){
+    const inputTexto = document.getElementById('input-oficial-texto');
+    const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
+    const marcador = criarMarcadorReferenciaAdmin(oracao);
+    const referencia = (quantidade > 1 ? `${marcador}{${quantidade}}` : marcador) + '\n';
+    const antes = inputTexto.value.slice(0, pos);
+    const depois = inputTexto.value.slice(pos);
+    inputTexto.value = antes + referencia + depois;
+    atualizarEstadoBotaoSalvarOficial();
+    fecharModalInserirAdmin();
+    inputTexto.focus({ preventScroll: true });
+    const novaPos = pos + referencia.length;
+    inputTexto.setSelectionRange(novaPos, novaPos);
+    posicaoCursorSalva = novaPos;
+  }
+
+  function inserirReferenciaAdmin(oracao){
+    abrirModalNumeroAdmin({
+      titulo: 'Repetir oração',
+      dica: `Quantas vezes rezar "${oracao.titulo}" aqui? Use 1 para rezar uma única vez.`,
+      valorInicial: 1,
+      min: 1,
+      max: 200,
+      aoConfirmar: quantidade => inserirReferenciaAdminComQuantidade(oracao, quantidade)
+    });
+  }
+
+  function inserirReferenciaOpcionalAdmin(oracao){
+    const inputTexto = document.getElementById('input-oficial-texto');
+    const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
+    const referencia = `${criarMarcadorReferenciaAdmin(oracao)}{opcional}\n`;
     const antes = inputTexto.value.slice(0, pos);
     const depois = inputTexto.value.slice(pos);
     inputTexto.value = antes + referencia + depois;
@@ -804,16 +939,9 @@
   // Insere um marcador de pausa curta no texto, ex: "[pausa]{2}" para 2 segundos.
   // Reaproveita a mesma sintaxe de citação de oração ([Título]{n}), só que
   // com a palavra reservada "pausa" no lugar de um título.
-  function inserirPausaAdmin(){
+  function inserirPausaAdminComSegundos(segundos){
     const inputTexto = document.getElementById('input-oficial-texto');
     const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
-    const resposta = prompt(
-      'Quantos segundos de pausa?\n(Ex: 2 para uma pequena pausa entre o fim de uma oração e o início de outra.)',
-      '2'
-    );
-    if(resposta === null) return;
-
-    const segundos = Math.min(Math.max(parseInt(resposta, 10) || 1, 1), 30);
     const marcador = `[pausa]{${segundos}}\n`;
     const antes = inputTexto.value.slice(0, pos);
     const depois = inputTexto.value.slice(pos);
@@ -823,6 +951,17 @@
     const novaPos = pos + marcador.length;
     inputTexto.setSelectionRange(novaPos, novaPos);
     posicaoCursorSalva = novaPos;
+  }
+
+  function inserirPausaAdmin(){
+    abrirModalNumeroAdmin({
+      titulo: 'Inserir pausa',
+      dica: 'Quantos segundos de pausa? Ex: 2 para uma pequena pausa entre uma oração e outra.',
+      valorInicial: 2,
+      min: 1,
+      max: 30,
+      aoConfirmar: inserirPausaAdminComSegundos
+    });
   }
 
   // Menu "+ Inserir": abre um pequeno menu com as opções Oração/Pausa
@@ -853,8 +992,24 @@
   });
 
   document.getElementById('btn-inserir-pausa-admin').addEventListener('click', () => { fecharMenuInserirAdmin(); inserirPausaAdmin(); });
-  document.getElementById('btn-inserir-oracao-admin').addEventListener('click', () => { fecharMenuInserirAdmin(); abrirModalInserirAdmin(); });
+  document.getElementById('btn-inserir-oracao-admin').addEventListener('click', () => { fecharMenuInserirAdmin(); abrirModalInserirAdmin(false); });
+  document.getElementById('btn-inserir-opcional-admin').addEventListener('click', () => { fecharMenuInserirAdmin(); abrirModalInserirAdmin(true); });
+  document.getElementById('btn-inserir-link-admin').addEventListener('click', () => { fecharMenuInserirAdmin(); abrirModalLinkAdmin(); });
   document.getElementById('btn-fechar-modal-admin').addEventListener('click', fecharModalInserirAdmin);
+  document.getElementById('btn-cancelar-link-admin').addEventListener('click', fecharModalLinkAdmin);
+  document.getElementById('btn-confirmar-link-admin').addEventListener('click', inserirLinkAdmin);
+  document.getElementById('input-link-url-admin').addEventListener('keydown', e => {
+    if(e.key === 'Enter') inserirLinkAdmin();
+    if(e.key === 'Escape') fecharModalLinkAdmin();
+  });
+  document.getElementById('btn-cancelar-numero-admin').addEventListener('click', fecharModalNumeroAdmin);
+  document.getElementById('btn-confirmar-numero-admin').addEventListener('click', () => {
+    if(aoConfirmarNumeroAdmin) aoConfirmarNumeroAdmin();
+  });
+  document.getElementById('input-numero-admin').addEventListener('keydown', e => {
+    if(e.key === 'Enter' && aoConfirmarNumeroAdmin) aoConfirmarNumeroAdmin();
+    if(e.key === 'Escape') fecharModalNumeroAdmin();
+  });
   document.getElementById('input-busca-inserir').addEventListener('input', e => {
     renderizarListaModalInserirAdmin(e.target.value);
   });

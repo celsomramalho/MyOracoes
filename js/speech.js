@@ -165,6 +165,19 @@ function obterLinhasParaFalar(){
           ancestraisBloco
         });
       });
+    } else if (el.classList.contains('bloco-opcional')) {
+      // Leitura opcional: só entra na fala se o usuário ligou o interruptor
+      // (classe "aberto"). Enquanto oculta, é pulada por completo.
+      if (!el.classList.contains('aberto')) return;
+      const conteudoDiv = el.querySelector(':scope > .bloco-opcional-conteudo');
+      if (conteudoDiv) {
+        Array.from(conteudoDiv.children).forEach(filho => {
+          extrairElemento(filho, secaoIdx, infoRepeticao, ancestraisBloco);
+        });
+      }
+    } else if (el.classList.contains('link-marcador')) {
+      // Links são apenas ação visual para o usuário abrir; nunca entram na fala.
+      return;
     } else if (el.classList.contains('pausa-marcador')) {
       const segundos = Math.min(Math.max(parseFloat(el.dataset.segundos) || 1, 1), 30);
       linhas.push({ tipo: 'pausa', elemento: el, segundos, secaoIdx: -1 });

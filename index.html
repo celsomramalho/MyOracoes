@@ -112,13 +112,19 @@
     <div class="editor-toolbar">
       <label class="campo-label" for="input-texto">Texto</label>
       <div class="editor-toolbar-botoes">
-        <button id="btn-inserir-pausa" class="btn-secundario" type="button">+ Inserir pausa</button>
-        <button id="btn-inserir-oracao" class="btn-secundario" type="button">+ Inserir oração</button>
-        <button id="btn-inserir-opcional" class="btn-secundario" type="button">+ Leitura opcional</button>
+        <div class="menu-inserir-wrapper">
+          <button id="btn-inserir" class="btn-secundario" type="button" aria-haspopup="true" aria-expanded="false">+ Inserir</button>
+          <div id="menu-inserir" class="menu-inserir hidden" role="menu">
+            <button id="btn-inserir-oracao" class="item-menu-inserir" type="button" role="menuitem">📜 Oração</button>
+            <button id="btn-inserir-opcional" class="item-menu-inserir" type="button" role="menuitem">📖 Leitura opcional</button>
+            <button id="btn-inserir-link" class="item-menu-inserir" type="button" role="menuitem">🔗 Link</button>
+            <button id="btn-inserir-pausa" class="item-menu-inserir" type="button" role="menuitem">⏸ Pausa</button>
+          </div>
+        </div>
       </div>
     </div>
     <textarea id="input-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
-    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Use <strong>+ Leitura opcional</strong> para citar uma oração salva como texto complementar (ex: uma reflexão) que fica oculto e fora da fala até o usuário decidir mostrar na hora de rezar. Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
+    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use <strong>+ Inserir → Oração</strong> — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir → Pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Use <strong>+ Inserir → Leitura opcional</strong> para citar uma oração salva como texto complementar que fica oculto e fora da fala até o usuário decidir mostrar na hora de rezar. Use <strong>+ Inserir → Link</strong> para inserir uma URL que aparece para abrir, mas não entra na narração. Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
   </main>
 
   <!-- TELA: REZAR -->
@@ -166,6 +172,32 @@
         <input id="input-busca-inserir" type="text" placeholder="🔎 Buscar oração..." autocomplete="off">
       </div>
       <div id="lista-modal-inserir" class="lista-modal modal-lista-rolavel"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: INSERIR LINK -->
+  <div id="modal-link" class="modal hidden">
+    <div class="modal-conteudo modal-conteudo-alerta">
+      <h3>Inserir link</h3>
+      <p class="dica">Cole a URL que ficará disponível para abrir, mas fora da narração.</p>
+      <input id="input-link-url" type="url" placeholder="https://exemplo.com" autocomplete="off">
+      <div class="modal-botoes">
+        <button id="btn-cancelar-link" class="btn-secundario btn-modal-flex" type="button">Cancelar</button>
+        <button id="btn-confirmar-link" class="btn-primario btn-modal-flex" type="button">Inserir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NÚMERO (repetições / pausa) -->
+  <div id="modal-numero" class="modal hidden">
+    <div class="modal-conteudo modal-conteudo-alerta">
+      <h3 id="modal-numero-titulo">Inserir</h3>
+      <p id="modal-numero-dica" class="dica"></p>
+      <input id="input-numero" type="number" min="1" max="200" step="1" inputmode="numeric">
+      <div class="modal-botoes">
+        <button id="btn-cancelar-numero" class="btn-secundario btn-modal-flex" type="button">Cancelar</button>
+        <button id="btn-confirmar-numero" class="btn-primario btn-modal-flex" type="button">Inserir</button>
+      </div>
     </div>
   </div>
 
