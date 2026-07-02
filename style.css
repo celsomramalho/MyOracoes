@@ -1095,7 +1095,14 @@ html,body{
 .acoes-backup{
   display: flex;
   gap: 10px;
-  margin-top: 24px;
+  margin-bottom: 20px;
+}
+.acoes-backup .btn-primario{
+  flex: 1;
+  width: auto;
+  margin: 0;
+  padding: 10px 8px;
+  font-size: 0.88rem;
 }
 .btn-backup{
   flex: 1;

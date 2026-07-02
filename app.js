@@ -17,16 +17,6 @@ function mostrarView(id){
   pararFala();
   window.scrollTo(0,0);
 
-  // Controle do FAB: Só aparece em view-todas
-  const fab = document.getElementById('fab-nova');
-  if(fab){
-    if(id === 'view-todas'){
-      fab.style.display = '';
-    } else {
-      fab.style.display = 'none';
-    }
-  }
-
   // Marca a tela ativa no #app (controla via CSS: vela só aparece na Home)
   const appEl = document.getElementById('app');
   appEl.dataset.tela = (id === 'view-home') ? 'home' : 'outra';
@@ -291,206 +281,53 @@ function salvarEditor(){
 // mostrarToast → js/components/toast.js
 
 // ===================== INSERIR REFERÊNCIA [Título] =====================
-let posicaoCursorSalva = null;
-let modoInserirOpcional = false; // true quando o modal foi aberto pelo botão "+ Leitura opcional"
-let aoConfirmarNumero = null;
-
-function renderizarListaModalInserir(termo){
-  const lista = document.getElementById('lista-modal-inserir');
-  if(!lista) return;
-
-  lista.innerHTML = '';
-
-  const pessoais = ORACOES.filter(o => o.id !== editandoId)
-    .map(o => ({ ...o, _tipo: 'pessoal' }));
-  const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
-  let disponiveis = [...pessoais, ...oficiais]
-    .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
-
-  const norm = normalizarBusca(termo || '');
-  if(norm) disponiveis = disponiveis.filter(o => normalizarBusca(o.titulo).includes(norm));
-
-  if(disponiveis.length === 0){
-    lista.innerHTML = '<p class="dica">Nenhuma oração encontrada.</p>';
-  }else{
-    disponiveis.forEach(o => {
-      const item = document.createElement('div');
-      item.className = 'item-modal';
-      item.innerHTML = `${escaparHTML(o.titulo)}${o._tipo === 'oficial' ? ' <span style="color:var(--texto-suave);font-size:0.8em;">📜 oficial</span>' : ''}`;
-      item.addEventListener('click', () => {
-        if(modoInserirOpcional){
-          inserirReferenciaOpcional(o);
-        }else{
-          inserirReferencia(o);
-        }
-      });
-      lista.appendChild(item);
-    });
-  }
-}
-
-function abrirModalInserir(opcional){
-  modoInserirOpcional = !!opcional;
-
-  const titulo = document.getElementById('modal-inserir-titulo');
-  const dica = document.getElementById('modal-inserir-dica');
-  if(modoInserirOpcional){
-    titulo.textContent = 'Inserir leitura opcional';
-    dica.textContent = 'Toque em uma oração para inseri-la como leitura opcional: fica oculta e fora da fala até o usuário decidir mostrar na hora de rezar.';
-  }else{
-    titulo.textContent = 'Inserir oração';
-    dica.textContent = 'Toque em uma oração para inserir a referência a ela no texto.';
-  }
-
-  const inputTexto = document.getElementById('input-texto');
-  posicaoCursorSalva = inputTexto.selectionStart;
-  document.getElementById('input-busca-inserir').value = '';
-  renderizarListaModalInserir('');
-  document.getElementById('modal-inserir').classList.remove('hidden');
-  document.getElementById('input-busca-inserir').focus();
-}
-
-function fecharModalInserir(){
-  document.getElementById('modal-inserir').classList.add('hidden');
-}
-
-function abrirModalNumero({ titulo, dica, valorInicial, min, max, aoConfirmar }){
-  const modal = document.getElementById('modal-numero');
-  const input = document.getElementById('input-numero');
-  document.getElementById('modal-numero-titulo').textContent = titulo;
-  document.getElementById('modal-numero-dica').textContent = dica;
-  input.min = String(min);
-  input.max = String(max);
-  input.value = String(valorInicial);
-  aoConfirmarNumero = () => {
-    const valor = Math.min(Math.max(parseInt(input.value, 10) || valorInicial, min), max);
-    fecharModalNumero();
-    aoConfirmar(valor);
-  };
-  modal.classList.remove('hidden');
-  input.focus({ preventScroll: true });
-  input.select();
-}
-
-function fecharModalNumero(){
-  document.getElementById('modal-numero').classList.add('hidden');
-  aoConfirmarNumero = null;
-}
-
-function normalizarUrlInserida(url){
-  const limpa = (url || '').trim();
-  if(!limpa) return '';
-  if(/^https?:\/\//i.test(limpa)) return limpa;
-  return `https://${limpa}`;
-}
-
-function abrirModalLink(){
-  const inputTexto = document.getElementById('input-texto');
-  posicaoCursorSalva = inputTexto.selectionStart;
-  const inputUrl = document.getElementById('input-link-url');
-  inputUrl.value = '';
-  document.getElementById('modal-link').classList.remove('hidden');
-  inputUrl.focus({ preventScroll: true });
-}
-
-function fecharModalLink(){
-  document.getElementById('modal-link').classList.add('hidden');
-}
-
-function inserirLink(){
-  const url = normalizarUrlInserida(document.getElementById('input-link-url').value);
-  if(!url){
-    mostrarToast('Informe uma URL para inserir o link.');
-    return;
-  }
-
-  const inputTexto = document.getElementById('input-texto');
-  const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
-  const marcador = `[link:${url}]`;
-  const antes = inputTexto.value.slice(0, pos);
-  const depois = inputTexto.value.slice(pos);
-  inputTexto.value = antes + marcador + depois;
-  atualizarEstadoBotaoSalvar();
-  fecharModalLink();
-  inputTexto.focus();
-  const novaPos = pos + marcador.length;
-  inputTexto.setSelectionRange(novaPos, novaPos);
-  posicaoCursorSalva = novaPos;
-}
-
-// Insere um marcador de pausa curta no texto, ex: "[pausa]{2}" para 2 segundos.
-// Reaproveita a mesma sintaxe de citação de oração ([Título]{n}), só que
-// com a palavra reservada "pausa" no lugar de um título.
-function inserirPausaComSegundos(segundos){
-  const inputTexto = document.getElementById('input-texto');
-  const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.selectionStart;
-  const marcador = `[pausa]{${segundos}}`;
-  const antes = inputTexto.value.slice(0, pos);
-  const depois = inputTexto.value.slice(pos);
-  inputTexto.value = antes + marcador + depois;
-  atualizarEstadoBotaoSalvar();
-  inputTexto.focus();
-  const novaPos = pos + marcador.length;
-  inputTexto.setSelectionRange(novaPos, novaPos);
-}
-
-function inserirPausa(){
-  abrirModalNumero({
-    titulo: 'Inserir pausa',
-    dica: 'Quantos segundos de pausa? Ex: 2 para uma pequena pausa entre uma oração e outra.',
-    valorInicial: 2,
-    min: 1,
-    max: 30,
-    aoConfirmar: inserirPausaComSegundos
-  });
-}
-
-function criarMarcadorReferencia(oracao){
-  return `[${oracao.titulo}|${oracao.id}]`;
-}
-
-function inserirReferenciaComQuantidade(oracao, quantidade){
-  const inputTexto = document.getElementById('input-texto');
-  const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
-  const marcador = criarMarcadorReferencia(oracao);
-  const referencia = quantidade > 1 ? `${marcador}{${quantidade}}` : marcador;
-  const antes = inputTexto.value.slice(0, pos);
-  const depois = inputTexto.value.slice(pos);
-  inputTexto.value = antes + referencia + depois;
-  atualizarEstadoBotaoSalvar();
-  fecharModalInserir();
-  inputTexto.focus();
-  const novaPos = pos + referencia.length;
-  inputTexto.setSelectionRange(novaPos, novaPos);
-}
-
-function inserirReferencia(oracao){
-  abrirModalNumero({
-    titulo: 'Repetir oração',
-    dica: `Quantas vezes rezar "${oracao.titulo}" aqui? Use 1 para rezar uma única vez.`,
-    valorInicial: 1,
-    min: 1,
-    max: 200,
-    aoConfirmar: quantidade => inserirReferenciaComQuantidade(oracao, quantidade)
-  });
-}
-
-// Insere uma citação como "leitura opcional" ([Título]{opcional}): não pede
-// quantidade, pois esse tipo de bloco sempre aparece uma única vez, oculto e
-// fora da fala até o usuário decidir mostrar durante a oração.
-function inserirReferenciaOpcional(oracao){
-  const inputTexto = document.getElementById('input-texto');
-  const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
-  const referencia = `${criarMarcadorReferencia(oracao)}{opcional}`;
-  const antes = inputTexto.value.slice(0, pos);
-  const depois = inputTexto.value.slice(pos);
-  inputTexto.value = antes + referencia + depois;
-  atualizarEstadoBotaoSalvar();
-  fecharModalInserir();
-  inputTexto.focus();
-  const novaPos = pos + referencia.length;
-  inputTexto.setSelectionRange(novaPos, novaPos);
-}
+criarControladorInsercao({
+  ids: {
+    textarea:              'input-texto',
+    btnInserir:            'btn-inserir',
+    menuInserir:           'menu-inserir',
+    btnInserirOracao:      'btn-inserir-oracao',
+    btnInserirOpcional:    'btn-inserir-opcional',
+    btnInserirLink:        'btn-inserir-link',
+    btnInserirPausa:       'btn-inserir-pausa',
+    modalInserir:          'modal-inserir',
+    modalInserirTitulo:    'modal-inserir-titulo',
+    modalInserirDica:      'modal-inserir-dica',
+    inputBuscaInserir:     'input-busca-inserir',
+    listaModalInserir:     'lista-modal-inserir',
+    btnFecharModalInserir: 'btn-fechar-modal',
+    modalLink:             'modal-link',
+    inputLinkUrl:          'input-link-url',
+    btnCancelarLink:       'btn-cancelar-link',
+    btnConfirmarLink:      'btn-confirmar-link',
+    modalNumero:           'modal-numero',
+    modalNumeroTitulo:     'modal-numero-titulo',
+    modalNumeroDica:       'modal-numero-dica',
+    inputNumero:           'input-numero',
+    btnCancelarNumero:     'btn-cancelar-numero',
+    btnConfirmarNumero:    'btn-confirmar-numero',
+  },
+  listarOracoes(termo) {
+    const pessoais = ORACOES.filter(o => o.id !== editandoId)
+      .map(o => ({ ...o, _tipo: 'pessoal' }));
+    const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
+    let lista = [...pessoais, ...oficiais]
+      .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+    const norm = normalizarBusca(termo || '');
+    return norm ? lista.filter(o => normalizarBusca(o.titulo).includes(norm)) : lista;
+  },
+  renderizarItemLista(o) {
+    return `${escaparHTML(o.titulo)}${
+      o._tipo === 'oficial'
+        ? ' <span style="color:var(--texto-suave);font-size:0.8em;">📜 oficial</span>'
+        : ''
+    }`;
+  },
+  aoInserir() { atualizarEstadoBotaoSalvar(); },
+  rastrearCursorContinuamente: false,
+  sufixoNovalinha: false,
+  preventScrollFocus: false,
+});
 
 // ===================== TELA "REZAR" =====================
 function abrirRezar(id, origem, tipo){
@@ -638,58 +475,8 @@ document.getElementById('fab-nova').addEventListener('click', () => abrirEditor(
 document.getElementById('btn-salvar-topo').addEventListener('click', salvarEditor);
 document.getElementById('input-titulo').addEventListener('input', atualizarEstadoBotaoSalvar);
 document.getElementById('input-texto').addEventListener('input', atualizarEstadoBotaoSalvar);
-
-const btnInserir = document.getElementById('btn-inserir');
-const menuInserir = document.getElementById('menu-inserir');
-
-function fecharMenuInserir(){
-  menuInserir.classList.add('hidden');
-  btnInserir.setAttribute('aria-expanded', 'false');
-}
-
-function alternarMenuInserir(){
-  const abrindo = menuInserir.classList.contains('hidden');
-  menuInserir.classList.toggle('hidden', !abrindo);
-  btnInserir.setAttribute('aria-expanded', String(abrindo));
-}
-
-btnInserir.addEventListener('click', (e) => {
-  e.stopPropagation();
-  alternarMenuInserir();
-});
-document.addEventListener('click', (e) => {
-  if(!menuInserir.classList.contains('hidden') && !menuInserir.contains(e.target) && e.target !== btnInserir){
-    fecharMenuInserir();
-  }
-});
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape') fecharMenuInserir();
-});
-
-document.getElementById('btn-inserir-pausa').addEventListener('click', () => { fecharMenuInserir(); inserirPausa(); });
-document.getElementById('btn-inserir-oracao').addEventListener('click', () => { fecharMenuInserir(); abrirModalInserir(false); });
-document.getElementById('btn-inserir-opcional').addEventListener('click', () => { fecharMenuInserir(); abrirModalInserir(true); });
-document.getElementById('btn-inserir-link').addEventListener('click', () => { fecharMenuInserir(); abrirModalLink(); });
-document.getElementById('btn-fechar-modal').addEventListener('click', fecharModalInserir);
-document.getElementById('btn-cancelar-link').addEventListener('click', fecharModalLink);
-document.getElementById('btn-confirmar-link').addEventListener('click', inserirLink);
-document.getElementById('input-link-url').addEventListener('keydown', e => {
-  if(e.key === 'Enter') inserirLink();
-  if(e.key === 'Escape') fecharModalLink();
-});
-document.getElementById('btn-cancelar-numero').addEventListener('click', fecharModalNumero);
-document.getElementById('btn-confirmar-numero').addEventListener('click', () => {
-  if(aoConfirmarNumero) aoConfirmarNumero();
-});
-document.getElementById('input-numero').addEventListener('keydown', e => {
-  if(e.key === 'Enter' && aoConfirmarNumero) aoConfirmarNumero();
-  if(e.key === 'Escape') fecharModalNumero();
-});
 document.getElementById('btn-cancelar-exclusao').addEventListener('click', fecharModalExclusao);
 document.getElementById('btn-confirmar-exclusao').addEventListener('click', confirmarExclusao);
-document.getElementById('input-busca-inserir').addEventListener('input', (e) => {
-  renderizarListaModalInserir(e.target.value);
-});
 
 document.getElementById('btn-favoritar-rezar').addEventListener('click', () => {
   if(!oracaoAtualId) return;

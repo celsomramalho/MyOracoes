@@ -1,19 +1,18 @@
 // js/oracoes-data.js — CRUD, fetch de oficiais, export/import, compartilhamento
 
 // ===================== CARREGAMENTO DAS OFICIAIS =====================
-async function carregarOficiais(){
-  try{
-    const res = await fetch('./oracoes-oficiais.json');
-    if(res.ok){
-      const dados = await res.json();
-      ORACOES_OFICIAIS = Array.isArray(dados) ? dados : [];
-    }
-  }catch(e){
-    ORACOES_OFICIAIS = [];
-  }
-  renderizarOficiais();
+// Os dados são embutidos diretamente em js/oracoes-oficiais-data.js como
+// window.ORACOES_OFICIAIS_DATA para funcionar tanto via servidor HTTP quanto
+// por arquivo local (file://), onde fetch() é bloqueado pelo navegador.
+function carregarOficiais(){
+  ORACOES_OFICIAIS = Array.isArray(ORACOES_OFICIAIS_DATA)
+    ? ORACOES_OFICIAIS_DATA
+    : [];
+  renderizarOficiais('');
   renderizarFavoritas(); // re-renderiza home para incluir favoritas oficiais
-  renderizarListaModalInserir(); // atualiza modal de inserir se estiver aberto
+  if (typeof renderizarListaModalInserir === 'function') {
+    renderizarListaModalInserir(); // atualiza modal de inserir se estiver aberto
+  }
 }
 
 // ===================== FAVORITOS =====================

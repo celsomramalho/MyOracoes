@@ -134,7 +134,7 @@ criarEditorOracao({
 
 Status: **em andamento**
 
-- [ ] Registrar manualmente os fluxos que precisam continuar funcionando.
+- [x] Registrar manualmente os fluxos que precisam continuar funcionando → `etapa1-fluxos-congelados.md`
 - [ ] Testar no usuario:
   - [ ] criar oracao pessoal
   - [ ] editar oracao pessoal
@@ -158,34 +158,35 @@ Status: **em andamento**
 
 ### Etapa 2 - Extrair funcoes puras compartilhadas
 
-Status: **pendente**
+Status: **concluido**
 
-- [ ] Criar `js/editor-core.js`.
-- [ ] Mover ou duplicar inicialmente funcoes puras para o modulo:
-  - [ ] `normalizarUrlInserida`
-  - [ ] `criarMarcadorReferencia`
-  - [ ] montagem de marcador `[Titulo|id]`
-  - [ ] montagem de `[pausa]{n}`
-  - [ ] montagem de `[link:url]`
-- [ ] Ajustar `app.js` e `admin.html` para usar essas funcoes sem mudar UI.
-- [ ] Validar que nao houve mudanca visual ou funcional.
+- [x] Criar `js/editor-core.js`.
+- [x] Mover ou duplicar inicialmente funcoes puras para o modulo:
+  - [x] `normalizarUrlInserida`
+  - [x] `criarMarcadorReferencia`
+  - [x] montagem de marcador `[Titulo|id]` → `montarMarcadorReferencia`
+  - [x] montagem de `[pausa]{n}` → `montarMarcadorPausa`
+  - [x] montagem de `[link:url]` → `montarMarcadorLink`
+  - [x] montagem de `[Titulo|id]{opcional}` → `montarMarcadorOpcional`
+- [x] Ajustar `app.js` e `admin.html` para usar essas funcoes sem mudar UI.
+- [x] Validar que nao houve mudanca visual ou funcional (`node --check` OK).
 
 ### Etapa 3 - Unificar logica de insercao
 
-Status: **pendente**
+Status: **concluido**
 
-- [ ] No `editor-core.js`, criar controlador de insercao configuravel.
-- [ ] Centralizar:
-  - [ ] abrir/fechar menu `+ Inserir`
-  - [ ] modal de lista de oracoes
-  - [ ] modal de numero
-  - [ ] modal de link
-  - [ ] controle de cursor
-  - [ ] insercao no textarea
-- [ ] Adaptar usuario para chamar o controlador compartilhado.
-- [ ] Adaptar admin para chamar o mesmo controlador compartilhado.
-- [ ] Remover funcoes duplicadas de insercao em `app.js`.
-- [ ] Remover funcoes duplicadas de insercao no script inline de `admin.html`.
+- [x] No `editor-core.js`, criar controlador de insercao configuravel (`criarControladorInsercao`).
+- [x] Centralizar:
+  - [x] abrir/fechar menu `+ Inserir`
+  - [x] modal de lista de oracoes
+  - [x] modal de numero
+  - [x] modal de link
+  - [x] controle de cursor
+  - [x] insercao no textarea
+- [x] Adaptar usuario para chamar o controlador compartilhado.
+- [x] Adaptar admin para chamar o mesmo controlador compartilhado.
+- [x] Remover funcoes duplicadas de insercao em `app.js`.
+- [x] Remover funcoes duplicadas de insercao no script inline de `admin.html`.
 
 ### Etapa 4 - Unificar markup do editor
 

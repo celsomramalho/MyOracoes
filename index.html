@@ -76,16 +76,16 @@
       Você ainda não tem orações favoritas.<br>
       Toque na estrela de uma oração para marcá-la aqui, ou crie uma nova.
     </p>
-
-    <!-- Exportar / Importar -->
-    <div class="acoes-backup">
-      <button id="btn-exportar-oracoes" class="btn-secundario btn-backup">📤 Exportar backup</button>
-      <button id="btn-importar-oracoes" class="btn-secundario btn-backup">📥 Importar backup</button>
-    </div>
   </main>
 
   <!-- TELA: TODAS AS ORAÇÕES (PESSOAIS) -->
   <main id="view-todas" class="view">
+    <!-- Nova oração / Exportar / Importar -->
+    <div class="acoes-backup">
+      <button id="fab-nova" class="btn-primario" aria-label="Nova oração">+ Nova Oração</button>
+      <button id="btn-exportar-oracoes" class="btn-secundario btn-backup">📤 Exportar backup</button>
+      <button id="btn-importar-oracoes" class="btn-secundario btn-backup">📥 Importar backup</button>
+    </div>
     <div id="lista-todas" class="lista-oracoes"></div>
     <p id="empty-todas" class="empty-state hidden">
       Nenhuma oração cadastrada ainda.<br>
@@ -155,8 +155,6 @@
 
     <div id="rezar-texto" class="texto-oracao"></div>
   </main>
-
-  <button id="fab-nova" class="fab" aria-label="Nova oração">+</button>
 
   <!-- MODAL: INSERIR ORAÇÃO -->
   <div id="modal-inserir" class="modal hidden">
@@ -257,14 +255,16 @@
 
 </div>
 
-<script src="state.js"></script>             <!-- Passo 1 -->
-<script src="js/utils.js"></script>          <!-- Passo 2 -->
-<script src="js/oracoes-data.js"></script>   <!-- Passo 3 -->
+<script src="oracoes-oficiais-data.js"></script> <!-- Passo 1: dados embutidos -->
+<script src="state.js"></script>             <!-- Passo 2 -->
+<script src="js/utils.js"></script>          <!-- Passo 3 -->
+<script src="js/oracoes-data.js"></script>   <!-- Passo 4 -->
 <script src="js/components/card.js"></script>   <!-- Passo 4 -->
 <script src="js/components/toast.js"></script> <!-- Passo 5 -->
 <script src="js/render-tree.js"></script>       <!-- Passo 6 -->
 <script src="js/speech.js"></script>            <!-- Passo 7 -->
 <script src="js/components/progresso.js"></script> <!-- Passo 8 -->
+<script src="js/editor-core.js"></script>          <!-- Passo 9: marcadores compartilhados -->
 <script src="app.js"></script>
 </body>
 </html>

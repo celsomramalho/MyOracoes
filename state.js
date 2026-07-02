@@ -87,7 +87,9 @@ function gerarId(){
 }
 
 let ORACOES = carregarOracoes();
-let ORACOES_OFICIAIS = [];       // carregado via fetch
+let ORACOES_OFICIAIS = (typeof ORACOES_OFICIAIS_DATA !== 'undefined' && Array.isArray(ORACOES_OFICIAIS_DATA))
+  ? ORACOES_OFICIAIS_DATA
+  : [];       // dados embutidos em oracoes-oficiais-data.js (carregado antes deste arquivo)
 let favoritasOficiaisIds = carregarFavoritasOficiais();
 let editandoId = null;     // id da oração sendo editada (null = criando nova)
 let editorTituloOriginal = '';  // valor do título ao abrir o editor, para detectar alterações não salvas

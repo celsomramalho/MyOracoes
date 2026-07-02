@@ -1,4 +1,6 @@
-[
+// Dados das oracoes oficiais - gerado automaticamente
+// NAO edite este arquivo diretamente; edite oracoes-oficiais.json
+var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_pai_nosso",
     "titulo": "Pai Nosso",
@@ -32,7 +34,7 @@
   {
     "id": "oficial_mqtzl9dc",
     "titulo": "Mistério Gozoso",
-    "texto": "1 Mistério: A Encarnação do Senhor\n[1 mistério gozoso (meditado)|oficial_mr3ve9o0]{opcional}\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\nV. Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas para o Céu e socorrei principalmente as que mais precisarem.\nR. Ó Virgem Dolorosíssima, as Vossas Lágrimas derrubaram o império infernal!\n2 Mistério: A visitação de Nossa Senhora à sua prima Santa Isabel\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\nV. Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas para o Céu e socorrei principalmente as que mais precisarem.\nR. Ó Virgem Dolorosíssima, as Vossas Lágrimas derrubaram o império infernal!\n3 Mistério: O Nascimento do Filho de Deus em Belém\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\nV. Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas para o Céu e socorrei principalmente as que mais precisarem.\nR. Ó Virgem Dolorosíssima, as Vossas Lágrimas derrubaram o império infernal!\n4 Mistério: A purificação de Nossa Senhora\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\nV. Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas para o Céu e socorrei principalmente as que mais precisarem.\nR. Ó Virgem Dolorosíssima, as Vossas Lágrimas derrubaram o império infernal!\n5 Mistério: Jesus perdido e achado no templo\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\nV. Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas para o Céu e socorrei principalmente as que mais precisarem.\nR. Ó Virgem Dolorosíssima, as Vossas Lágrimas derrubaram o império infernal!\n",
+    "texto": "Primeiro Mistério: A Encarnação do Senhor\n[pausa]{2}\n[1 mistério gozoso (meditado)|oficial_mr3ve9o0]{opcional}\n[1 mistério gozoso (São Josemaria)|oficial_mr3vkvfu]{opcional}\n[pausa]{2}\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\n[Oração de Fátima|oficial_mr28kql4]\n[pausa]{2}\nSegundo Mistério: A visitação de Nossa Senhora à sua prima Santa Isabel\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\n[Oração de Fátima|oficial_mr28kql4]\n[pausa]{2}\nTerceiro Mistério: O Nascimento do Filho de Deus em Belém\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\n[Oração de Fátima|oficial_mr28kql4]\n[pausa]{2}\nQuatdo Mistério: A purificação de Nossa Senhora\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\n[Oração de Fátima|oficial_mr28kql4]\n[pausa]{2}\nQuinto Mistério: Jesus perdido e achado no templo\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\n[Oração de Fátima|oficial_mr28kql4]\n",
     "oculta": false,
     "colapsarNaFala": false
   },
@@ -72,15 +74,16 @@
   {
     "id": "oficial_mqv9ztns",
     "titulo": "Coroa das Lágrimas",
-    "texto": "V. Oferecimento.\nEis-nos aqui aos Vossos pés, ó dulcíssimo Jesus Crucificado, para Vos oferecermos as lágrimas dAquela que, com tanto amor, Vos acompanhou no caminho doloroso do Calvário. Fazei, ó bom Mestre, que nós saibamos aproveitar da lição que elas nos dão, para que, na Terra, realizando a Vossa Santíssima Vontade, possamos um dia, no Céu, Vos louvar por toda a eternidade.\n[pausa]{2}\n[Coroa das lágrimas (setena)]{7}\n[pausa]{2}\nV. Vede, ó Jesus, que são as lágrimas dAquela que mais Vos amou na Terra.\nR. E que mais Vos ama no Céu.\nV. Vede, ó Jesus, que são as lágrimas dAquela que mais Vos amou na Terra.\nR. E que mais Vos ama no Céu.\nV. Vede, ó Jesus, que são as lágrimas dAquela que mais Vos amou na Terra.\nR. E que mais Vos ama no Céu.\n[pausa]{2}\nV. Oremos.\nVirgem Santíssima e Mãe das Dores, nós Vos pedimos que junteis os Vossos rogos aos nossos, a fim de que Jesus, Vosso Divino Filho, a quem nos dirigimos em nome das Vossas lágrimas de Mãe, ouça as nossas preces e nos conceda, com as graças que desejamos, a coroa da vida eterna. \nR. Amém.\n\n",
+    "texto": "[Sinal da cruz|oficial_mr0skuf2]\n[pausa]{2}\nV. Oferecimento.\nEis-nos aqui aos Vossos pés, ó dulcíssimo Jesus Crucificado, para Vos oferecermos as lágrimas dAquela que, com tanto amor, Vos acompanhou no caminho doloroso do Calvário. Fazei, ó bom Mestre, que nós saibamos aproveitar da lição que elas nos dão, para que, na Terra, realizando a Vossa Santíssima Vontade, possamos um dia, no Céu, Vos louvar por toda a eternidade.\n[pausa]{2}\n[Coroa das lágrimas (setena)]{7}\n[pausa]{2}\n[Coroa das lágrimas (contas grandes)|oficial_mr3x3u53]{3}\n[pausa]{2}\nV. Oremos.\nVirgem Santíssima e Mãe das Dores, nós Vos pedimos que junteis os Vossos rogos aos nossos, a fim de que Jesus, Vosso Divino Filho, a quem nos dirigimos em nome das Vossas lágrimas de Mãe, ouça as nossas preces e nos conceda, com as graças que desejamos, a coroa da vida eterna. \nR. Amém.\n\n",
     "oculta": false,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mqva6v5p",
-    "titulo": "Coroa das lágrimas (contas)",
-    "texto": "V. Meu Jesus, ouvi os nossos rogos.\nR. Pelas Lágrimas de Vossa Mãe Santíssima.",
-    "oculta": true
+    "titulo": "Coroa das lágrimas (contas pequenas)",
+    "texto": "V. Meu Jesus, ouvi os nossos rogos\nR. pelas Lágrimas de Vossa Mãe Santíssima.",
+    "oculta": true,
+    "colapsarNaFala": false
   },
   {
     "id": "oficial_mqy7tofl",
@@ -165,5 +168,19 @@
     "texto": "“No sexto mês, o anjo Gabriel foi enviado por Deus a uma cidade da Galileia, chamada Nazaré, a uma virgem desposada com um homem que se chamava José, da casa de Davi e o nome da virgem era Maria.” (Lc 1, 26-27) ",
     "oculta": true,
     "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr3vkvfu",
+    "titulo": "1 mistério gozoso (São Josemaria)",
+    "texto": "Não te esqueças, meu amigo, de que somos crianças. A Senhora do doce nome, Maria, está recolhida em oração.\nTu és, naquela casa, o que quiseres ser: um amigo, um criado, um curioso, um vizinho… - Eu por agora não me atrevo a ser nada. Escondo-me atrás de ti e, pasmado, contemplo a cena.\nO Arcanjo comunica a sua mensagem… - Quomodo fiet istud, quoniam virum non cognosco? - Como se fará isso, se não conheço varão? (Lc 1, 34).\nA voz da nossa Mãe traz à minha memória, por contraste, todas as impurezas dos homens…, as minhas também.\nE como odeio então essas baixas misérias da terra!… Que propósitos!\nFiat mihi secundum verbum tuum. - Faça-se em mim segundo a tua palavra (Lc 1, 38). Ao encanto destas palavras virginais, o Verbo se fez carne.\nVai terminar a primeira dezena… Ainda tenho tempo de dizer ao meu Deus, antes que nenhum mortal: Jesus, eu Te amo.\n",
+    "oculta": true,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr3x3u53",
+    "titulo": "Coroa das lágrimas (contas grandes)",
+    "texto": "V. Vêde, ó Jesus, que são as lágrimas dAquela que mais Vos amou na Terra, R. e que mais Vos ama no Céu.",
+    "oculta": true,
+    "colapsarNaFala": false
   }
-]
+];
