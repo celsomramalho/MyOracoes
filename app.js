@@ -2,8 +2,10 @@
 // ===================== NAVEGAÇÃO =====================
 
 // Ícone exibido na topbar para cada tela (a Home usa a vela animada, definida no CSS)
+const ICONE_CRIAR_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>';
+
 const ICONES_TELA = {
-  'view-todas': '✏️',
+  'view-todas': ICONE_CRIAR_SVG,
   'view-oficiais': '📜',
   'view-editor': '✏️',
   'view-rezar': '🙏',
@@ -46,7 +48,7 @@ function mostrarView(id){
       btnTopbarHome.classList.remove('hidden');
       if (btnCompartilharApp) btnCompartilharApp.classList.add('hidden');
       if (id === 'view-todas') {
-        textoTitulo = 'Criar/Editar';
+        textoTitulo = 'Criar';
       } else if (id === 'view-oficiais') {
         textoTitulo = 'Orações Oficiais';
       } else if (id === 'view-editor') {
@@ -58,7 +60,7 @@ function mostrarView(id){
 
     topbarTitulo.textContent = textoTitulo;
     topbarTitulo.title = textoTitulo; // tooltip com o nome completo, caso seja cortado
-    if (topbarIconeTela) topbarIconeTela.textContent = ICONES_TELA[id] || '';
+    if (topbarIconeTela) topbarIconeTela.innerHTML = ICONES_TELA[id] || '';
   }
 
   // Botões de ação do Modo Rezar (Ouvir / Velocidade) só aparecem na topbar
@@ -290,6 +292,7 @@ function salvarEditor(){
 
 // ===================== INSERIR REFERÊNCIA [Título] =====================
 let posicaoCursorSalva = null;
+let modoInserirOpcional = false; // true quando o modal foi aberto pelo botão "+ Leitura opcional"
 
 function renderizarListaModalInserir(termo){
   const lista = document.getElementById('lista-modal-inserir');
@@ -313,13 +316,31 @@ function renderizarListaModalInserir(termo){
       const item = document.createElement('div');
       item.className = 'item-modal';
       item.innerHTML = `${escaparHTML(o.titulo)}${o._tipo === 'oficial' ? ' <span style="color:var(--texto-suave);font-size:0.8em;">📜 oficial</span>' : ''}`;
-      item.addEventListener('click', () => inserirReferencia(o.titulo));
+      item.addEventListener('click', () => {
+        if(modoInserirOpcional){
+          inserirReferenciaOpcional(o.titulo);
+        }else{
+          inserirReferencia(o.titulo);
+        }
+      });
       lista.appendChild(item);
     });
   }
 }
 
-function abrirModalInserir(){
+function abrirModalInserir(opcional){
+  modoInserirOpcional = !!opcional;
+
+  const titulo = document.getElementById('modal-inserir-titulo');
+  const dica = document.getElementById('modal-inserir-dica');
+  if(modoInserirOpcional){
+    titulo.textContent = 'Inserir leitura opcional';
+    dica.textContent = 'Toque em uma oração para inseri-la como leitura opcional: fica oculta e fora da fala até o usuário decidir mostrar na hora de rezar.';
+  }else{
+    titulo.textContent = 'Inserir oração';
+    dica.textContent = 'Toque em uma oração para inserir a referência a ela no texto.';
+  }
+
   const inputTexto = document.getElementById('input-texto');
   posicaoCursorSalva = inputTexto.selectionStart;
   document.getElementById('input-busca-inserir').value = '';

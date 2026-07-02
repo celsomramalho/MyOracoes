@@ -113,6 +113,7 @@ html,body{
 /* Ícone simples (emoji) usado em todas as telas, exceto a Home */
 .icone-tela{ display:none; }
 #app:not([data-tela="home"]) .icone-tela{ display: inline-block; }
+.icone-tela svg{ color: var(--ouro); vertical-align: middle; }
 .flame span{
   position:absolute;
   bottom:0;
@@ -231,6 +232,19 @@ html,body{
   filter: brightness(1.08);
 }
 
+/* Mesmo estado de "alterações não salvas", em versão para botões de texto
+   (ex: botão "Salvar arquivo" na lista do Painel Admin) */
+.btn-secundario.nao-salvo {
+  background: var(--perigo);
+  border-color: var(--perigo) !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 3px rgba(201, 117, 107, 0.25);
+}
+.btn-secundario.nao-salvo:hover {
+  background: var(--perigo);
+  filter: brightness(1.08);
+}
+
 /* Container de navegação na Home */
 .home-nav-container {
   display: flex;
@@ -260,6 +274,10 @@ html,body{
 }
 .btn-nav-home:active {
   transform: scale(0.98);
+}
+.icone-btn-nav {
+  color: var(--ouro);
+  flex-shrink: 0;
 }
 
 /* Bloco fixo da Home: botões de navegação + contador diário + busca
@@ -431,6 +449,42 @@ html,body{
   gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+/* Menu suspenso do botão "+ Inserir" (Admin) */
+.menu-inserir-wrapper{
+  position: relative;
+}
+.menu-inserir{
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg-alto);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 160px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  z-index: 15;
+}
+.menu-inserir.hidden{ display: none; }
+.item-menu-inserir{
+  background: none;
+  border: none;
+  color: var(--texto);
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.item-menu-inserir:hover{
+  background: var(--superficie-alta);
+  color: var(--ouro-suave);
 }
 
 .dica{

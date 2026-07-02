@@ -74,12 +74,6 @@
     gap: 8px;
     align-items: center;
   }
-  .nav-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
   .campo-senha-wrapper {
     position: relative;
   }
@@ -118,6 +112,31 @@
   }
   .form-acoes-topo.com-sombra {
     box-shadow: 0 8px 14px -10px rgba(0,0,0,0.45);
+  }
+
+  /* ── Tela principal do Admin: botões de ação + busca ficam fixos
+     logo abaixo da topbar, mesmo padrão do .form-acoes-topo acima. ── */
+  .admin-lista-fixo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: sticky;
+    top: var(--topbar-altura, 78px);
+    z-index: 4;
+    background: var(--bg);
+    margin: 0 -20px;
+    padding: 10px 20px 14px;
+  }
+  .admin-lista-fixo.com-sombra {
+    box-shadow: 0 8px 14px -10px rgba(0,0,0,0.45);
+  }
+  .admin-lista-acoes {
+    display: flex;
+    gap: 8px;
+  }
+  .admin-lista-acoes button {
+    flex: 1;
+    margin: 0;
   }
   #preview-area {
     border: 1px solid var(--borda);
@@ -194,6 +213,12 @@
         <line x1="21" y1="12" x2="9" y2="12"></line>
       </svg>
     </button>
+    <button id="btn-voltar-lista-admin" class="btn-topbar-home hidden" title="Voltar para a lista" aria-label="Voltar para a lista">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </button>
   </header>
 
   <!-- TELA DE LOGIN -->
@@ -218,16 +243,17 @@
 
   <!-- TELA PRINCIPAL: LISTAR ORAÇÕES OFICIAIS -->
   <main id="view-admin-list" class="view">
-    <button id="btn-criar-nova-oficial" class="btn-primario" style="margin-top: 10px; margin-bottom: 20px; width: 100%;">+ Criar Nova Oração Oficial</button>
-
-    <div id="aviso-alteracoes-pendentes" class="instrucoes-box hidden" style="border-color: var(--perigo); background: rgba(204,80,80,0.08);">
-      <h4 style="color: var(--perigo);">⚠️ Alterações não exportadas</h4>
-      <p class="dica" style="margin: 0;">Você criou, editou ou excluiu orações oficiais nesta sessão. Essas mudanças só existem aqui no painel — clique em <strong>"📥 Baixar arquivo atualizado"</strong> abaixo e suba esse arquivo no projeto pra elas valerem de fato no aplicativo.</p>
+    <div class="admin-lista-fixo">
+      <div class="admin-lista-acoes">
+        <button id="btn-criar-nova-oficial" class="btn-primario">+ Nova Oração</button>
+        <button id="btn-exportar-json" class="btn-secundario" style="border-color: var(--ouro); color: var(--ouro-suave);">💾 Salvar arquivo</button>
+      </div>
+      <input id="input-busca-editar" type="text" placeholder="🔎 Buscar oração..." autocomplete="off">
     </div>
 
-    <div class="nav-header">
-      <button id="btn-buscar-editar" class="btn-secundario">🔎 Buscar oração para editar</button>
-      <button id="btn-exportar-json" class="btn-secundario" style="border-color: var(--ouro); color: var(--ouro-suave);">📥 Baixar arquivo atualizado</button>
+    <div id="aviso-alteracoes-pendentes" class="instrucoes-box hidden" style="border-color: var(--perigo); background: rgba(204,80,80,0.08);">
+      <h4 style="color: var(--perigo);">⚠️ Alterações não salvas</h4>
+      <p class="dica" style="margin: 0;">Você criou, editou ou excluiu orações oficiais nesta sessão. Essas mudanças só existem aqui no painel — clique em <strong>"💾 Salvar arquivo"</strong> e suba esse arquivo no projeto pra elas valerem de fato no aplicativo.</p>
     </div>
 
     <div id="lista-admin-oficiais" class="lista-oracoes" style="margin-bottom: 30px;"></div>
@@ -246,14 +272,7 @@
           <polyline points="7 3 7 8 15 8"></polyline>
         </svg>
       </button>
-      <button id="btn-cancelar-admin-form" class="btn-secundario btn-icone" type="button" title="Voltar" aria-label="Voltar">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-          <polyline points="9 22 9 12 15 12 15 22"></polyline>
-        </svg>
-      </button>
     </div>
-    <h2 class="titulo-secao" id="admin-form-cabecalho">Nova Oração Oficial</h2>
 
     <div id="preview-area" class="hidden">
       <div id="rezar-texto"></div>
@@ -275,12 +294,17 @@
     <div class="editor-toolbar">
       <label class="campo-label" for="input-oficial-texto">Texto</label>
       <div class="editor-toolbar-botoes">
-        <button id="btn-inserir-pausa-admin" class="btn-secundario" type="button">+ Inserir pausa</button>
-        <button id="btn-inserir-oracao-admin" class="btn-secundario" type="button">+ Inserir oração</button>
+        <div class="menu-inserir-wrapper">
+          <button id="btn-inserir-admin" class="btn-secundario" type="button" aria-haspopup="true" aria-expanded="false">+ Inserir</button>
+          <div id="menu-inserir-admin" class="menu-inserir hidden" role="menu">
+            <button id="btn-inserir-oracao-admin" class="item-menu-inserir" type="button" role="menuitem">📜 Oração</button>
+            <button id="btn-inserir-pausa-admin" class="item-menu-inserir" type="button" role="menuitem">⏸ Pausa</button>
+          </div>
+        </div>
       </div>
     </div>
     <textarea id="input-oficial-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
-    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use o botão acima — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
+    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use <strong>+ Inserir → Oração</strong> — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir → Pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
 
   </main>
 
@@ -298,23 +322,6 @@
         <input id="input-busca-inserir" type="text" placeholder="🔎 Buscar oração..." autocomplete="off">
       </div>
       <div id="lista-modal-inserir-admin" class="lista-modal modal-lista-rolavel"></div>
-    </div>
-  </div>
-
-  <!-- MODAL: BUSCAR ORAÇÃO PARA EDITAR -->
-  <div id="modal-buscar-editar" class="modal hidden">
-    <div class="modal-conteudo modal-conteudo-fixo">
-      <div class="modal-cabecalho">
-        <div>
-          <h3>Buscar oração para editar</h3>
-          <p class="dica">Toque em uma oração para abrir a edição.</p>
-        </div>
-        <button id="btn-fechar-modal-buscar-editar" class="btn-secundario">Cancelar</button>
-      </div>
-      <div class="modal-busca">
-        <input id="input-busca-editar" type="text" placeholder="🔎 Buscar..." autocomplete="off">
-      </div>
-      <div id="lista-modal-buscar-editar" class="lista-modal modal-lista-rolavel"></div>
     </div>
   </div>
 
@@ -374,15 +381,18 @@
   
   let editandoId = null;
   let alteracoesNaoExportadas = false;
+  let filtroListaAdmin = '';
   let formOriginal = { titulo: '', texto: '', oculta: false, colapsarNaFala: false };
 
   function atualizarAvisoAlteracoes(){
     const aviso = document.getElementById('aviso-alteracoes-pendentes');
-    if(!aviso) return;
-    aviso.classList.toggle('hidden', !alteracoesNaoExportadas);
+    const btnExportar = document.getElementById('btn-exportar-json');
+    if(aviso) aviso.classList.toggle('hidden', !alteracoesNaoExportadas);
+    if(btnExportar) btnExportar.classList.toggle('nao-salvo', alteracoesNaoExportadas);
   }
 
   const btnLogout = document.getElementById('btn-admin-logout');
+  const btnVoltarListaAdmin = document.getElementById('btn-voltar-lista-admin');
 
   // Verificação de autenticação na sessão
   if (sessionStorage.getItem(CHAVE_SESSION) === 'true') {
@@ -432,26 +442,42 @@
   }
 
   function liberarAdmin() {
-    btnLogout.classList.remove('hidden');
     mostrarView('view-admin-list');
     carregarDadosIniciais();
+  }
+
+  // Título da topbar: na tela de formulário, varia entre "Nova oração" e
+  // "Editar oração" conforme editandoId; nas demais telas, é fixo.
+  function atualizarTopbarTituloAdmin(id) {
+    const topbarTitulo = document.getElementById('admin-topbar-titulo');
+    if (!topbarTitulo) return;
+    topbarTitulo.textContent = (id === 'view-admin-form')
+      ? (editandoId ? 'Editar oração' : 'Nova oração')
+      : 'Orações Oficiais';
   }
 
   function mostrarView(id) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('view-active'));
     document.getElementById(id).classList.add('view-active');
-    // Esconde o botão de logout se estiver na tela de login
+    // Na tela de edição, o botão de sair vira o botão de voltar pra lista;
+    // nas demais telas (exceto login), volta a ser o botão de sair
     if (id === 'view-login') {
       btnLogout.classList.add('hidden');
+      btnVoltarListaAdmin.classList.add('hidden');
+    } else if (id === 'view-admin-form') {
+      btnLogout.classList.add('hidden');
+      btnVoltarListaAdmin.classList.remove('hidden');
+    } else {
+      btnLogout.classList.remove('hidden');
+      btnVoltarListaAdmin.classList.add('hidden');
     }
     // Título da topbar varia conforme a tela ativa
-    const topbarTitulo = document.getElementById('admin-topbar-titulo');
-    if (topbarTitulo) {
-      topbarTitulo.textContent = (id === 'view-admin-form') ? 'Orações Oficiais - Admin' : 'Orações Oficiais';
-    }
-    // Fileira de ações do formulário começa sem sombra ao entrar na tela
+    atualizarTopbarTituloAdmin(id);
+    // Fileiras de ações fixas começam sem sombra ao entrar na tela
     const formAcoesTopo = document.querySelector('.form-acoes-topo');
     if (formAcoesTopo) formAcoesTopo.classList.remove('com-sombra');
+    const listaFixo = document.querySelector('.admin-lista-fixo');
+    if (listaFixo) listaFixo.classList.remove('com-sombra');
     window.scrollTo(0,0);
     // A altura da topbar pode variar (ex: botão de logout aparecendo/sumindo),
     // então remedimos depois que o navegador aplicar a troca de tela
@@ -470,11 +496,15 @@
   window.addEventListener('load', atualizarAlturaTopbarAdmin);
   atualizarAlturaTopbarAdmin();
 
-  // Sombra na fileira de ações fixa quando o conteúdo é rolado
+  // Sombra nas fileiras de ações fixas quando o conteúdo é rolado
   window.addEventListener('scroll', () => {
     const formAcoesTopo = document.querySelector('.form-acoes-topo');
     const viewFormAtiva = document.getElementById('view-admin-form')?.classList.contains('view-active');
     if (formAcoesTopo) formAcoesTopo.classList.toggle('com-sombra', viewFormAtiva && window.scrollY > 4);
+
+    const listaFixo = document.querySelector('.admin-lista-fixo');
+    const viewListaAtiva = document.getElementById('view-admin-list')?.classList.contains('view-active');
+    if (listaFixo) listaFixo.classList.toggle('com-sombra', viewListaAtiva && window.scrollY > 4);
   }, { passive: true });
 
   async function carregarDadosIniciais() {
@@ -501,10 +531,17 @@
       return;
     }
 
-    // Ordenar em ordem alfabética
+    // Ordenar em ordem alfabética e aplicar o filtro de busca, se houver
     const ordenadas = ORACOES_OFICIAIS.slice().sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+    const norm = normalizarBusca(filtroListaAdmin);
+    const filtradas = norm ? ordenadas.filter(o => normalizarBusca(o.titulo).includes(norm)) : ordenadas;
 
-    ordenadas.forEach(o => {
+    if (filtradas.length === 0) {
+      lista.innerHTML = '<p class="empty-state">Nenhuma oração encontrada.</p>';
+      return;
+    }
+
+    filtradas.forEach(o => {
       const card = document.createElement('div');
       card.className = 'card-oracao';
       card.innerHTML = `
@@ -541,21 +578,19 @@
 
   function abrirForm(id) {
     editandoId = id || null;
+    posicaoCursorSalva = null;
     const inputTitulo = document.getElementById('input-oficial-titulo');
     const inputTexto = document.getElementById('input-oficial-texto');
     const checkOculta = document.getElementById('checkbox-oficial-oculta');
     const checkColapsarFala = document.getElementById('checkbox-oficial-colapsar-fala');
-    const cabecalho = document.getElementById('admin-form-cabecalho');
 
     if (editandoId) {
       const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
-      cabecalho.textContent = 'Editar Oração Oficial';
       inputTitulo.value = o ? o.titulo : '';
       inputTexto.value = o ? o.texto : '';
       checkOculta.checked = o ? !!o.oculta : false;
       checkColapsarFala.checked = o ? !!o.colapsarNaFala : false;
     } else {
-      cabecalho.textContent = 'Nova Oração Oficial';
       inputTitulo.value = '';
       inputTexto.value = '';
       checkOculta.checked = false;
@@ -620,8 +655,8 @@
   // Botão Criar Nova
   document.getElementById('btn-criar-nova-oficial').addEventListener('click', () => abrirForm(null));
 
-  // Botão Cancelar Formulário
-  document.getElementById('btn-cancelar-admin-form').addEventListener('click', () => {
+  // Botão Cancelar Formulário (agora vive na topbar, no lugar do botão de sair)
+  document.getElementById('btn-voltar-lista-admin').addEventListener('click', () => {
     resetarPreview();
     mostrarView('view-admin-list');
   });
@@ -666,10 +701,10 @@
     mostrarToast('Oração oficial salva com sucesso!', 'sucesso');
 
     // Permanece na tela do formulário; atualiza o "original" (ícone volta ao
-    // neutro), o cabeçalho (de "Nova" para "Editar") e habilita a pré-visualização
+    // neutro), o título da topbar (de "Nova" para "Editar") e habilita a pré-visualização
     formOriginal = { titulo, texto, oculta, colapsarNaFala };
     atualizarEstadoBotaoSalvarOficial();
-    document.getElementById('admin-form-cabecalho').textContent = 'Editar Oração Oficial';
+    atualizarTopbarTituloAdmin('view-admin-form');
     habilitarBotoesPreview();
     document.getElementById('btn-preview-reiniciar').disabled = true;
   });
@@ -693,6 +728,19 @@
 
   // Modal Inserir Oração
   let posicaoCursorSalva = null;
+
+  // Guarda a posição do cursor continuamente enquanto o usuário está DENTRO
+  // do textarea (não só no momento do clique de um botão externo). Em mobile,
+  // assim que o textarea perde o foco (ex: ao tocar num botão fora dele),
+  // selectionStart deixa de ser confiável — por isso não dá pra ler na hora
+  // do clique, é preciso já ter salvo antes, enquanto o foco ainda era do textarea.
+  function salvarPosicaoCursorTextoAdmin(){
+    const inputTexto = document.getElementById('input-oficial-texto');
+    if(inputTexto) posicaoCursorSalva = inputTexto.selectionStart;
+  }
+  document.getElementById('input-oficial-texto').addEventListener('keyup', salvarPosicaoCursorTextoAdmin);
+  document.getElementById('input-oficial-texto').addEventListener('click', salvarPosicaoCursorTextoAdmin);
+  document.getElementById('input-oficial-texto').addEventListener('select', salvarPosicaoCursorTextoAdmin);
 
   function renderizarListaModalInserirAdmin(termo){
     const lista = document.getElementById('lista-modal-inserir-admin');
@@ -719,7 +767,7 @@
 
   function abrirModalInserirAdmin(){
     const inputTexto = document.getElementById('input-oficial-texto');
-    posicaoCursorSalva = inputTexto.selectionStart;
+    if(posicaoCursorSalva == null) posicaoCursorSalva = inputTexto.value.length;
     document.getElementById('input-busca-inserir').value = '';
     renderizarListaModalInserirAdmin('');
     document.getElementById('modal-inserir-admin').classList.remove('hidden');
@@ -741,15 +789,16 @@
 
     const inputTexto = document.getElementById('input-oficial-texto');
     const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
-    const referencia = quantidade > 1 ? `[${titulo}]{${quantidade}}` : `[${titulo}]`;
+    const referencia = (quantidade > 1 ? `[${titulo}]{${quantidade}}` : `[${titulo}]`) + '\n';
     const antes = inputTexto.value.slice(0, pos);
     const depois = inputTexto.value.slice(pos);
     inputTexto.value = antes + referencia + depois;
     atualizarEstadoBotaoSalvarOficial();
     fecharModalInserirAdmin();
-    inputTexto.focus();
+    inputTexto.focus({ preventScroll: true });
     const novaPos = pos + referencia.length;
     inputTexto.setSelectionRange(novaPos, novaPos);
+    posicaoCursorSalva = novaPos;
   }
 
   // Insere um marcador de pausa curta no texto, ex: "[pausa]{2}" para 2 segundos.
@@ -757,7 +806,7 @@
   // com a palavra reservada "pausa" no lugar de um título.
   function inserirPausaAdmin(){
     const inputTexto = document.getElementById('input-oficial-texto');
-    const pos = inputTexto.selectionStart;
+    const pos = posicaoCursorSalva != null ? posicaoCursorSalva : inputTexto.value.length;
     const resposta = prompt(
       'Quantos segundos de pausa?\n(Ex: 2 para uma pequena pausa entre o fim de uma oração e o início de outra.)',
       '2'
@@ -765,70 +814,59 @@
     if(resposta === null) return;
 
     const segundos = Math.min(Math.max(parseInt(resposta, 10) || 1, 1), 30);
-    const marcador = `[pausa]{${segundos}}`;
+    const marcador = `[pausa]{${segundos}}\n`;
     const antes = inputTexto.value.slice(0, pos);
     const depois = inputTexto.value.slice(pos);
     inputTexto.value = antes + marcador + depois;
     atualizarEstadoBotaoSalvarOficial();
-    inputTexto.focus();
+    inputTexto.focus({ preventScroll: true });
     const novaPos = pos + marcador.length;
     inputTexto.setSelectionRange(novaPos, novaPos);
+    posicaoCursorSalva = novaPos;
   }
 
-  document.getElementById('btn-inserir-pausa-admin').addEventListener('click', inserirPausaAdmin);
-  document.getElementById('btn-inserir-oracao-admin').addEventListener('click', abrirModalInserirAdmin);
+  // Menu "+ Inserir": abre um pequeno menu com as opções Oração/Pausa
+  const btnInserirAdmin = document.getElementById('btn-inserir-admin');
+  const menuInserirAdmin = document.getElementById('menu-inserir-admin');
+
+  function fecharMenuInserirAdmin(){
+    menuInserirAdmin.classList.add('hidden');
+    btnInserirAdmin.setAttribute('aria-expanded', 'false');
+  }
+  function alternarMenuInserirAdmin(){
+    const abrindo = menuInserirAdmin.classList.contains('hidden');
+    menuInserirAdmin.classList.toggle('hidden', !abrindo);
+    btnInserirAdmin.setAttribute('aria-expanded', String(abrindo));
+  }
+
+  btnInserirAdmin.addEventListener('click', (e) => {
+    e.stopPropagation();
+    alternarMenuInserirAdmin();
+  });
+  document.addEventListener('click', (e) => {
+    if (!menuInserirAdmin.classList.contains('hidden') && !menuInserirAdmin.contains(e.target) && e.target !== btnInserirAdmin) {
+      fecharMenuInserirAdmin();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') fecharMenuInserirAdmin();
+  });
+
+  document.getElementById('btn-inserir-pausa-admin').addEventListener('click', () => { fecharMenuInserirAdmin(); inserirPausaAdmin(); });
+  document.getElementById('btn-inserir-oracao-admin').addEventListener('click', () => { fecharMenuInserirAdmin(); abrirModalInserirAdmin(); });
   document.getElementById('btn-fechar-modal-admin').addEventListener('click', fecharModalInserirAdmin);
   document.getElementById('input-busca-inserir').addEventListener('input', e => {
     renderizarListaModalInserirAdmin(e.target.value);
   });
 
-  // ── MODAL: BUSCAR ORAÇÃO PARA EDITAR ────────────────────────────────────────
+  // ── BUSCA (filtro ao vivo da lista de orações oficiais) ────────────────────
   function normalizarBusca(texto){
     return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
   }
 
-  function renderizarListaModalBuscarEditar(termo){
-    const lista = document.getElementById('lista-modal-buscar-editar');
-    lista.innerHTML = '';
-    const norm = normalizarBusca(termo);
-    const ordenadas = ORACOES_OFICIAIS.slice().sort((a,b) => a.titulo.localeCompare(b.titulo,'pt-BR'));
-    const filtradas = norm ? ordenadas.filter(o => normalizarBusca(o.titulo).includes(norm)) : ordenadas;
-
-    if(filtradas.length === 0){
-      lista.innerHTML = '<p class="dica">Nenhuma oração encontrada.</p>';
-      return;
-    }
-    filtradas.forEach(o => {
-      const item = document.createElement('div');
-      item.className = 'item-modal';
-      item.textContent = o.titulo;
-      item.addEventListener('click', () => {
-        fecharModalBuscarEditar();
-        abrirForm(o.id);
-      });
-      lista.appendChild(item);
-    });
-  }
-
-  function abrirModalBuscarEditar(){
-    if(ORACOES_OFICIAIS.length === 0){
-      mostrarToast('Nenhuma oração oficial cadastrada ainda.');
-      return;
-    }
-    document.getElementById('input-busca-editar').value = '';
-    renderizarListaModalBuscarEditar('');
-    document.getElementById('modal-buscar-editar').classList.remove('hidden');
-    document.getElementById('input-busca-editar').focus();
-  }
-
-  function fecharModalBuscarEditar(){
-    document.getElementById('modal-buscar-editar').classList.add('hidden');
-  }
-
-  document.getElementById('btn-buscar-editar').addEventListener('click', abrirModalBuscarEditar);
-  document.getElementById('btn-fechar-modal-buscar-editar').addEventListener('click', fecharModalBuscarEditar);
   document.getElementById('input-busca-editar').addEventListener('input', e => {
-    renderizarListaModalBuscarEditar(e.target.value);
+    filtroListaAdmin = e.target.value;
+    renderizarListaAdmin();
   });
 
   // ── PREVIEW (📖 Ler / ▶ Play / 🔄 Reiniciar) ─────────────────────────────
