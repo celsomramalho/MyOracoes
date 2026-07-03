@@ -179,8 +179,9 @@ const editorOracao = criarEditorOracao({
     texto: 'input-texto',
     botaoSalvar: 'btn-salvar-topo',
     menuInserir: 'menu-inserir',
-    botaoInserir: 'btn-inserir',
-    idsModais: {
+    botaoInserir: 'btn-inserir'
+  },
+  idsModais: {
       btnInserirOracao:      'btn-inserir-oracao',
       btnInserirOpcional:    'btn-inserir-opcional',
       btnInserirLink:        'btn-inserir-link',
@@ -201,7 +202,6 @@ const editorOracao = criarEditorOracao({
       inputNumero:           'input-numero',
       btnCancelarNumero:     'btn-cancelar-numero',
       btnConfirmarNumero:    'btn-confirmar-numero'
-    }
   },
   recursos: {
     mostrarCamposAdmin: false,
@@ -280,6 +280,31 @@ function salvarEditor(){
   // Atualiza para o novo ID se foi criada agora
   editorOracao.abrir(editandoId);
   mostrarView('view-editor');
+}
+
+let idParaExcluir = null;
+
+function excluirOracao(id){
+  const o = ORACOES.find(x => x.id === id);
+  if(!o) return;
+  idParaExcluir = id;
+  document.getElementById('texto-confirmar-exclusao').textContent =
+    `Excluir a oração "${o.titulo}"? Essa ação não pode ser desfeita.`;
+  document.getElementById('modal-confirmar-exclusao').classList.remove('hidden');
+}
+
+function fecharModalExclusao(){
+  document.getElementById('modal-confirmar-exclusao').classList.add('hidden');
+  idParaExcluir = null;
+}
+
+function confirmarExclusao(){
+  if(!idParaExcluir) return;
+  ORACOES = ORACOES.filter(x => x.id !== idParaExcluir);
+  salvarOracoes(ORACOES);
+  renderizarTudo();
+  fecharModalExclusao();
+  mostrarView('view-todas');
 }
 
 
@@ -469,8 +494,6 @@ document.getElementById('btn-compartilhar-app').addEventListener('click', compar
 
 document.getElementById('fab-nova').addEventListener('click', () => abrirEditor(null));
 document.getElementById('btn-salvar-topo').addEventListener('click', salvarEditor);
-document.getElementById('input-titulo').addEventListener('input', atualizarEstadoBotaoSalvar);
-document.getElementById('input-texto').addEventListener('input', atualizarEstadoBotaoSalvar);
 document.getElementById('btn-cancelar-exclusao').addEventListener('click', fecharModalExclusao);
 document.getElementById('btn-confirmar-exclusao').addEventListener('click', confirmarExclusao);
 

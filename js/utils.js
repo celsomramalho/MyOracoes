@@ -13,8 +13,18 @@ function obterInicial(titulo){
   return t ? t[0].toUpperCase() : '?';
 }
 
+// Remove marcações internas do texto (ex: [Título|id]{n} -> Título; [pausa]{n} -> removido)
+// para exibição em listagens/prévias. O id após "|" é controle interno e nunca deve aparecer.
+function limparMarcacoesTexto(texto){
+  return (texto || '').replace(/\[([^\[\]]+)\](?:\{(?:\d+|opcional)\})?/gi, (match, conteudo) => {
+    const partes = conteudo.split('|');
+    const titulo = partes[0].trim();
+    return /^pausa$/i.test(titulo) ? '' : titulo;
+  });
+}
+
 function primeiraLinhaUtil(texto){
-  const linha = (texto || '').split('\n').map(l => l.trim()).find(l => l.length > 0);
+  const linha = limparMarcacoesTexto(texto).split('\n').map(l => l.trim()).find(l => l.length > 0);
   return linha ? linha.replace(/^V\.\s*|^R\.\s*/,'') : '';
 }
 

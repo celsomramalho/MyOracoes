@@ -1,11 +1,22 @@
-const CACHE_NOME = 'minhas-oracoes-v4';
+const CACHE_NOME = 'minhas-oracoes-v5';
 const ARQUIVOS_PARA_CACHE = [
   './',
   './index.html',
   './style.css',
   './app.js',
+  './state.js',
   './manifest.json',
   './oracoes-oficiais.json',
+  './js/utils.js',
+  './js/oracoes-data.js',
+  './js/oracoes-oficiais-data.js',
+  './js/rezar-core.js',
+  './js/render-tree.js',
+  './js/speech.js',
+  './js/editor-core.js',
+  './js/components/card.js',
+  './js/components/toast.js',
+  './js/components/progresso.js',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];

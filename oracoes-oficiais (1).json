@@ -1,6 +1,4 @@
-// Dados das oracoes oficiais - gerado automaticamente
-// NAO edite este arquivo diretamente; edite oracoes-oficiais.json
-var ORACOES_OFICIAIS_DATA = [
+[
   {
     "id": "oficial_pai_nosso",
     "titulo": "Pai Nosso",
@@ -158,7 +156,7 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mr2mo8c5",
     "titulo": "Augusta Rainha dos Céus",
-    "texto": "Augusta Rainha dos céus, soberana mestra dos Anjos, Vós que, desde o princípio, recebestes de Deus o poder e a missão de esmagar a cabeça de Satanás, nós vo-lo pedimos humildemente, enviai vossas legiões celestes para que, sob vossas ordens, e por vosso poder, elas persigam os demônios, combatendo-os por toda a parte, reprimindo-lhes a insolência, e lançando-os no abismo.\nQuem é como Deus?\nÓ Mãe de bondade e ternura, Vós sereis sempre o nosso Amor e a nossa esperança.\nÓ Mãe Divina, enviai os Santos Anjos para nos defenderem, e repeli para longe de nós o cruel inimigo. Santos Anjos e Arcanjos, defendei-nos e guardai-nos. \nR. Amém.",
+    "texto": "Augusta Rainha dos céus, soberana mestra dos Anjos, Vós que, desde o princípio, recebestes de Deus o poder e a missão de esmagar a cabeça de Satanás, nós vo-lo pedimos humildemente, enviai vossas legiões celestes para que, sob vossas ordens, e por vosso poder, elas persigam os demônios, combatendo-os por toda a parte, reprimindo-lhes a insolência, e lançando-os no abismo.\nQuem é como Deus? \nÓ Mãe de bondade e ternura, Vós sereis sempre o nosso Amor e a nossa esperança.\nÓ Mãe Divina, enviai os Santos Anjos para nos defenderem, e repeli para longe de nós o cruel inimigo. Santos Anjos e Arcanjos, defendei-nos e guardai-nos. \nR. Amém.",
     "oculta": false,
     "colapsarNaFala": false
   },
@@ -183,4 +181,4 @@ var ORACOES_OFICIAIS_DATA = [
     "oculta": true,
     "colapsarNaFala": false
   }
-];
+]

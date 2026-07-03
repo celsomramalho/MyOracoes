@@ -1,10 +1,10 @@
 // ===================== ÁRVORE DE NÓS PARA RENDERIZAÇÃO =====================
 
 function adicionarLinhas(nos, texto, estado){
-  const linhas = (texto || '').split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const linhas = (texto || '').split('\n').map(l => l.replace(/[\r\n]/g, '')).filter(l => l.trim().length > 0);
 
   for(let i = 0; i < linhas.length; i++){
-    const linha = linhas[i];
+    const linha = linhas[i].trim();
 
     // Diretiva de resposta automática para ladainhas: uma linha sozinha
     // entre chaves, ex: "{R. rogai por nós.}", liga o modo automático —
@@ -196,6 +196,13 @@ function criarBtnCheck(idx, ctx){
   return btn;
 }
 
+function continuacaoDeFrase(texto) {
+  // Linha é continuação se começa com letra minúscula (ignorando prefixos V./R.)
+  const s = texto.replace(/^[VR]\.\s*/, '').trimStart();
+  const c = s.charAt(0);
+  return c !== '' && c === c.toLowerCase() && c !== c.toUpperCase();
+}
+
 function agruparNos(nos){
   // Regras de agrupamento:
   // 1. V. + R. imediatamente seguinte → um grupo só (par inseparável)
@@ -212,13 +219,6 @@ function agruparNos(nos){
       grupos.push({ tipo: 'grupo-linhas', linhas: linhasAtm });
       linhasAtm = [];
     }
-  }
-
-  function continuacaoDeFrase(texto) {
-    // Linha é continuação se começa com letra minúscula (ignorando prefixos V./R.)
-    const s = texto.replace(/^[VR]\.\s*/, '').trimStart();
-    const c = s.charAt(0);
-    return c !== '' && c === c.toLowerCase() && c !== c.toUpperCase();
   }
 
   for (let i = 0; i < nos.length; i++) {
@@ -272,11 +272,11 @@ function agruparNos(nos){
     } else {
       const ultimaLinha = linhasAtm[linhasAtm.length - 1];
       const ultimaEhParagrafo = ultimaLinha.classe !== 'linha-v' && ultimaLinha.classe !== 'linha-r';
-      if (ultimaEhParagrafo && continuacaoDeFrase(no.texto)) {
-        // Continuação de frase (começa com minúscula) — cola com a linha anterior
+      if (ultimaEhParagrafo) {
+        // Se a anterior e a atual são parágrafos livres comuns, elas pertencem ao mesmo grupo/parágrafo.
         linhasAtm.push(no);
       } else {
-        // Nova frase/parágrafo — fecha o atual e abre novo
+        // Se a anterior era V. ou R., fecha o grupo e abre novo
         fecharGrupo();
         linhasAtm.push(no);
       }
@@ -297,21 +297,37 @@ function renderizarNos(nos, container, ctx){
 
       const conteudo = document.createElement('div');
       conteudo.className = 'grupo-texto-conteudo';
-      g.linhas.forEach(no => {
-        const p = document.createElement('p');
-        if(no.classe) p.className = no.classe;
+      let pAtual = null;
+      g.linhas.forEach((no, idxNo) => {
+        // Se for a primeira linha ou começar com V. ou R., criamos um novo parágrafo.
+        // Se for linha de texto comum e for continuação de frase (começa com minúscula),
+        // colocamos no mesmo parágrafo da linha anterior com um espaço ou quebra suave.
+        // Caso contrário (linha comum que NÃO é continuação, ex: nova frase/parágrafo
+        // que só por acaso não é V./R.), também abre parágrafo novo — sem isso, toda
+        // sequência de linhas "livres" (separadas por \n no texto original) virava um
+        // parágrafo único colado, ignorando as quebras de linha do texto de origem.
+        const ehNovoP = idxNo === 0 || no.classe === 'linha-v' || no.classe === 'linha-r' || !continuacaoDeFrase(no.texto);
+        
+        if (ehNovoP || !pAtual) {
+          pAtual = document.createElement('p');
+          if(no.classe) pAtual.className = no.classe;
+          conteudo.appendChild(pAtual);
+        } else {
+          // É uma continuação de linha no mesmo bloco P
+          pAtual.appendChild(document.createTextNode(' '));
+        }
+
         criarPartesLinha(no.texto, no.classe).forEach(parte => {
           if(!parte.texto) return;
           if(parte.classe){
             const span = document.createElement('span');
             span.className = parte.classe;
             span.textContent = parte.texto;
-            p.appendChild(span);
+            pAtual.appendChild(span);
           }else{
-            p.appendChild(document.createTextNode(parte.texto));
+            pAtual.appendChild(document.createTextNode(parte.texto));
           }
         });
-        conteudo.appendChild(p);
       });
       wrapper.appendChild(conteudo);
 
