@@ -1,4 +1,4 @@
-﻿// js/editor-core.js — Funções puras compartilhadas do editor de orações
+// js/editor-core.js — Funções puras compartilhadas do editor de orações
 // Sem dependências de outros módulos: pode ser carregado antes ou depois de
 // qualquer outro script, tanto em index.html quanto em admin.html.
 
@@ -353,4 +353,168 @@ function criarControladorInsercao(config) {
       });
     });
   }
+
+  // Retorna métodos para controle manual se necessário
+  return {
+    obterCursor() { return posicaoCursorSalva; },
+    definirCursor(pos) { posicaoCursorSalva = pos; focarTextarea(pos); },
+    inserirTexto(txt) { inserirTextoNoCursor(txt); }
+  };
 }
+
+// ===================== GERENCIADOR DE ESTADO DO FORMULÁRIO (Etapa 5) =====================
+
+function criarEditorOracao(config) {
+  let idEdicaoAtual = null;
+  let dadosOriginais = { titulo: '', texto: '', oculta: false, colapsarNaFala: false };
+
+  // Cache dos elementos DOM
+  const dom = {
+    titulo: document.getElementById(config.ids.titulo),
+    texto: document.getElementById(config.ids.texto),
+    botaoSalvar: document.getElementById(config.ids.botaoSalvar)
+  };
+
+  // Se houver campos extras
+  if (config.camposExtras) {
+    if (config.camposExtras.oculta) dom.oculta = document.getElementById(config.camposExtras.oculta);
+    if (config.camposExtras.colapsarNaFala) dom.colapsarNaFala = document.getElementById(config.camposExtras.colapsarNaFala);
+  }
+
+  // Verifica se há alguma alteração comparado ao estado original carregado
+  function verificarAlteracao() {
+    if (!dom.titulo || !dom.texto) return false;
+    
+    const tituloAlterado = dom.titulo.value !== dadosOriginais.titulo;
+    const textoAlterado = dom.texto.value !== dadosOriginais.texto;
+    
+    let extrasAlterados = false;
+    if (config.recursos.mostrarCamposAdmin) {
+      const ocultaAtual = dom.oculta ? dom.oculta.checked : false;
+      const colapsarAtual = dom.colapsarNaFala ? dom.colapsarNaFala.checked : false;
+      extrasAlterados = ocultaAtual !== dadosOriginais.oculta || colapsarAtual !== dadosOriginais.colapsarNaFala;
+    }
+
+    const houveAlteracao = tituloAlterado || textoAlterado || extrasAlterados;
+    atualizarUIEstadoSalvar(houveAlteracao);
+    
+    if (config.aoMudarEstadoSalvar) {
+      config.aoMudarEstadoSalvar(houveAlteracao);
+    }
+    return houveAlteracao;
+  }
+
+  function atualizarUIEstadoSalvar(houveAlteracao) {
+    if (dom.botaoSalvar) {
+      dom.botaoSalvar.classList.toggle('nao-salvo', houveAlteracao);
+    }
+  }
+
+  // Escuta as alterações nos inputs para reagir em tempo real
+  if (dom.titulo) dom.titulo.addEventListener('input', verificarAlteracao);
+  if (dom.texto) dom.texto.addEventListener('input', verificarAlteracao);
+  if (dom.oculta) dom.oculta.addEventListener('change', verificarAlteracao);
+  if (dom.colapsarNaFala) dom.colapsarNaFala.addEventListener('change', verificarAlteracao);
+
+  // Instancia também o controlador de inserção interno
+  const idsInsercao = {
+    textarea: config.ids.texto,
+    menuInserir: config.ids.menuInserir,
+    btnInserir: config.ids.botaoInserir,
+    ...config.idsModais // Herda IDs de modais configurados no escopo do app
+  };
+  
+  const controladorInsercao = criarControladorInsercao({
+    ids: idsInsercao,
+    sufixoNovalinha: !!config.sufixoNovalinha,
+    preventScrollFocus: !!config.preventScrollFocus,
+    rastrearCursorContinuamente: !!config.rastrearCursorContinuamente,
+    listarOracoes: config.listarReferencias,
+    renderizarItemLista: config.renderizarItemListaReferencia,
+    aoInserir: () => {
+      verificarAlteracao();
+      if (config.aoInserirTexto) config.aoInserirTexto();
+    }
+  });
+
+  return {
+    abrir(id) {
+      idEdicaoAtual = id || null;
+      
+      let oracao = null;
+      if (idEdicaoAtual && config.carregarPorId) {
+        oracao = config.carregarPorId(idEdicaoAtual);
+      }
+
+      // Preenche os dados nos elementos do formulário
+      if (dom.titulo) dom.titulo.value = oracao ? oracao.titulo : '';
+      if (dom.texto) dom.texto.value = oracao ? oracao.texto : '';
+      
+      if (config.recursos.mostrarCamposAdmin) {
+        if (dom.oculta) dom.oculta.checked = oracao ? !!oracao.oculta : false;
+        if (dom.colapsarNaFala) dom.colapsarNaFala.checked = oracao ? !!oracao.colapsarNaFala : false;
+      }
+
+      // Salva o estado original
+      dadosOriginais = {
+        titulo: dom.titulo ? dom.titulo.value : '',
+        texto: dom.texto ? dom.texto.value : '',
+        oculta: (config.recursos.mostrarCamposAdmin && dom.oculta) ? dom.oculta.checked : false,
+        colapsarNaFala: (config.recursos.mostrarCamposAdmin && dom.colapsarNaFala) ? dom.colapsarNaFala.checked : false
+      };
+
+      // Reseta UI
+      atualizarUIEstadoSalvar(false);
+
+      if (dom.titulo) {
+        if (config.preventScrollFocus) {
+          dom.titulo.focus({ preventScroll: true });
+        } else {
+          dom.titulo.focus();
+        }
+      }
+    },
+
+    obterValores() {
+      const valores = {
+        id: idEdicaoAtual,
+        titulo: dom.titulo ? dom.titulo.value.trim() : '',
+        texto: dom.texto ? dom.texto.value : ''
+      };
+
+      if (config.recursos.mostrarCamposAdmin) {
+        valores.oculta = dom.oculta ? dom.oculta.checked : false;
+        valores.colapsarNaFala = dom.colapsarNaFala ? dom.colapsarNaFala.checked : false;
+      }
+
+      return valores;
+    },
+
+    definirValores(oracao) {
+      if (dom.titulo && oracao.titulo !== undefined) dom.titulo.value = oracao.titulo;
+      if (dom.texto && oracao.texto !== undefined) dom.texto.value = oracao.texto;
+      if (config.recursos.mostrarCamposAdmin) {
+        if (dom.oculta && oracao.oculta !== undefined) dom.oculta.checked = !!oracao.oculta;
+        if (dom.colapsarNaFala && oracao.colapsarNaFala !== undefined) dom.colapsarNaFala.checked = !!oracao.colapsarNaFala;
+      }
+      verificarAlteracao();
+    },
+
+    marcarComoSalvo() {
+      dadosOriginais = {
+        titulo: dom.titulo ? dom.titulo.value : '',
+        texto: dom.texto ? dom.texto.value : '',
+        oculta: (config.recursos.mostrarCamposAdmin && dom.oculta) ? dom.oculta.checked : false,
+        colapsarNaFala: (config.recursos.mostrarCamposAdmin && dom.colapsarNaFala) ? dom.colapsarNaFala.checked : false
+      };
+      atualizarUIEstadoSalvar(false);
+    },
+
+    verificarAlteracoesPendentes() {
+      return verificarAlteracao();
+    },
+
+    controladorInsercao
+  };
+}
+

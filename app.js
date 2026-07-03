@@ -171,78 +171,86 @@ function renderizarTudo(){
 // atualizarProgressoDiario → js/components/progresso.js
 
 // ===================== EDITOR (CRIAR / EDITAR) =====================
+// Instancia o editor unificado para o contexto do Usuário
+const editorOracao = criarEditorOracao({
+  contexto: 'usuario',
+  ids: {
+    titulo: 'input-titulo',
+    texto: 'input-texto',
+    botaoSalvar: 'btn-salvar-topo',
+    menuInserir: 'menu-inserir',
+    botaoInserir: 'btn-inserir',
+    idsModais: {
+      btnInserirOracao:      'btn-inserir-oracao',
+      btnInserirOpcional:    'btn-inserir-opcional',
+      btnInserirLink:        'btn-inserir-link',
+      btnInserirPausa:       'btn-inserir-pausa',
+      modalInserir:          'modal-inserir',
+      modalInserirTitulo:    'modal-inserir-titulo',
+      modalInserirDica:      'modal-inserir-dica',
+      inputBuscaInserir:     'input-busca-inserir',
+      listaModalInserir:     'lista-modal-inserir',
+      btnFecharModalInserir: 'btn-fechar-modal',
+      modalLink:             'modal-link',
+      inputLinkUrl:          'input-link-url',
+      btnCancelarLink:       'btn-cancelar-link',
+      btnConfirmarLink:      'btn-confirmar-link',
+      modalNumero:           'modal-numero',
+      modalNumeroTitulo:     'modal-numero-titulo',
+      modalNumeroDica:       'modal-numero-dica',
+      inputNumero:           'input-numero',
+      btnCancelarNumero:     'btn-cancelar-numero',
+      btnConfirmarNumero:    'btn-confirmar-numero'
+    }
+  },
+  recursos: {
+    mostrarCamposAdmin: false,
+    preview: false
+  },
+  sufixoNovalinha: false,
+  preventScrollFocus: false,
+  rastrearCursorContinuamente: false,
+
+  listarReferencias(termo) {
+    const pessoais = ORACOES.filter(o => o.id !== editandoId)
+      .map(o => ({ ...o, _tipo: 'pessoal' }));
+    const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
+    let lista = [...pessoais, ...oficiais]
+      .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+    const norm = normalizarBusca(termo || '');
+    return norm ? lista.filter(o => normalizarBusca(o.titulo).includes(norm)) : lista;
+  },
+
+  renderizarItemListaReferencia(o) {
+    return `${escaparHTML(o.titulo)}${
+      o._tipo === 'oficial'
+        ? ' <span style="color:var(--texto-suave);font-size:0.8em;">📜 oficial</span>'
+        : ''
+    }`;
+  },
+
+  carregarPorId(id) {
+    return ORACOES.find(x => x.id === id);
+  }
+});
+
 function abrirEditor(id){
   editandoId = id || null;
-  const inputTitulo = document.getElementById('input-titulo');
-  const inputTexto = document.getElementById('input-texto');
-
-  if(editandoId){
-    const o = ORACOES.find(x => x.id === editandoId);
-    inputTitulo.value = o ? o.titulo : '';
-    inputTexto.value = o ? o.texto : '';
-  }else{
-    inputTitulo.value = '';
-    inputTexto.value = '';
-  }
-
-  editorTituloOriginal = inputTitulo.value;
-  editorTextoOriginal = inputTexto.value;
-  atualizarEstadoBotaoSalvar();
-
+  editorOracao.abrir(editandoId);
   mostrarView('view-editor');
-  inputTitulo.focus();
-}
-
-// Compara o conteúdo atual do editor com o que havia ao abrir a tela e
-// sinaliza no ícone de salvar da topbar se há alterações não salvas
-function atualizarEstadoBotaoSalvar(){
-  const btnSalvarTopo = document.getElementById('btn-salvar-topo');
-  if(!btnSalvarTopo) return;
-  const inputTitulo = document.getElementById('input-titulo');
-  const inputTexto = document.getElementById('input-texto');
-  const houveAlteracao = inputTitulo.value !== editorTituloOriginal || inputTexto.value !== editorTextoOriginal;
-  btnSalvarTopo.classList.toggle('nao-salvo', houveAlteracao);
-}
-
-let idParaExcluir = null;
-
-function excluirOracao(id){
-  const o = ORACOES.find(x => x.id === id);
-  if(!o) return;
-  idParaExcluir = id;
-  document.getElementById('texto-confirmar-exclusao').textContent =
-    `Excluir a oração "${o.titulo}"? Essa ação não pode ser desfeita.`;
-  document.getElementById('modal-confirmar-exclusao').classList.remove('hidden');
-}
-
-function fecharModalExclusao(){
-  document.getElementById('modal-confirmar-exclusao').classList.add('hidden');
-  idParaExcluir = null;
-}
-
-function confirmarExclusao(){
-  if(!idParaExcluir) return;
-  ORACOES = ORACOES.filter(x => x.id !== idParaExcluir);
-  salvarOracoes(ORACOES);
-  renderizarTudo();
-  fecharModalExclusao();
-  mostrarView('view-todas');
 }
 
 function salvarEditor(){
-  const inputTitulo = document.getElementById('input-titulo');
-  const inputTexto = document.getElementById('input-texto');
-  const titulo = inputTitulo.value.trim();
-  const texto = inputTexto.value;
+  const valores = editorOracao.obterValores();
 
-  if(!titulo){
+  if(!valores.titulo){
     alert('Dê um título para a oração antes de salvar.');
-    inputTitulo.focus();
+    document.getElementById('input-titulo').focus();
     return;
   }
 
   // Verifica duplicata em pessoais E oficiais
-  const nomeLower = titulo.toLowerCase();
+  const nomeLower = valores.titulo.toLowerCase();
   const duplicadaPessoal = ORACOES.find(o =>
     o.titulo && o.titulo.trim().toLowerCase() === nomeLower && o.id !== editandoId
   );
@@ -256,10 +264,10 @@ function salvarEditor(){
 
   if(editandoId){
     const o = ORACOES.find(x => x.id === editandoId);
-    o.titulo = titulo;
-    o.texto = texto;
+    o.titulo = valores.titulo;
+    o.texto = valores.texto;
   }else{
-    const nova = { id: gerarId(), titulo, texto, favorita: false };
+    const nova = { id: gerarId(), titulo: valores.titulo, texto: valores.texto, favorita: false };
     ORACOES.push(nova);
     editandoId = nova.id; // passa a editar a oração recém-criada, sem sair da tela
   }
@@ -268,98 +276,71 @@ function salvarEditor(){
   renderizarTudo();
   mostrarToast('Oração salva com sucesso!', 'sucesso');
 
-  // Permanece na tela de edição; apenas atualiza a referência do que é
-  // "original" (para o ícone de salvar voltar ao estado neutro) e o
-  // título da topbar (de "Nova oração" para "Editar oração", se for o caso)
-  editorTituloOriginal = titulo;
-  editorTextoOriginal = texto;
-  atualizarEstadoBotaoSalvar();
+  editorOracao.marcarComoSalvo();
+  // Atualiza para o novo ID se foi criada agora
+  editorOracao.abrir(editandoId);
   mostrarView('view-editor');
 }
 
 
-// mostrarToast → js/components/toast.js
+// ===================== TELA "REZAR" =====================
+// Etapa 4 do PLANO-UNIFICACAO-TELA-REZAR.md: abrirRezar deixou de conter a
+// lógica da tela Rezar diretamente — agora é um wrapper fino em torno do
+// controlador genérico criarTelaRezar (js/rezar-core.js), configurado para
+// o contexto do usuário. mostrarView continua com o mesmo id de view
+// ('view-rezar') e os checks hardcoded que dependem dele em outros lugares
+// do app não mudam nesta etapa (isso só muda na Etapa 5, com
+// 'view-rezar-admin'). As globais oracaoAtualId/oracaoAtualTipo/origemRezar
+// continuam existindo do mesmo jeito, só que agora setadas via callback de
+// config em vez de direto no corpo de abrirRezar.
+const telaRezarUsuario = criarTelaRezar({
+  contexto: 'usuario',
 
-// ===================== INSERIR REFERÊNCIA [Título] =====================
-criarControladorInsercao({
-  ids: {
-    textarea:              'input-texto',
-    btnInserir:            'btn-inserir',
-    menuInserir:           'menu-inserir',
-    btnInserirOracao:      'btn-inserir-oracao',
-    btnInserirOpcional:    'btn-inserir-opcional',
-    btnInserirLink:        'btn-inserir-link',
-    btnInserirPausa:       'btn-inserir-pausa',
-    modalInserir:          'modal-inserir',
-    modalInserirTitulo:    'modal-inserir-titulo',
-    modalInserirDica:      'modal-inserir-dica',
-    inputBuscaInserir:     'input-busca-inserir',
-    listaModalInserir:     'lista-modal-inserir',
-    btnFecharModalInserir: 'btn-fechar-modal',
-    modalLink:             'modal-link',
-    inputLinkUrl:          'input-link-url',
-    btnCancelarLink:       'btn-cancelar-link',
-    btnConfirmarLink:      'btn-confirmar-link',
-    modalNumero:           'modal-numero',
-    modalNumeroTitulo:     'modal-numero-titulo',
-    modalNumeroDica:       'modal-numero-dica',
-    inputNumero:           'input-numero',
-    btnCancelarNumero:     'btn-cancelar-numero',
-    btnConfirmarNumero:    'btn-confirmar-numero',
+  definirEstado(id, origem, tipo){
+    // Mesma ordem e mesmos defaults do abrirRezar original: as globais são
+    // setadas antes mesmo de saber se a oração existe.
+    oracaoAtualId = id;
+    oracaoAtualTipo = tipo || 'pessoal';
+    origemRezar = origem || 'home';
   },
-  listarOracoes(termo) {
-    const pessoais = ORACOES.filter(o => o.id !== editandoId)
-      .map(o => ({ ...o, _tipo: 'pessoal' }));
-    const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
-    let lista = [...pessoais, ...oficiais]
-      .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
-    const norm = normalizarBusca(termo || '');
-    return norm ? lista.filter(o => normalizarBusca(o.titulo).includes(norm)) : lista;
+
+  carregarOracao(id, tipo){
+    const ehOficial = (tipo || 'pessoal') === 'oficial';
+    return ehOficial
+      ? ORACOES_OFICIAIS.find(x => x.id === id)
+      : ORACOES.find(x => x.id === id);
   },
-  renderizarItemLista(o) {
-    return `${escaparHTML(o.titulo)}${
-      o._tipo === 'oficial'
-        ? ' <span style="color:var(--texto-suave);font-size:0.8em;">📜 oficial</span>'
-        : ''
-    }`;
+
+  atualizarUI(o){
+    const ehOficial = oracaoAtualTipo === 'oficial';
+
+    const tituloEl = document.getElementById('rezar-titulo');
+    tituloEl.textContent = o.titulo;
+    tituloEl.title = o.titulo;
+    atualizarEstrelaRezar();
+    atualizarBotaoMarcarRezada();
+    atualizarBotaoVelocidade();
+    renderizarTextoRezar(o.texto);
+
+    // Botão compartilhar: apenas em pessoais
+    const btnCompartilhar = document.getElementById('btn-compartilhar-atual');
+    if(btnCompartilhar) btnCompartilhar.style.display = ehOficial ? 'none' : '';
+
+    // Aplica a origem/tipo já defaultados (não os parâmetros crus recebidos
+    // por abrir()) na área de ações, para CSS controlar visibilidade — os
+    // mesmos valores e a mesma ordem que o abrirRezar original usava.
+    const viewRezar = document.getElementById('view-rezar');
+    viewRezar.dataset.origem = origemRezar;
+    viewRezar.dataset.tipo = oracaoAtualTipo;
   },
-  aoInserir() { atualizarEstadoBotaoSalvar(); },
-  rastrearCursorContinuamente: false,
-  sufixoNovalinha: false,
-  preventScrollFocus: false,
+
+  mostrarTela(){
+    mostrarView('view-rezar');
+  }
 });
 
-// ===================== TELA "REZAR" =====================
 function abrirRezar(id, origem, tipo){
-  oracaoAtualId = id;
-  oracaoAtualTipo = tipo || 'pessoal';
-  origemRezar = origem || 'home';
-
-  const ehOficial = oracaoAtualTipo === 'oficial';
-  const o = ehOficial
-    ? ORACOES_OFICIAIS.find(x => x.id === id)
-    : ORACOES.find(x => x.id === id);
-
-  if(!o) return;
-
-  const tituloEl = document.getElementById('rezar-titulo');
-  tituloEl.textContent = o.titulo;
-  tituloEl.title = o.titulo;
-  atualizarEstrelaRezar();
-  atualizarBotaoMarcarRezada();
-  atualizarBotaoVelocidade();
-  renderizarTextoRezar(o.texto);
-
-  // Botão compartilhar: apenas em pessoais
-  const btnCompartilhar = document.getElementById('btn-compartilhar-atual');
-  if(btnCompartilhar) btnCompartilhar.style.display = ehOficial ? 'none' : '';
-
-  // Aplica a classe de origem na área de ações para CSS controlar visibilidade
-  const viewRezar = document.getElementById('view-rezar');
-  viewRezar.dataset.origem = origemRezar;
-  viewRezar.dataset.tipo = oracaoAtualTipo;
-
-  mostrarView('view-rezar');
+  telaRezarUsuario.abrir(id, origem, tipo);
 }
 
 function atualizarEstrelaRezar(){
@@ -433,9 +414,29 @@ function alternarVelocidade(){
   }
 }
 
+// Monta o contexto de progresso a partir da oração aberta agora e delega a
+// renderização em si para o núcleo compartilhado com o preview do admin
+// (js/rezar-core.js, Etapa 2 do PLANO-UNIFICACAO-TELA-REZAR.md).
+function renderizarTextoRezar(textoOriginal){
+  const container = document.getElementById('rezar-texto');
+  const ctx = criarContextoProgresso(oracaoAtualId);
+  secaoCtxAtual = ctx;
+
+  renderizarTextoNaTela(
+    textoOriginal,
+    container,
+    ctx,
+    'Esta oração ainda não tem texto. Toque em "Editar" para escrever.'
+  );
+
+  if(ctx) atualizarVisuaisProgresso(ctx.oracaoId, ctx.elementos);
+}
+
 // adicionarLinhas, construirArvore, criarBtnCheck, agruparNos, renderizarNos,
-// renderizarTextoRezar, marcarSecao, desmarcarSecao, limparProgressoLeitura,
+// marcarSecao, desmarcarSecao, limparProgressoLeitura,
 // atualizarVisuaisProgresso, expandirParaElemento → js/render-tree.js
+// renderizarTextoNaTela, criarContextoProgresso, limparContasDoId,
+// ID_PREVIEW_REZAR → js/rezar-core.js
 
 // configVozes, salvarConfigVozes, aguardarVozesDisponiveis, ordenarVozesPtPrimeiro,
 // escolherVozesAutomaticas, abrirConfigVozes, fecharModalVozes, salvarConfigVozesModal,
@@ -461,12 +462,7 @@ document.getElementById('input-busca-favoritas').addEventListener('input', (e) =
 });
 
 document.getElementById('btn-topbar-home').addEventListener('click', () => {
-  const activeView = document.querySelector('.view-active');
-  if (activeView && activeView.id === 'view-editor' && editandoId) {
-    abrirRezar(editandoId, origemRezar, oracaoAtualTipo);
-  } else {
-    mostrarView('view-home');
-  }
+  mostrarView('view-home');
 });
 
 document.getElementById('btn-compartilhar-app').addEventListener('click', compartilharApp);
@@ -502,6 +498,7 @@ document.getElementById('btn-importar-oracoes').addEventListener('click', import
 // ===================== INICIALIZAÇÃO =====================
 renderizarTodas();
 carregarOficiais();
+renderizarFavoritas(); // Garante o carregamento inicial correto das favoritas oficiais na Home
 verificarLinkImportacao();
 
 // ===================== PWA: SERVICE WORKER =====================

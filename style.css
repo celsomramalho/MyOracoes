@@ -188,6 +188,13 @@ html,body{
   display: none;
 }
 
+/* Ícone emoji (🙏) do botão Rezar na topbar do admin, para ficar
+   visualmente do mesmo tamanho dos demais ícones SVG da topbar */
+#btn-rezar-admin {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
 /* Botão de salvar (ícone) exibido na topbar da tela Editar/Nova oração */
 .btn-topbar-salvar {
   background: none;
@@ -416,7 +423,7 @@ html,body{
   text-transform: uppercase;
 }
 
-#input-titulo, #input-texto, #input-oficial-titulo, #input-oficial-texto, #input-senha{
+.editor-campo-titulo, .editor-campo-texto, #input-senha{
   width:100%;
   background: var(--superficie);
   border: 1px solid var(--borda);
@@ -427,15 +434,35 @@ html,body{
   padding: 12px 14px;
   box-sizing: border-box;
 }
-#input-titulo:focus, #input-texto:focus, #input-oficial-titulo:focus, #input-oficial-texto:focus, #input-senha:focus{
+.editor-campo-titulo:focus, .editor-campo-texto:focus, #input-senha:focus{
   outline: none;
   border-color: var(--ouro);
 }
 
-#input-texto, #input-oficial-texto{
+.editor-campo-texto{
   min-height: 260px;
   resize: vertical;
   line-height: 1.7;
+}
+
+/* Campos extras do editor (ex.: checkboxes "oculta", "colapsarNaFala" do admin) */
+.editor-campo-extra{
+  margin: 12px 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.editor-checkbox{
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.editor-campo-extra-label{
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  font-size: 1rem;
+  color: var(--texto);
 }
 
 .editor-toolbar{

@@ -213,10 +213,28 @@
         <line x1="21" y1="12" x2="9" y2="12"></line>
       </svg>
     </button>
+    <button id="btn-rezar-admin" class="btn-topbar-home hidden" title="Rezar" aria-label="Rezar" type="button">🙏</button>
+    <button id="btn-salvar-oficial" class="btn-topbar-salvar hidden" title="Salvar oração oficial" aria-label="Salvar oração oficial" type="button">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+    </button>
+    <div id="topbar-acoes-rezar-admin" class="topbar-acoes-rezar hidden">
+      <button id="btn-falar" class="btn-topbar-acao" title="Ouvir" aria-label="Ouvir">🔊</button>
+      <button id="btn-velocidade-admin" class="btn-topbar-acao">⚡ 1.0x</button>
+    </div>
     <button id="btn-voltar-lista-admin" class="btn-topbar-home hidden" title="Voltar para a lista" aria-label="Voltar para a lista">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
         <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </button>
+    <button id="btn-voltar-form-admin" class="btn-topbar-home hidden" title="Voltar para o editor" aria-label="Voltar para o editor">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
       </svg>
     </button>
   </header>
@@ -259,36 +277,50 @@
     <div id="lista-admin-oficiais" class="lista-oracoes" style="margin-bottom: 30px;"></div>
   </main>
 
-  <!-- TELA: FORMULÁRIO CRIAR / EDITAR OFICIAL -->
-  <main id="view-admin-form" class="view">
-    <div class="form-acoes-topo">
-      <button id="btn-preview-ler"       class="btn-secundario btn-icone" type="button" title="Ler (sem narrar)" disabled>📖</button>
-      <button id="btn-falar"             class="btn-secundario btn-icone" type="button" title="Ouvir narração"   disabled>▶</button>
-      <button id="btn-preview-reiniciar" class="btn-secundario btn-icone" type="button" title="Reiniciar narração" disabled>🔄</button>
-      <button id="btn-salvar-oficial" class="btn-secundario btn-icone" type="button" title="Salvar oração oficial" aria-label="Salvar oração oficial">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-          <polyline points="17 21 17 13 7 13 7 21"></polyline>
-          <polyline points="7 3 7 8 15 8"></polyline>
+  <!-- TELA: REZAR (ADMIN) — Etapa 3 do PLANO-UNIFICACAO-TELA-REZAR.md
+       Mesma estrutura visual da tela Rezar do usuário (index.html), com IDs próprios
+       para não colidir com o preview antigo (#preview-area / #rezar-texto) que continua
+       funcionando em paralelo até a Etapa 5. Ainda não é aberta por nenhum botão. -->
+  <main id="view-rezar-admin" class="view">
+    <div id="rezar-admin-fixo" class="rezar-fixo">
+      <div class="rezar-cabecalho">
+        <h2 id="rezar-titulo-admin"></h2>
+        <button id="btn-favoritar-rezar-admin" class="btn-estrela hidden" aria-label="Favoritar">☆</button>
+      </div>
+    </div>
+
+    <div class="rezar-acoes">
+      <button id="btn-rezar-admin-reiniciar" class="btn-secundario btn-icone" title="Reiniciar progresso" aria-label="Reiniciar progresso">🔄</button>
+      <button id="btn-config-vozes-admin" class="btn-secundario btn-icone hidden" title="Vozes" aria-label="Vozes">⚙️</button>
+      <button id="btn-compartilhar-atual-admin" class="btn-secundario editar-excluir hidden">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
         </svg>
+        Compartilhar
       </button>
     </div>
 
-    <div id="preview-area" class="hidden">
-      <div id="rezar-texto"></div>
-    </div>
+    <div id="rezar-texto" class="texto-oracao"></div>
+  </main>
+
+  <!-- TELA: FORMULÁRIO CRIAR / EDITAR OFICIAL -->
+  <main id="view-admin-form" class="view">
 
     <label class="campo-label" for="input-oficial-titulo">Título</label>
-    <input id="input-oficial-titulo" type="text" placeholder="Ex: Pai Nosso" autocomplete="off">
+    <input id="input-oficial-titulo" class="editor-campo-titulo" type="text" placeholder="Ex: Pai Nosso" autocomplete="off">
 
-    <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 8px;">
-      <input id="checkbox-oficial-oculta" type="checkbox" style="width: 20px; height: 20px; cursor: pointer;">
-      <label for="checkbox-oficial-oculta" class="dica" style="margin: 0; cursor: pointer; user-select: none; font-size: 1rem; color: var(--texto);">Ocultar esta oração na lista principal do aplicativo</label>
+    <div class="editor-campo-extra">
+      <input id="checkbox-oficial-oculta" class="editor-checkbox" type="checkbox">
+      <label for="checkbox-oficial-oculta" class="dica editor-campo-extra-label">Ocultar esta oração na lista principal do aplicativo</label>
     </div>
 
-    <div style="margin: 12px 0 16px 0; display: flex; align-items: center; gap: 8px;">
-      <input id="checkbox-oficial-colapsar-fala" type="checkbox" style="width: 20px; height: 20px; cursor: pointer;">
-      <label for="checkbox-oficial-colapsar-fala" class="dica" style="margin: 0; cursor: pointer; user-select: none; font-size: 1rem; color: var(--texto);">Não abrir automaticamente durante a fala (oração já conhecida, ex: Ave Maria)</label>
+    <div class="editor-campo-extra">
+      <input id="checkbox-oficial-colapsar-fala" class="editor-checkbox" type="checkbox">
+      <label for="checkbox-oficial-colapsar-fala" class="dica editor-campo-extra-label">Não abrir automaticamente durante a fala (oração já conhecida, ex: Ave Maria)</label>
     </div>
 
     <div class="editor-toolbar">
@@ -305,8 +337,8 @@
         </div>
       </div>
     </div>
-    <textarea id="input-oficial-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
-    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use <strong>+ Inserir → Oração</strong> — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir → Pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Use <strong>+ Inserir → Leitura opcional</strong> para citar uma oração salva como texto complementar que fica oculto e fora da fala até o usuário decidir mostrar na hora de rezar. Use <strong>+ Inserir → Link</strong> para inserir uma URL que aparece para abrir, mas não entra na narração. Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
+    <textarea id="input-oficial-texto" class="editor-campo-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
+    <p class="dica editor-dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use <strong>+ Inserir → Oração</strong> — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir → Pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Use <strong>+ Inserir → Leitura opcional</strong> para citar uma oração salva como texto complementar que fica oculto e fora da fala até o usuário decidir mostrar na hora de rezar. Use <strong>+ Inserir → Link</strong> para inserir uma URL que aparece para abrir, mas não entra na narração. Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
 
   </main>
 
@@ -376,28 +408,48 @@
 
 </div>
 
+<!-- rezar-core.js só declara const/function (nada roda na hora de carregar),
+     por isso pode vir antes do bloco de globais abaixo mesmo sem depender
+     de nada dele. -->
+<script src="js/rezar-core.js"></script>
+
 <!-- Globais que render-tree.js / speech.js precisam no nível de módulo.
      DEVEM vir ANTES dos <script src> para evitar ReferenceError. -->
 <script>
   const ORACOES         = [];
   const CHAVE_VOZES     = 'minhas_oracoes_vozes_v1';
-  const ID_PREVIEW      = '__preview_admin__';
+  const ID_PREVIEW      = ID_PREVIEW_REZAR; // js/rezar-core.js — Etapa 2 do PLANO-UNIFICACAO-TELA-REZAR.md
+  // Chaves isoladas para o progresso do preview do admin — nunca colidem com
+  // os dados reais do usuário no app principal.
+  const CHAVE_PROGRESSO_ADMIN   = 'myoracoes_admin_preview_progresso_v1';
+  const CHAVE_REZADAS_ADMIN     = 'myoracoes_admin_preview_rezadas_v1';
+  const CHAVE_VELOCIDADE        = 'minhas_oracoes_velocidade_v1';
+  const OPCOES_VELOCIDADE        = [0.8, 1.0, 1.25, 1.5, 1.75, 2.0];
   let ORACOES_OFICIAIS  = [];   // também usado pelo admin; preenchido em carregarDadosIniciais()
   let oracaoAtualId     = null;
-  let progressoLeitura  = {};
-  let rezadasDiarias    = {};
+  let progressoLeitura  = (()=>{ try{ return JSON.parse(localStorage.getItem(CHAVE_PROGRESSO_ADMIN)||'{}'); }catch(e){ return {}; } })();
+  let rezadasDiarias    = (()=>{ try{ const d=JSON.parse(localStorage.getItem(CHAVE_REZADAS_ADMIN)||'{}'); const h=(new Date()).toISOString().slice(0,10); return d.data===h ? (d.ids||{}) : {}; }catch(e){ return {}; } })();
   let secaoCtxAtual     = null;
-  let velocidadeAtual   = 1;
+  let velocidadeAtual   = parseFloat(localStorage.getItem(CHAVE_VELOCIDADE)) || 1.0;
 
   function obterDataLocalHoje(){
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
-  function salvarProgressoLeitura(){}
-  function salvarRezadasDiarias(){}
+  // Salva progresso de leitura do preview em chave isolada (não toca nos dados do usuário real)
+  function salvarProgressoLeitura(){
+    localStorage.setItem(CHAVE_PROGRESSO_ADMIN, JSON.stringify(progressoLeitura));
+  }
+  // Salva marcação de rezada do preview em chave isolada
+  function salvarRezadasDiarias(dados){
+    localStorage.setItem(CHAVE_REZADAS_ADMIN, JSON.stringify(dados || { data: obterDataLocalHoje(), ids: rezadasDiarias }));
+  }
   function renderizarTudo(){}
   function atualizarProgressoDiario(){}
-  function atualizarBotaoMarcarRezada(){}
+  // Atualiza o botão de marcar rezada na tela de preview do admin
+  function atualizarBotaoMarcarRezada(){
+    atualizarBotaoMarcarRezadaAdmin();
+  }
 </script>
 
 <script src="js/components/toast.js"></script>
@@ -411,7 +463,6 @@
   let editandoId = null;
   let alteracoesNaoExportadas = false;
   let filtroListaAdmin = '';
-  let formOriginal = { titulo: '', texto: '', oculta: false, colapsarNaFala: false };
 
   function atualizarAvisoAlteracoes(){
     const aviso = document.getElementById('aviso-alteracoes-pendentes');
@@ -422,6 +473,9 @@
 
   const btnLogout = document.getElementById('btn-admin-logout');
   const btnVoltarListaAdmin = document.getElementById('btn-voltar-lista-admin');
+  const btnRezarAdmin = document.getElementById('btn-rezar-admin');
+  const btnSalvarOficialTopo = document.getElementById('btn-salvar-oficial');
+  const btnVoltarFormAdmin = document.getElementById('btn-voltar-form-admin');
 
   // Verificação de autenticação na sessão
   if (sessionStorage.getItem(CHAVE_SESSION) === 'true') {
@@ -482,29 +536,48 @@
     if (!topbarTitulo) return;
     topbarTitulo.textContent = (id === 'view-admin-form')
       ? (editandoId ? 'Editar oração' : 'Nova oração')
-      : 'Orações Oficiais';
+      : (id === 'view-rezar-admin') ? 'Rezar (Preview)' : 'Orações Oficiais';
   }
 
   function mostrarView(id) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('view-active'));
     document.getElementById(id).classList.add('view-active');
+
+    // Controla visibilidade das ações de rezar na topbar do admin
+    const topbarAcoesRezarAdmin = document.getElementById('topbar-acoes-rezar-admin');
+    if (topbarAcoesRezarAdmin) {
+      topbarAcoesRezarAdmin.classList.toggle('hidden', id !== 'view-rezar-admin');
+    }
+
     // Na tela de edição, o botão de sair vira o botão de voltar pra lista;
     // nas demais telas (exceto login), volta a ser o botão de sair
     if (id === 'view-login') {
       btnLogout.classList.add('hidden');
       btnVoltarListaAdmin.classList.add('hidden');
+      btnRezarAdmin.classList.add('hidden');
+      btnSalvarOficialTopo.classList.add('hidden');
+      btnVoltarFormAdmin.classList.add('hidden');
     } else if (id === 'view-admin-form') {
       btnLogout.classList.add('hidden');
       btnVoltarListaAdmin.classList.remove('hidden');
+      btnRezarAdmin.classList.remove('hidden');
+      btnSalvarOficialTopo.classList.remove('hidden');
+      btnVoltarFormAdmin.classList.add('hidden');
+    } else if (id === 'view-rezar-admin') {
+      btnLogout.classList.add('hidden');
+      btnVoltarListaAdmin.classList.add('hidden');
+      btnRezarAdmin.classList.add('hidden');
+      btnSalvarOficialTopo.classList.add('hidden');
+      btnVoltarFormAdmin.classList.remove('hidden');
     } else {
       btnLogout.classList.remove('hidden');
       btnVoltarListaAdmin.classList.add('hidden');
+      btnRezarAdmin.classList.add('hidden');
+      btnSalvarOficialTopo.classList.add('hidden');
+      btnVoltarFormAdmin.classList.add('hidden');
     }
     // Título da topbar varia conforme a tela ativa
     atualizarTopbarTituloAdmin(id);
-    // Fileiras de ações fixas começam sem sombra ao entrar na tela
-    const formAcoesTopo = document.querySelector('.form-acoes-topo');
-    if (formAcoesTopo) formAcoesTopo.classList.remove('com-sombra');
     const listaFixo = document.querySelector('.admin-lista-fixo');
     if (listaFixo) listaFixo.classList.remove('com-sombra');
     window.scrollTo(0,0);
@@ -527,10 +600,6 @@
 
   // Sombra nas fileiras de ações fixas quando o conteúdo é rolado
   window.addEventListener('scroll', () => {
-    const formAcoesTopo = document.querySelector('.form-acoes-topo');
-    const viewFormAtiva = document.getElementById('view-admin-form')?.classList.contains('view-active');
-    if (formAcoesTopo) formAcoesTopo.classList.toggle('com-sombra', viewFormAtiva && window.scrollY > 4);
-
     const listaFixo = document.querySelector('.admin-lista-fixo');
     const viewListaAtiva = document.getElementById('view-admin-list')?.classList.contains('view-active');
     if (listaFixo) listaFixo.classList.toggle('com-sombra', viewListaAtiva && window.scrollY > 4);
@@ -635,8 +704,6 @@
     atualizarEstadoBotaoSalvarOficial();
 
     mostrarView('view-admin-form');
-    resetarPreview();
-    if(editandoId) habilitarBotoesPreview();
     inputTitulo.focus();
   }
 
@@ -681,30 +748,109 @@
   document.getElementById('btn-cancelar-exclusao').addEventListener('click', fecharModalExclusao);
   document.getElementById('btn-confirmar-exclusao').addEventListener('click', confirmarExclusaoOficial);
 
+  // Instancia o editor unificado para o contexto do Admin (Orações Oficiais)
+  const editorOracaoAdmin = criarEditorOracao({
+    contexto: 'admin',
+    ids: {
+      titulo: 'input-oficial-titulo',
+      texto: 'input-oficial-texto',
+      botaoSalvar: 'btn-salvar-oficial',
+      menuInserir: 'menu-inserir-admin',
+      botaoInserir: 'btn-inserir-admin',
+      idsModais: {
+        btnInserirOracao:      'btn-inserir-oracao-admin',
+        btnInserirOpcional:    'btn-inserir-opcional-admin',
+        btnInserirLink:        'btn-inserir-link-admin',
+        btnInserirPausa:       'btn-inserir-pausa-admin',
+        modalInserir:          'modal-inserir-admin',
+        modalInserirTitulo:    'modal-inserir-admin-titulo',
+        modalInserirDica:      'modal-inserir-admin-dica',
+        inputBuscaInserir:     'input-busca-inserir',
+        listaModalInserir:     'lista-modal-inserir-admin',
+        btnFecharModalInserir: 'btn-fechar-modal-admin',
+        modalLink:             'modal-link-admin',
+        inputLinkUrl:          'input-link-url-admin',
+        btnCancelarLink:       'btn-cancelar-link-admin',
+        btnConfirmarLink:      'btn-confirmar-link-admin',
+        modalNumero:           'modal-numero-admin',
+        modalNumeroTitulo:     'modal-numero-admin-titulo',
+        modalNumeroDica:       'modal-numero-admin-dica',
+        inputNumero:           'input-numero-admin',
+        btnCancelarNumero:     'btn-cancelar-numero-admin',
+        btnConfirmarNumero:    'btn-confirmar-numero-admin'
+      }
+    },
+    recursos: {
+      mostrarCamposAdmin: true,
+      preview: true
+    },
+    camposExtras: {
+      oculta: 'checkbox-oficial-oculta',
+      colapsarNaFala: 'checkbox-oficial-colapsar-fala'
+    },
+    sufixoNovalinha: true,
+    preventScrollFocus: true,
+    rastrearCursorContinuamente: true,
+
+    listarReferencias(termo) {
+      const norm = normalizarBusca(termo || '');
+      const lista = ORACOES_OFICIAIS
+        .filter(o => o.id !== editandoId)
+        .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
+      return norm ? lista.filter(o => normalizarBusca(o.titulo).includes(norm)) : lista;
+    },
+
+    carregarPorId(id) {
+      return ORACOES_OFICIAIS.find(x => x.id === id);
+    }
+  });
+
+  function abrirForm(id) {
+    editandoId = id || null;
+    editorOracaoAdmin.abrir(editandoId);
+    mostrarView('view-admin-form');
+  }
+
+  function previewHaAlteracaoNaoSalva() {
+    return editorOracaoAdmin.verificarAlteracoesPendentes();
+  }
+
   // Botão Criar Nova
   document.getElementById('btn-criar-nova-oficial').addEventListener('click', () => abrirForm(null));
 
   // Botão Cancelar Formulário (agora vive na topbar, no lugar do botão de sair)
   document.getElementById('btn-voltar-lista-admin').addEventListener('click', () => {
-    resetarPreview();
+    pararFala();
     mostrarView('view-admin-list');
+  });
+
+  // Botão Rezar (topbar do formulário do admin). Abre a view de rezar unificada.
+  document.getElementById('btn-rezar-admin').addEventListener('click', () => {
+    if(!editandoId){
+      mostrarToast('Salve a oração antes de pré-visualizar.');
+      return;
+    }
+    if(previewHaAlteracaoNaoSalva()){
+      mostrarToast('Para visualizar, salve a oração antes.');
+      return;
+    }
+    pararFala();
+    limparContasDoId(ID_PREVIEW);
+    telaRezarAdmin.abrir(editandoId);
   });
 
   // Botão Salvar Formulário
   document.getElementById('btn-salvar-oficial').addEventListener('click', () => {
-    const titulo = document.getElementById('input-oficial-titulo').value.trim();
-    const texto = document.getElementById('input-oficial-texto').value;
-    const oculta = document.getElementById('checkbox-oficial-oculta').checked;
-    const colapsarNaFala = document.getElementById('checkbox-oficial-colapsar-fala').checked;
+    const valores = editorOracaoAdmin.obterValores();
 
-    if (!titulo) {
+    if (!valores.titulo) {
       alert('Dê um título para a oração.');
       return;
     }
 
     // Verificar duplicidade de título no conjunto de oficiais
     const duplicada = ORACOES_OFICIAIS.find(o => 
-      o.titulo.trim().toLowerCase() === titulo.toLowerCase() && o.id !== editandoId
+      o.titulo.trim().toLowerCase() === valores.titulo.toLowerCase() && o.id !== editandoId
     );
     if (duplicada) {
       alert('Já existe uma oração oficial com esse título.');
@@ -714,14 +860,20 @@
     if (editandoId) {
       const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
       if (o) {
-        o.titulo = titulo;
-        o.texto = texto;
-        o.oculta = oculta;
-        o.colapsarNaFala = colapsarNaFala;
+        o.titulo = valores.titulo;
+        o.texto = valores.texto;
+        o.oculta = valores.oculta;
+        o.colapsarNaFala = valores.colapsarNaFala;
       }
     } else {
       const novoId = 'oficial_' + Date.now().toString(36);
-      ORACOES_OFICIAIS.push({ id: novoId, titulo, texto, oculta, colapsarNaFala });
+      ORACOES_OFICIAIS.push({
+        id: novoId,
+        titulo: valores.titulo,
+        texto: valores.texto,
+        oculta: valores.oculta,
+        colapsarNaFala: valores.colapsarNaFala
+      });
       editandoId = novoId; // passa a editar a oração recém-criada, sem sair da tela
     }
 
@@ -729,19 +881,11 @@
     renderizarListaAdmin();
     mostrarToast('Oração oficial salva com sucesso!', 'sucesso');
 
-    // Permanece na tela do formulário; atualiza o "original" (ícone volta ao
-    // neutro), o título da topbar (de "Nova" para "Editar") e habilita a pré-visualização
-    formOriginal = { titulo, texto, oculta, colapsarNaFala };
-    atualizarEstadoBotaoSalvarOficial();
+    editorOracaoAdmin.marcarComoSalvo();
+    // Reabre para atualizar referências de estado original
+    editorOracaoAdmin.abrir(editandoId);
     atualizarTopbarTituloAdmin('view-admin-form');
-    habilitarBotoesPreview();
-    document.getElementById('btn-preview-reiniciar').disabled = true;
   });
-
-  document.getElementById('input-oficial-titulo').addEventListener('input', atualizarEstadoBotaoSalvarOficial);
-  document.getElementById('input-oficial-texto').addEventListener('input', atualizarEstadoBotaoSalvarOficial);
-  document.getElementById('checkbox-oficial-oculta').addEventListener('change', atualizarEstadoBotaoSalvarOficial);
-  document.getElementById('checkbox-oficial-colapsar-fala').addEventListener('change', atualizarEstadoBotaoSalvarOficial);
 
   // Botão Baixar arquivo JSON atualizado
   document.getElementById('btn-exportar-json').addEventListener('click', () => {
@@ -755,46 +899,6 @@
     atualizarAvisoAlteracoes();
   });
 
-  // ===================== INSERIR REFERÊNCIA [Título] =====================
-  criarControladorInsercao({
-    ids: {
-      textarea:              'input-oficial-texto',
-      btnInserir:            'btn-inserir-admin',
-      menuInserir:           'menu-inserir-admin',
-      btnInserirOracao:      'btn-inserir-oracao-admin',
-      btnInserirOpcional:    'btn-inserir-opcional-admin',
-      btnInserirLink:        'btn-inserir-link-admin',
-      btnInserirPausa:       'btn-inserir-pausa-admin',
-      modalInserir:          'modal-inserir-admin',
-      modalInserirTitulo:    'modal-inserir-admin-titulo',
-      modalInserirDica:      'modal-inserir-admin-dica',
-      inputBuscaInserir:     'input-busca-inserir',
-      listaModalInserir:     'lista-modal-inserir-admin',
-      btnFecharModalInserir: 'btn-fechar-modal-admin',
-      modalLink:             'modal-link-admin',
-      inputLinkUrl:          'input-link-url-admin',
-      btnCancelarLink:       'btn-cancelar-link-admin',
-      btnConfirmarLink:      'btn-confirmar-link-admin',
-      modalNumero:           'modal-numero-admin',
-      modalNumeroTitulo:     'modal-numero-admin-titulo',
-      modalNumeroDica:       'modal-numero-admin-dica',
-      inputNumero:           'input-numero-admin',
-      btnCancelarNumero:     'btn-cancelar-numero-admin',
-      btnConfirmarNumero:    'btn-confirmar-numero-admin',
-    },
-    listarOracoes(termo) {
-      const norm = normalizarBusca(termo || '');
-      const lista = ORACOES_OFICIAIS
-        .filter(o => o.id !== editandoId)
-        .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
-      return norm ? lista.filter(o => normalizarBusca(o.titulo).includes(norm)) : lista;
-    },
-    aoInserir() { atualizarEstadoBotaoSalvarOficial(); },
-    rastrearCursorContinuamente: true,
-    sufixoNovalinha: true,
-    preventScrollFocus: true,
-  });
-
   // ── BUSCA (filtro ao vivo da lista de orações oficiais) ────────────────────
   function normalizarBusca(texto){
     return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
@@ -805,39 +909,6 @@
     renderizarListaAdmin();
   });
 
-  // ── PREVIEW (📖 Ler / ▶ Play / 🔄 Reiniciar) ─────────────────────────────
-  let previewNarracaoAtiva = false; // true após o primeiro Play nessa sessão de edição
-
-  function limparContasPreview(){
-    for(let i = localStorage.length - 1; i >= 0; i--){
-      const chave = localStorage.key(i);
-      if(chave && chave.startsWith(`contas_${ID_PREVIEW}_`)) localStorage.removeItem(chave);
-    }
-  }
-
-  function resetarPreview(){
-    pararFala();
-    oracaoAtualId  = null;
-    secaoCtxAtual  = null;
-    previewNarracaoAtiva = false;
-    limparContasPreview();
-
-    document.getElementById('preview-area').classList.add('hidden');
-    document.getElementById('rezar-texto').innerHTML = '';
-
-    // Botões de preview: só habilitados quando há uma oração sendo editada
-    const temOracaoSalva = !!editandoId;
-    document.getElementById('btn-preview-ler').disabled       = !temOracaoSalva;
-    document.getElementById('btn-falar').disabled             = !temOracaoSalva;
-    document.getElementById('btn-preview-reiniciar').disabled = true; // sempre desabilitado até o Play rodar
-  }
-
-  // Habilita os botões Ler/Play assim que abrirForm() carrega uma oração salva
-  function habilitarBotoesPreview(){
-    document.getElementById('btn-preview-ler').disabled = false;
-    document.getElementById('btn-falar').disabled       = false;
-  }
-
   // Retorna true se o textarea tem conteúdo diferente do texto salvo
   function previewHaAlteracaoNaoSalva(){
     if(!editandoId) return false;
@@ -847,63 +918,92 @@
     return textoSalvo !== textoAtual;
   }
 
-  function previewRenderizarTexto(textoSalvo){
-    const container = document.getElementById('rezar-texto');
-    container.innerHTML = '';
-    const arvore = construirArvore(textoSalvo, new Set());
-    // ctx = null → sem checks (✓), sem progresso, pura leitura visual
-    renderizarNos(arvore, container, null);
-    if(!container.innerHTML.trim()){
-      container.innerHTML = '<p class="dica">Esta oração ainda não tem texto.</p>';
+  // Atualiza o botão de velocidade do admin
+  function atualizarBotaoVelocidadeAdmin(){
+    const btn = document.getElementById('btn-velocidade-admin');
+    if(btn) {
+      btn.textContent = `⚡ ${velocidadeAtual.toFixed(2).replace('.00', '.0')}x`;
     }
   }
 
-  function previewAbrir(comNarracao){
-    if(!editandoId){
-      mostrarToast('Salve a oração antes de pré-visualizar.');
-      return;
-    }
-    if(previewHaAlteracaoNaoSalva()){
-      mostrarToast('Para visualizar, salve a oração antes.');
-      return;
-    }
-
-    const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
-
-    pararFala();
-    // Fixa o id de preview → isola "contas" de terço sem tocar ids reais
-    oracaoAtualId = ID_PREVIEW;
-    secaoCtxAtual = null; // sem progresso/checks no preview
-
-    document.getElementById('preview-area').classList.remove('hidden');
-    previewRenderizarTexto(o.texto);
-
-    if(comNarracao){
-      iniciarFala();
-      previewNarracaoAtiva = true;
-      document.getElementById('btn-preview-reiniciar').disabled = false;
+  function alternarVelocidadeAdmin(){
+    let index = OPCOES_VELOCIDADE.indexOf(velocidadeAtual);
+    if(index === -1) index = 1; // fallback para 1.0
+    
+    index = (index + 1) % OPCOES_VELOCIDADE.length;
+    velocidadeAtual = OPCOES_VELOCIDADE[index];
+    
+    localStorage.setItem(CHAVE_VELOCIDADE, velocidadeAtual.toString());
+    atualizarBotaoVelocidadeAdmin();
+    
+    if(falando && !pausado){
+      if(utteranciaAtual){
+        utteranciaAtual.onend = null;
+        utteranciaAtual.onerror = null;
+      }
+      window.speechSynthesis.cancel();
+      falarProximaLinha();
     }
   }
 
-  document.getElementById('btn-preview-ler').addEventListener('click', () => previewAbrir(false));
-  document.getElementById('btn-falar').addEventListener('click', () => {
-    if(!editandoId){ mostrarToast('Salve a oração antes de pré-visualizar.'); return; }
-    if(previewHaAlteracaoNaoSalva()){ mostrarToast('Para visualizar, salve a oração antes.'); return; }
-    // Se já está narrando, o btn-falar pausa/continua normalmente via alternarFala()
-    if(previewNarracaoAtiva){
-      alternarFala();
-    } else {
-      previewAbrir(true);
+  // Instancia o controlador da tela Rezar unificada para o contexto do admin
+  const telaRezarAdmin = criarTelaRezar({
+    contexto: 'admin',
+    carregarOracao(id) {
+      return ORACOES_OFICIAIS.find(x => x.id === id);
+    },
+    definirEstado(id, origem, tipo) {
+      // Isola o progresso do preview sob ID_PREVIEW — não afeta dados do usuário
+      oracaoAtualId = ID_PREVIEW;
+      // Inicializa o ctx de seção — será recriado em atualizarUI com dados reais
+      secaoCtxAtual = null;
+    },
+    atualizarUI(oracao, { id, origem, tipo }) {
+      document.getElementById('rezar-titulo-admin').textContent = oracao.titulo;
+      const container = document.getElementById('rezar-texto');
+      // ctx com progresso isolado — comportamento idêntico ao usuário
+      const ctx = {
+        oracaoId: ID_PREVIEW,
+        n: 0,
+        elementos: []
+      };
+      renderizarTextoNaTela(oracao.texto, container, ctx, 'Esta oração ainda não tem texto.');
+      secaoCtxAtual = ctx;
+      atualizarBotaoVelocidadeAdmin();
+    },
+    mostrarTela() {
+      mostrarView('view-rezar-admin');
     }
   });
-  document.getElementById('btn-preview-reiniciar').addEventListener('click', () => {
-    if(!previewNarracaoAtiva) return;
+
+  // Botões de ação da tela Rezar do admin
+  document.getElementById('btn-falar').addEventListener('click', alternarFala);
+  document.getElementById('btn-velocidade-admin').addEventListener('click', alternarVelocidadeAdmin);
+
+  document.getElementById('btn-rezar-admin-reiniciar').addEventListener('click', () => {
     pararFala();
-    // Rerenderiza para garantir que os blocos estão fechados antes de reler
+    // Limpa progresso isolado de preview
+    if(oracaoAtualId) delete progressoLeitura[oracaoAtualId];
+    salvarProgressoLeitura();
+    limparContasDoId(ID_PREVIEW);
     const o = ORACOES_OFICIAIS.find(x => x.id === editandoId);
-    if(o) previewRenderizarTexto(o.texto);
+    if (o) {
+      const container = document.getElementById('rezar-texto');
+      const ctx = { oracaoId: ID_PREVIEW, n: 0, elementos: [] };
+      renderizarTextoNaTela(o.texto, container, ctx, 'Esta oração ainda não tem texto.');
+      secaoCtxAtual = ctx;
+    }
     iniciarFala();
   });
+
+  // Botão de voltar da tela Rezar do admin para o editor
+  btnVoltarFormAdmin.addEventListener('click', () => {
+    pararFala();
+    limparContasDoId(ID_PREVIEW);
+    mostrarView('view-admin-form');
+  });
+
+
 
 </script>
 </body>

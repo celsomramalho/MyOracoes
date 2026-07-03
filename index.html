@@ -107,7 +107,7 @@
   <!-- TELA: CRIAR / EDITAR -->
   <main id="view-editor" class="view">
     <label class="campo-label" for="input-titulo">Título</label>
-    <input id="input-titulo" type="text" placeholder="Ex: Ave Maria" autocomplete="off">
+    <input id="input-titulo" class="editor-campo-titulo" type="text" placeholder="Ex: Ave Maria" autocomplete="off">
 
     <div class="editor-toolbar">
       <label class="campo-label" for="input-texto">Texto</label>
@@ -123,8 +123,8 @@
         </div>
       </div>
     </div>
-    <textarea id="input-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
-    <p class="dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use <strong>+ Inserir → Oração</strong> — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir → Pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Use <strong>+ Inserir → Leitura opcional</strong> para citar uma oração salva como texto complementar que fica oculto e fora da fala até o usuário decidir mostrar na hora de rezar. Use <strong>+ Inserir → Link</strong> para inserir uma URL que aparece para abrir, mas não entra na narração. Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
+    <textarea id="input-texto" class="editor-campo-texto" placeholder="V. Ave Maria, cheia de graça...&#10;R. Santa Maria, Mãe de Deus..."></textarea>
+    <p class="dica editor-dica">Dica: comece a linha com <strong>V.</strong> para o primeiro narrador e <strong>R.</strong> para a segunda voz. Para citar outra oração salva (pessoal ou oficial), use <strong>+ Inserir → Oração</strong> — ele te pergunta quantas vezes repetir (ex: <strong>[Ave Maria]{10}</strong> para uma dezena). Para uma pequena pausa entre uma oração e outra, use <strong>+ Inserir → Pausa</strong> (ex: <strong>[pausa]{2}</strong> para 2 segundos). Use <strong>+ Inserir → Leitura opcional</strong> para citar uma oração salva como texto complementar que fica oculto e fora da fala até o usuário decidir mostrar na hora de rezar. Use <strong>+ Inserir → Link</strong> para inserir uma URL que aparece para abrir, mas não entra na narração. Em ladainhas, onde a resposta se repete sempre igual, escreva <strong>{R. rogai por nós.}</strong> numa linha sozinha para ligar a resposta automática — ela passa a aparecer depois de toda linha V. seguinte, sem precisar repetir. Use <strong>{}</strong> sozinho para desligar.</p>
   </main>
 
   <!-- TELA: REZAR -->
@@ -255,12 +255,13 @@
 
 </div>
 
-<script src="oracoes-oficiais-data.js"></script> <!-- Passo 1: dados embutidos -->
+<script src="js/oracoes-oficiais-data.js"></script> <!-- Passo 1: dados embutidos -->
 <script src="state.js"></script>             <!-- Passo 2 -->
 <script src="js/utils.js"></script>          <!-- Passo 3 -->
 <script src="js/oracoes-data.js"></script>   <!-- Passo 4 -->
 <script src="js/components/card.js"></script>   <!-- Passo 4 -->
 <script src="js/components/toast.js"></script> <!-- Passo 5 -->
+<script src="js/rezar-core.js"></script>        <!-- Núcleo compartilhado da tela Rezar (PLANO-UNIFICACAO-TELA-REZAR.md) -->
 <script src="js/render-tree.js"></script>       <!-- Passo 6 -->
 <script src="js/speech.js"></script>            <!-- Passo 7 -->
 <script src="js/components/progresso.js"></script> <!-- Passo 8 -->

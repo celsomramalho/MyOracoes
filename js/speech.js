@@ -353,6 +353,32 @@ function falarProximaLinha(){
 
   const item = filaFala[indiceFalaAtual];
 
+  // Proteção: se a seção deste item já foi marcada como concluída (ex: usuário
+  // marcou manualmente enquanto a fala estava em outra posição), pula para o próximo
+  // sem falar — evita repetir o que o usuário já sinalizou como rezado.
+  if(oracaoAtualId && item.secaoIdx >= 0){
+    const concluidas = new Set(progressoLeitura[oracaoAtualId] || []);
+    if(concluidas.has(item.secaoIdx)){
+      indiceFalaAtual++;
+      falarProximaLinha();
+      return;
+    }
+    // Bloco repetido: pula voltas já concluídas pelo clique manual de conta
+    if(item.repetido && item.blocoEl){
+      const secaoIdxBloco = item.blocoEl.dataset.secaoIdx != null
+        ? parseInt(item.blocoEl.dataset.secaoIdx, 10)
+        : item.secaoIdx;
+      const contasConcluidas = parseInt(
+        localStorage.getItem(`contas_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
+      );
+      if(item.contaIdx <= contasConcluidas){
+        indiceFalaAtual++;
+        falarProximaLinha();
+        return;
+      }
+    }
+  }
+
   if(item.tipo === 'pausa'){
     falarPausa(item);
     return;

@@ -510,23 +510,11 @@ function renderizarNos(nos, container, ctx){
   });
 }
 
-function renderizarTextoRezar(textoOriginal){
-  const container = document.getElementById('rezar-texto');
-  container.innerHTML = '';
-
-  const arvore = construirArvore(textoOriginal, new Set());
-
-  const ctx = oracaoAtualId ? { n: 0, oracaoId: oracaoAtualId, elementos: [] } : null;
-  secaoCtxAtual = ctx;
-
-  renderizarNos(arvore, container, ctx);
-
-  if(ctx) atualizarVisuaisProgresso(ctx.oracaoId, ctx.elementos);
-
-  if(container.innerHTML === ''){
-    container.innerHTML = '<p class="dica">Esta oração ainda não tem texto. Toque em "Editar" para escrever.</p>';
-  }
-}
+// renderizarTextoRezar (glue específica da tela do usuário: decide o ctx a
+// partir de oracaoAtualId, atualiza secaoCtxAtual, chama atualizarVisuaisProgresso)
+// → js/app.js. A parte pura e compartilhada com o preview do admin
+// (montar a árvore + jogar no container) é renderizarTextoNaTela, em
+// js/rezar-core.js (Etapa 2 do PLANO-UNIFICACAO-TELA-REZAR.md).
 
 // ===================== MARCAÇÃO DE PROGRESSO POR SEÇÃO =====================
 
@@ -641,14 +629,8 @@ function limparProgressoLeitura(){
   if(!oracaoAtualId) return;
   delete progressoLeitura[oracaoAtualId];
   salvarProgressoLeitura();
-  
-  for (let i = 0; i < localStorage.length; i++) {
-    const chave = localStorage.key(i);
-    if (chave && chave.startsWith(`contas_${oracaoAtualId}_`)) {
-      localStorage.removeItem(chave);
-      i--;
-    }
-  }
+
+  limparContasDoId(oracaoAtualId); // js/rezar-core.js
 
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoAtualId){
     atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
