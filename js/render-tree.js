@@ -292,7 +292,21 @@ function agruparNos(nos){
   return grupos;
 }
 
-function renderizarNos(nos, container, ctx){
+function renderizarNos(nos, container, ctx, ctxRepetidoAninhado){
+  // ctxRepetidoAninhado: o ctx de progresso "real" mais próximo, propagado por
+  // baixo de qualquer nível de repetição — serve só para dar identidade
+  // própria (idx e entrada em elementos) a um bloco REPETIDO aninhado dentro
+  // de outro repetido, mesmo que `ctx` esteja null naquele nível (propósito
+  // do null: linha solta ou bloco simples dentro de uma repetição não ganha
+  // check individual — o progresso dele é só o contador de contas do nível
+  // que o envolve). Sem isso, um repetido dentro de outro repetido caía
+  // sempre em idx=-1 e ficava fora de ctx.elementos: a chave de progresso
+  // dele no localStorage colava na do repetido pai (mesma chave "-1"/idx
+  // herdado), o "zerar progresso" não atualizava visualmente as contas dele,
+  // e a fala automática interpretava a repetição inteira do nível de cima
+  // como concluída assim que saía do primeiro filho para o repetido aninhado.
+  if(ctxRepetidoAninhado === undefined) ctxRepetidoAninhado = ctx;
+
   agruparNos(nos).forEach(g => {
     if(g.tipo === 'grupo-linhas'){
       const idx = ctx ? ctx.n++ : -1;
@@ -365,13 +379,22 @@ function renderizarNos(nos, container, ctx){
 
       let idx;
       let fileira = null;
+      let ctxProprio; // ctx efetivamente "dono" deste nó (usado pro check/idx dele)
 
       if(g.tipo === 'repetido'){
-        // Repetido: o índice precisa existir ANTES das contas, pois o clique
-        // numa conta usa "idx" pra marcar/desmarcar a seção imediatamente.
-        // O conteúdo interno (a oração repetida) continua sem checks próprios
-        // — o progresso dele é o contador de contas abaixo, não checks por linha.
-        idx = ctx ? ctx.n++ : -1;
+        // Repetido sempre precisa de identidade própria — usa o ctx local se
+        // existir, senão cai para o ctx herdado do repetido mais próximo
+        // acima (ctxRepetidoAninhado). Isso garante que um repetido aninhado
+        // dentro de outro repetido tenha seu PRÓPRIO idx (e sua própria
+        // chave de contas no localStorage), nunca -1 nem compartilhado com o
+        // pai. O índice precisa existir ANTES das contas, pois o clique numa
+        // conta usa "idx" pra marcar/desmarcar a seção imediatamente.
+        // O conteúdo interno (a oração repetida) continua sem checks
+        // próprios por linha — o progresso dele é o contador de contas
+        // abaixo — mas se esse conteúdo tiver, por sua vez, outro repetido
+        // dentro, aquele recebe sua própria identidade do mesmo jeito.
+        ctxProprio = ctx || ctxRepetidoAninhado;
+        idx = ctxProprio ? ctxProprio.n++ : -1;
 
         fileira = document.createElement('div');
         fileira.className = 'fileira-contas';
@@ -404,17 +427,20 @@ function renderizarNos(nos, container, ctx){
               c.classList.toggle('concluida', cIdx <= contasConcluidas);
             });
 
-            if(ctx){
+            if(ctxProprio){
               if(contasConcluidas === g.quantidade){
-                marcarSecao(ctx.oracaoId, idx);
+                marcarSecao(ctxProprio.oracaoId, idx);
               } else {
-                desmarcarSecao(ctx.oracaoId, idx);
+                desmarcarSecao(ctxProprio.oracaoId, idx);
               }
             }
           });
           fileira.appendChild(conta);
         }
-        renderizarNos(g.filhos, divConteudo, null);
+        // Filhos diretos (linhas soltas) continuam sem checks próprios (null),
+        // mas ctxProprio segue disponível como ctxRepetidoAninhado para caso
+        // haja outro repetido mais interno ainda.
+        renderizarNos(g.filhos, divConteudo, null, ctxProprio);
 
       }else{
         // Bloco simples (referência sem repetição): renderiza os filhos
@@ -424,17 +450,18 @@ function renderizarNos(nos, container, ctx){
         // marcarSecao() preenche tudo de 0 até o índice clicado, marcar o
         // cabeçalho do bloco passa a marcar automaticamente tudo que está
         // dentro dele também.
-        renderizarNos(g.filhos, divConteudo, ctx);
+        ctxProprio = ctx;
+        renderizarNos(g.filhos, divConteudo, ctx, ctxRepetidoAninhado);
         idx = ctx ? ctx.n++ : -1;
       }
 
       if(idx >= 0) divBloco.dataset.secaoIdx = idx;
       if(g.colapsarNaFala) divBloco.dataset.colapsarNaFala = '1';
 
-      if(ctx){
-        const btn = criarBtnCheck(idx, ctx);
+      if(ctxProprio){
+        const btn = criarBtnCheck(idx, ctxProprio);
         divTitulo.appendChild(btn);
-        ctx.elementos.push({ idx, el: divBloco, btn });
+        ctxProprio.elementos.push({ idx, el: divBloco, btn });
       }
 
       divTitulo.addEventListener('click', (e) => {

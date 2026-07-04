@@ -136,7 +136,19 @@ function obterLinhasParaFalar(){
         // diferente do índice do bloco-pai. Guardamos o índice do bloco-pai
         // na cadeia de ancestrais para podermos marcá-lo como concluído
         // separadamente quando todas as linhas internas forem lidas.
-        const novosAncestrais = secaoAtualIdx >= 0
+        //
+        // IMPORTANTE: só fazemos isso quando o bloco tem um índice PRÓPRIO
+        // (dataset.secaoIdx realmente definido nele). Um bloco simples sem
+        // repetição (como "contas grandes") que vive DENTRO de um repetido
+        // não tem índice próprio — ele só "herda" o índice do repetido pai
+        // (secaoAtualIdx aqui veio do parâmetro `secaoIdx`, não de
+        // el.dataset.secaoIdx). Se colocássemos esse índice herdado na
+        // cadeia de ancestrais, terminar de ler esse bloco marcaria o
+        // REPETIDO PAI inteiro como concluído prematuramente (bug: uma
+        // repetição de 7 voltas era dada como finalizada assim que a 1ª
+        // volta terminava, pulando direto para a próxima oração).
+        const temIndiceProprio = !!el.dataset.secaoIdx;
+        const novosAncestrais = (temIndiceProprio && secaoAtualIdx >= 0)
           ? [...ancestraisBloco, secaoAtualIdx]
           : ancestraisBloco;
         Array.from(conteudoDiv.children).forEach(filho => {
@@ -353,6 +365,53 @@ function falarProximaLinha(){
 
   const item = filaFala[indiceFalaAtual];
 
+  // Detecta se este item é o início de uma NOVA volta de algum bloco repetido
+  // (contaIdx volta a 1) e, nesse caso, zera o contador de contas/localStorage
+  // desse bloco ANTES de qualquer checagem de "pular item já concluído".
+  // Isso precisa acontecer primeiro: se um bloco repetido está aninhado
+  // dentro de outro (ex: "contas pequenas x7" dentro de "setena x7"), o
+  // contador de contas do bloco interno chega a "completo" ao fim da 1ª
+  // volta externa e fica assim guardado no localStorage. Se a checagem de
+  // "já concluído" rodasse antes do reset, ela leria esse valor antigo
+  // (da volta anterior) e pularia a volta INTEIRA seguinte por engano —
+  // e isso em cascata pulava todas as voltas restantes do bloco de fora.
+  document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
+  if (item.repetido && item.historicoRepeticoes) {
+    const itemAnterior = indiceFalaAtual > 0 ? filaFala[indiceFalaAtual - 1] : null;
+    item.historicoRepeticoes.forEach(rep => {
+      const fileira = rep.blocoEl.querySelector('.fileira-contas');
+      if (fileira) {
+        // Verifica se esta é a PRIMEIRA LINHA de uma nova volta deste bloco,
+        // comparando com o item anterior. Isso garante que o reset de contas
+        // acontece apenas UMA VEZ ao entrar na volta, e não a cada linha durante ela.
+        const repAnterior = itemAnterior && itemAnterior.historicoRepeticoes
+          ? itemAnterior.historicoRepeticoes.find(r => r.blocoEl === rep.blocoEl)
+          : null;
+        const entrandoNovaVolta = !repAnterior || repAnterior.contaIdx !== rep.contaIdx;
+
+        if (entrandoNovaVolta && rep.contaIdx === 1) {
+          fileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
+          const blocoSecaoIdxProprio = rep.blocoEl.dataset.secaoIdx;
+          if (blocoSecaoIdxProprio != null) {
+            localStorage.removeItem(`contas_${oracaoAtualId}_${blocoSecaoIdxProprio}`);
+          }
+          rep.blocoEl.querySelectorAll('.fileira-contas').forEach(subFileira => {
+            if (subFileira !== fileira) {
+              subFileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
+              const subBlocoRef = subFileira.closest('.bloco-ref');
+              if (subBlocoRef) {
+                const subSecaoIdx = subBlocoRef.dataset.secaoIdx;
+                if (subSecaoIdx != null) {
+                  localStorage.removeItem(`contas_${oracaoAtualId}_${subSecaoIdx}`);
+                }
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
   // Proteção: se a seção deste item já foi marcada como concluída (ex: usuário
   // marcou manualmente enquanto a fala estava em outra posição), pula para o próximo
   // sem falar — evita repetir o que o usuário já sinalizou como rezado.
@@ -397,40 +456,10 @@ function falarProximaLinha(){
     if(!estaVisivel(item.elemento)) item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
   }
 
-  document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
   if (item.repetido && item.historicoRepeticoes) {
-    const itemAnterior = indiceFalaAtual > 0 ? filaFala[indiceFalaAtual - 1] : null;
     item.historicoRepeticoes.forEach(rep => {
       const fileira = rep.blocoEl.querySelector('.fileira-contas');
       if (fileira) {
-        // Verifica se esta é a PRIMEIRA LINHA de uma nova volta deste bloco,
-        // comparando com o item anterior. Isso garante que o reset de contas
-        // acontece apenas UMA VEZ ao entrar na volta, e não a cada linha durante ela.
-        const repAnterior = itemAnterior && itemAnterior.historicoRepeticoes
-          ? itemAnterior.historicoRepeticoes.find(r => r.blocoEl === rep.blocoEl)
-          : null;
-        const entrandoNovaVolta = !repAnterior || repAnterior.contaIdx !== rep.contaIdx;
-
-        if (entrandoNovaVolta && rep.contaIdx === 1) {
-          fileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
-          const blocoSecaoIdxProprio = rep.blocoEl.dataset.secaoIdx;
-          if (blocoSecaoIdxProprio != null) {
-            localStorage.removeItem(`contas_${oracaoAtualId}_${blocoSecaoIdxProprio}`);
-          }
-          rep.blocoEl.querySelectorAll('.fileira-contas').forEach(subFileira => {
-            if (subFileira !== fileira) {
-              subFileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
-              const subBlocoRef = subFileira.closest('.bloco-ref');
-              if (subBlocoRef) {
-                const subSecaoIdx = subBlocoRef.dataset.secaoIdx;
-                if (subSecaoIdx != null) {
-                  localStorage.removeItem(`contas_${oracaoAtualId}_${subSecaoIdx}`);
-                }
-              }
-            }
-          });
-        }
-
         const contaAtiva = fileira.querySelector(`.conta-terco[data-conta-idx="${rep.contaIdx}"]`);
         if (contaAtiva) contaAtiva.classList.add('ativa');
       }
