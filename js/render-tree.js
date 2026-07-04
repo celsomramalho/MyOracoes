@@ -272,11 +272,16 @@ function agruparNos(nos){
     } else {
       const ultimaLinha = linhasAtm[linhasAtm.length - 1];
       const ultimaEhParagrafo = ultimaLinha.classe !== 'linha-v' && ultimaLinha.classe !== 'linha-r';
-      if (ultimaEhParagrafo) {
-        // Se a anterior e a atual são parágrafos livres comuns, elas pertencem ao mesmo grupo/parágrafo.
+      // Só cola no grupo atual se a anterior também era parágrafo livre E a
+      // linha atual é continuação de frase (começa com minúscula). Duas
+      // linhas livres que não são continuação uma da outra são parágrafos
+      // distintos e precisam de marcadores separados — sem essa checagem,
+      // vários parágrafos ficavam "grudados" num único marcador.
+      const ehContinuacao = ultimaEhParagrafo && continuacaoDeFrase(no.texto);
+      if (ehContinuacao) {
         linhasAtm.push(no);
       } else {
-        // Se a anterior era V. ou R., fecha o grupo e abre novo
+        // Nova frase/parágrafo (ou a anterior era V./R.) → fecha o grupo e abre outro
         fecharGrupo();
         linhasAtm.push(no);
       }
