@@ -1,3 +1,36 @@
+// ===================== TELA LIGADA ENQUANTO FALA (Wake Lock) =====================
+// Sem isso, o celular apaga a tela sozinho pelo tempo normal configurado nele,
+// mesmo com o app aberto e falando. Pedimos pro navegador manter a tela ligada
+// só enquanto a fala está realmente ativa (não pausada), e liberamos o pedido
+// ao pausar/parar, pra não deixar a tela sempre acesa à toa gastando bateria.
+let wakeLockAtivo = null;
+
+async function ativarWakeLock(){
+  if(!('wakeLock' in navigator)) return; // navegador sem suporte (ex: iOS antigo) — segue sem travar nada
+  try{
+    wakeLockAtivo = await navigator.wakeLock.request('screen');
+    wakeLockAtivo.addEventListener('release', () => { wakeLockAtivo = null; });
+  }catch(erro){
+    wakeLockAtivo = null; // ex: bateria baixa, permissão negada — não é um erro fatal
+  }
+}
+
+function desativarWakeLock(){
+  if(wakeLockAtivo){
+    wakeLockAtivo.release().catch(() => {});
+    wakeLockAtivo = null;
+  }
+}
+
+// O navegador libera o wake lock sozinho quando a aba/app fica em segundo
+// plano. Se o usuário voltar e a fala ainda estiver ativa (não pausada),
+// pede de novo automaticamente.
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible' && typeof falando !== 'undefined' && falando && !pausado){
+    ativarWakeLock();
+  }
+});
+
 // ===================== SCROLL INTELIGENTE =====================
 
 // Retorna true se o elemento já está inteiramente visível dentro da viewport
@@ -388,6 +421,7 @@ async function iniciarFala(){
   indiceFalaAtual = indiceInicial;
   falando = true;
   pausado = false;
+  ativarWakeLock();
   atualizarBotaoFala();
   falarProximaLinha();
 }
@@ -395,6 +429,7 @@ async function iniciarFala(){
 function pausarFala(){
   if(!falando || pausado) return;
   pausado = true;
+  desativarWakeLock();
   if(utteranciaAtual){
     utteranciaAtual.onend = null;
     utteranciaAtual.onerror = null;
@@ -423,6 +458,7 @@ function continuarFala(){
   indiceFalaAtual = indiceRecalculado;
 
   pausado = false;
+  ativarWakeLock();
   atualizarBotaoFala();
   falarProximaLinha();
 }
@@ -691,6 +727,7 @@ function falarPausa(item){
 function pararFala(){
   falando = false;
   pausado = false;
+  desativarWakeLock();
   if(utteranciaAtual){
     utteranciaAtual.onend = null;
     utteranciaAtual.onerror = null;

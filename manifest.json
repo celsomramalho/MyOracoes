@@ -1,6 +1,6 @@
 {
   "name": "MyOrações",
-  "short_name": "Orações",
+  "short_name": "MyOrações",
   "description": "Crie, organize e reze suas orações favoritas.",
   "start_url": "./index.html",
   "scope": "./",
