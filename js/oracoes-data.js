@@ -122,15 +122,22 @@ const LINK_APP_MYORACOES = 'https://myoracoes.vercel.app/';
 function compartilharApp(){
   const texto = `Quero compartilhar este aplicativo que estou usando para rezar e criar orações personalizadas.\n\n${LINK_APP_MYORACOES}`;
 
+  // Copia o texto completo ANTES de tentar compartilhar: assim, mesmo que o
+  // compartilhamento nativo não role (ex: no computador, sem app de
+  // WhatsApp instalado), o texto já fica pronto na área de transferência
+  // pra colar em qualquer lugar (WhatsApp Web, e-mail, etc.).
+  copiarParaClipboard(texto, { silencioso: true });
+
   try{
     if(navigator.share){
       navigator.share({ title: 'MyOrações', text: texto }).catch(() => {
-        copiarParaClipboard(LINK_APP_MYORACOES);
+        mostrarToast('Texto copiado! Cole onde quiser.', 'sucesso');
       });
     }else{
       // Fallback: WhatsApp Web
       const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
       window.open(urlWhatsApp, '_blank');
+      mostrarToast('Texto copiado! Cole onde quiser.', 'sucesso');
     }
   }catch(e){
     mostrarToast('Não foi possível compartilhar o link.');
@@ -149,25 +156,33 @@ function compartilharOracao(id){
 
     const texto = `Quero compartilhar esta oração com você pelo app MyOrações:\n\n"${o.titulo}"\n\n${link}`;
 
+    // Copia o texto completo ANTES de tentar compartilhar (mesmo motivo de
+    // compartilharApp): garante que o usuário sempre tem o texto pronto pra
+    // colar, independente do compartilhamento nativo funcionar ou não —
+    // útil sobretudo no computador, onde dá pra colar direto no WhatsApp Web.
+    copiarParaClipboard(texto, { silencioso: true });
+
     if(navigator.share){
       navigator.share({ title: o.titulo, text: texto }).catch(() => {
-        copiarParaClipboard(link);
+        mostrarToast('Texto copiado! Cole onde quiser.', 'sucesso');
       });
     }else{
       // Fallback: WhatsApp Web
       const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
       window.open(urlWhatsApp, '_blank');
+      mostrarToast('Texto copiado! Cole onde quiser.', 'sucesso');
     }
   }catch(e){
     mostrarToast('Não foi possível gerar o link de compartilhamento.');
   }
 }
 
-function copiarParaClipboard(texto){
+function copiarParaClipboard(texto, opcoes){
+  const silencioso = opcoes && opcoes.silencioso;
   navigator.clipboard.writeText(texto).then(() => {
-    mostrarToast('Link copiado para a área de transferência!', 'sucesso');
+    if(!silencioso) mostrarToast('Link copiado para a área de transferência!', 'sucesso');
   }).catch(() => {
-    mostrarToast('Não foi possível copiar o link automaticamente.');
+    if(!silencioso) mostrarToast('Não foi possível copiar o link automaticamente.');
   });
 }
 

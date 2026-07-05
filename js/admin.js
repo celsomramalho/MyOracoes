@@ -393,6 +393,18 @@ function crc32(bytes){
   return (~crc) >>> 0;
 }
 
+// Converte um objeto Date do JS para os dois campos de 16 bits que o
+// formato ZIP exige (hora e data, cada um compactado em bits específicos).
+// Sem isso, o zip ficava com uma data fixa e fictícia (1980-01-01 00:00) em
+// todo arquivo — o Explorer do Windows não conseguia exibir essa data
+// mínima/zerada corretamente e mostrava a coluna "Data de modificação" em
+// branco ao extrair.
+function paraDosDataHora(data){
+  const dosTime = (data.getHours() << 11) | (data.getMinutes() << 5) | Math.floor(data.getSeconds() / 2);
+  const dosDate = ((data.getFullYear() - 1980) << 9) | ((data.getMonth() + 1) << 5) | data.getDate();
+  return { dosTime, dosDate };
+}
+
 // arquivos: [{ nome: 'caminho/dentro/do/zip.ext', conteudo: 'string' }, ...]
 // Caminhos com "/" viram subpastas ao extrair (ex: 'js/arquivo.js').
 function criarZip(arquivos){
@@ -400,8 +412,9 @@ function criarZip(arquivos){
   const partesLocais = [];
   const partesCentral = [];
   let offset = 0;
-  const dosTime = 0;
-  const dosDate = 0x21; // 1980-01-01, data mínima válida no formato ZIP (irrelevante aqui)
+  // Mesmo instante para todos os arquivos do zip, batendo com o horário real
+  // em que o download foi gerado.
+  const { dosTime, dosDate } = paraDosDataHora(new Date());
 
   arquivos.forEach(({ nome, conteudo }) => {
     const nomeBytes = encoder.encode(nome);

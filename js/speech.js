@@ -156,7 +156,18 @@ function obterLinhasParaFalar(){
         });
       }
     } else if (el.classList.contains('grupo-texto-secao')) {
-      const secaoAtualIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : secaoIdx;
+      // Só usa o índice do PRÓPRIO elemento (dataset.secaoIdx). Uma linha
+      // dentro de um repetido não tem índice próprio por design (não ganha
+      // check individual — seu progresso é o contador de contas do
+      // repetido que a envolve). Antes, ela "herdava" o índice do parâmetro
+      // `secaoIdx` (o do repetido pai) como se fosse seu próprio secaoIdx —
+      // isso fazia o repetido pai ser marcado como concluído assim que essa
+      // linha terminava (bug: repetição de várias voltas dada como
+      // finalizada já na 1ª volta). Sem índice próprio, fica -1 (sem dono):
+      // o controle de "já foi lida nesta volta" continua funcionando
+      // normalmente através de item.blocoEl/item.contaIdx, que apontam pro
+      // repetido de verdade mais próximo (historicoRepeticoes), não por aqui.
+      const secaoAtualIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : -1;
       el.querySelectorAll('p').forEach(p => {
         if (p.classList.contains('linha-ref')) return;
         let texto = p.textContent.replace(/^V\.\s*/,'').replace(/^R\.\s*/,'').trim();
@@ -224,31 +235,68 @@ async function alternarFala(){
   }
 }
 
-// Calcula a partir de qual linha a fala deve começar, considerando as
-// seções que já estão marcadas como concluídas (check verde). Retorna
-// null se a oração já estiver 100% concluída (nada para continuar).
-function calcularIndiceInicialFala(fila){
-  if(!oracaoAtualId) return 0;
-  const concluidas = new Set(progressoLeitura[oracaoAtualId] || []);
+// Verifica se um item da fila de fala já foi concluído — seja porque a
+// seção dele já está marcada (check verde), seja porque a(s) volta(s) do(s)
+// bloco(s) repetido(s) a que ele pertence já foram concluídas.
+//
+// IMPORTANTE (repetição dentro de repetição, ex: "setena x7" contendo
+// "contas pequenas x7" dentro): um item pode pertencer a VÁRIOS blocos
+// repetidos ao mesmo tempo, um aninhado no outro. O contador de voltas de
+// cada bloco (localStorage `contas_<id>_<secaoIdx>`) é reaproveitado a cada
+// nova volta do bloco que o contém — ou seja, o número guardado para o
+// bloco interno só faz sentido dentro da volta ATUAL do bloco externo.
+// Por isso é preciso percorrer a cadeia do mais externo para o mais
+// interno: se a volta atual de um nível já está concluída, o item inteiro
+// (e tudo que há dentro dele) já foi feito, não importa o que os
+// contadores dos níveis mais internos digam (eles pertencem a uma volta
+// externa diferente da que estamos verificando).
+function itemJaConcluido(item){
+  if(!oracaoAtualId) return false;
 
-  const idx = fila.findIndex(item => {
-    // Seção totalmente concluída → pula
-    if(item.secaoIdx >= 0 && concluidas.has(item.secaoIdx)) return false;
+  // Seção com índice próprio já marcada como concluída (check verde)
+  if(item.secaoIdx >= 0){
+    const concluidas = progressoLeitura[oracaoAtualId] || [];
+    if(concluidas.includes(item.secaoIdx)) return true;
+  }
 
-    // Item de bloco repetido: verifica quantas voltas já foram concluídas
-    if(item.repetido && item.blocoEl){
-      const secaoIdxBloco = item.blocoEl.dataset.secaoIdx
-        ? parseInt(item.blocoEl.dataset.secaoIdx, 10)
-        : item.secaoIdx;
+  // Cadeia de blocos repetidos, do mais externo para o mais interno
+  if(item.historicoRepeticoes && item.historicoRepeticoes.length){
+    for(const rep of item.historicoRepeticoes){
+      const secaoIdxBloco = rep.blocoEl && rep.blocoEl.dataset.secaoIdx != null
+        ? parseInt(rep.blocoEl.dataset.secaoIdx, 10)
+        : -1;
+      if(secaoIdxBloco < 0) continue;
+
       const contasConcluidas = parseInt(
         localStorage.getItem(`contas_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
       );
-      if(item.contaIdx <= contasConcluidas) return false; // volta já feita → pula
+
+      if(rep.contaIdx <= contasConcluidas){
+        // Esta volta, neste nível, já foi concluída → o item já foi feito,
+        // independentemente de níveis mais internos.
+        return true;
+      }
+      if(rep.contaIdx > contasConcluidas + 1){
+        // Estado inesperado (contador mais adiantado do que deveria) —
+        // não assume concluído, trata com segurança como pendente.
+        return false;
+      }
+      // rep.contaIdx === contasConcluidas + 1: é a volta em andamento
+      // neste nível. Segue verificando o próximo nível (mais interno).
     }
+  }
 
-    return true; // este item ainda não foi feito → começa aqui
-  });
+  return false;
+}
 
+// Calcula a partir de qual linha a fala deve começar, considerando as
+// seções que já estão marcadas como concluídas (check verde) e, em blocos
+// repetidos aninhados, em qual volta de cada nível a leitura realmente
+// parou. Retorna null se a oração já estiver 100% concluída (nada para
+// continuar).
+function calcularIndiceInicialFala(fila){
+  if(!oracaoAtualId) return 0;
+  const idx = fila.findIndex(item => !itemJaConcluido(item));
   return idx === -1 ? null : idx;
 }
 
@@ -412,30 +460,17 @@ function falarProximaLinha(){
     });
   }
 
-  // Proteção: se a seção deste item já foi marcada como concluída (ex: usuário
-  // marcou manualmente enquanto a fala estava em outra posição), pula para o próximo
-  // sem falar — evita repetir o que o usuário já sinalizou como rezado.
-  if(oracaoAtualId && item.secaoIdx >= 0){
-    const concluidas = new Set(progressoLeitura[oracaoAtualId] || []);
-    if(concluidas.has(item.secaoIdx)){
-      indiceFalaAtual++;
-      falarProximaLinha();
-      return;
-    }
-    // Bloco repetido: pula voltas já concluídas pelo clique manual de conta
-    if(item.repetido && item.blocoEl){
-      const secaoIdxBloco = item.blocoEl.dataset.secaoIdx != null
-        ? parseInt(item.blocoEl.dataset.secaoIdx, 10)
-        : item.secaoIdx;
-      const contasConcluidas = parseInt(
-        localStorage.getItem(`contas_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
-      );
-      if(item.contaIdx <= contasConcluidas){
-        indiceFalaAtual++;
-        falarProximaLinha();
-        return;
-      }
-    }
+  // Proteção: se este item já foi concluído (ex: usuário marcou manualmente
+  // uma conta ou seção enquanto a fala estava em outra posição), pula para o
+  // próximo sem falar — evita repetir o que o usuário já sinalizou como
+  // rezado. Usa a mesma checagem hierárquica (do bloco mais externo para o
+  // mais interno) usada ao retomar de uma pausa, para funcionar corretamente
+  // também em repetições aninhadas (ex: "setena x7" com "contas pequenas x7"
+  // dentro).
+  if(itemJaConcluido(item)){
+    indiceFalaAtual++;
+    falarProximaLinha();
+    return;
   }
 
   if(item.tipo === 'pausa'){
