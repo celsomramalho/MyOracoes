@@ -289,15 +289,84 @@ function itemJaConcluido(item){
   return false;
 }
 
-// Calcula a partir de qual linha a fala deve começar, considerando as
-// seções que já estão marcadas como concluídas (check verde) e, em blocos
-// repetidos aninhados, em qual volta de cada nível a leitura realmente
-// parou. Retorna null se a oração já estiver 100% concluída (nada para
-// continuar).
+// Calcula a partir de qual linha a fala deve começar, considerando: seções
+// já marcadas como concluídas (check verde), voltas já concluídas de blocos
+// repetidos aninhados, E a posição exata onde a leitura parou DENTRO da
+// volta em andamento — inclusive para trechos sem check próprio (como um
+// texto fixo que aparece uma vez a cada volta, antes de uma sub-repetição
+// interna). Retorna null se a oração já estiver 100% concluída.
+//
+// Como funciona a posição dentro da volta: cada vez que uma linha termina de
+// ser falada, o onend (mais abaixo) incrementa um contador `subpos_<id>_<idx>`
+// por bloco repetido — "quantos itens desta volta atual já foram ditos". Esse
+// contador zera sempre que uma volta nova começa. Aqui, ao re-varrer a fila
+// inteira do zero, contamos de novo, virtualmente, quantos itens de cada
+// volta "atual" (a que ainda não terminou) já passamos na varredura — e
+// comparamos com o valor salvo. Se já passamos menos do que o salvo, o item
+// já foi dito de verdade; senão, é exatamente aqui que a fala deve retomar.
 function calcularIndiceInicialFala(fila){
   if(!oracaoAtualId) return 0;
-  const idx = fila.findIndex(item => !itemJaConcluido(item));
-  return idx === -1 ? null : idx;
+
+  const concluidas = progressoLeitura[oracaoAtualId] || [];
+  const rodadaAtualPorBloco = new Map();     // blocoEl -> contaIdx da volta sendo varrida
+  const posicaoNaRodadaPorBloco = new Map(); // blocoEl -> itens desta volta já varridos
+
+  for(let i = 0; i < fila.length; i++){
+    const item = fila[i];
+
+    // Marcadores [pausa]{n} nunca contam como "ponto de retomada" — ver
+    // itemJaConcluido para mais contexto sobre por que isso é necessário.
+    if(item.tipo === 'pausa') continue;
+
+    if(item.secaoIdx >= 0 && concluidas.includes(item.secaoIdx)) continue;
+
+    let jaConcluido = false;
+    let decidido = false;
+
+    if(item.historicoRepeticoes && item.historicoRepeticoes.length){
+      for(const rep of item.historicoRepeticoes){
+        const secaoIdxBloco = rep.blocoEl && rep.blocoEl.dataset.secaoIdx != null
+          ? parseInt(rep.blocoEl.dataset.secaoIdx, 10)
+          : -1;
+
+        // Mantém a contagem de posição dentro da volta atual DESTE bloco.
+        // Se a volta mudou desde o último item visto, reinicia a contagem.
+        if(rodadaAtualPorBloco.get(rep.blocoEl) !== rep.contaIdx){
+          rodadaAtualPorBloco.set(rep.blocoEl, rep.contaIdx);
+          posicaoNaRodadaPorBloco.set(rep.blocoEl, 0);
+        }
+        const posicaoAntes = posicaoNaRodadaPorBloco.get(rep.blocoEl) || 0;
+        posicaoNaRodadaPorBloco.set(rep.blocoEl, posicaoAntes + 1);
+
+        if(secaoIdxBloco < 0 || decidido) continue;
+
+        const contasConcluidas = parseInt(
+          localStorage.getItem(`contas_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
+        );
+
+        if(rep.contaIdx <= contasConcluidas){
+          // Volta já concluída neste nível → todo o conteúdo dentro dela
+          // (inclusive níveis mais internos) já foi feito.
+          jaConcluido = true;
+          decidido = true;
+        }else if(rep.contaIdx === contasConcluidas + 1){
+          // Volta em andamento neste nível: usa a posição salva para saber
+          // exatamente até onde já foi falado DENTRO dela.
+          const subposConcluida = parseInt(
+            localStorage.getItem(`subpos_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
+          );
+          jaConcluido = posicaoAntes < subposConcluida;
+          decidido = true;
+        }
+        // rep.contaIdx > contasConcluidas + 1: estado inesperado — não
+        // decide aqui, mantém jaConcluido=false (trata como pendente).
+      }
+    }
+
+    if(!jaConcluido) return i;
+  }
+
+  return null;
 }
 
 async function iniciarFala(){
@@ -437,6 +506,18 @@ function falarProximaLinha(){
           : null;
         const entrandoNovaVolta = !repAnterior || repAnterior.contaIdx !== rep.contaIdx;
 
+        // A cada NOVA volta (não só a primeira), zera a posição-dentro-da-volta
+        // guardada (usada só para saber exatamente onde retomar depois de uma
+        // pausa — ver `subpos_` mais abaixo, no onend). Sem isso, o valor da
+        // volta anterior "vazava" para a volta nova e confundia o cálculo de
+        // retomada.
+        if(entrandoNovaVolta){
+          const idxProprioSubpos = rep.blocoEl.dataset.secaoIdx;
+          if(idxProprioSubpos != null){
+            localStorage.removeItem(`subpos_${oracaoAtualId}_${idxProprioSubpos}`);
+          }
+        }
+
         if (entrandoNovaVolta && rep.contaIdx === 1) {
           fileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
           const blocoSecaoIdxProprio = rep.blocoEl.dataset.secaoIdx;
@@ -524,6 +605,17 @@ function falarProximaLinha(){
     const proximoItem = filaFala[indiceFalaAtual + 1];
     if (item.repetido && item.historicoRepeticoes) {
       item.historicoRepeticoes.forEach(rep => {
+        // Marca que mais um item desta volta foi concluído — usado só para
+        // saber, ao retomar de uma pausa, exatamente onde parar dentro da
+        // volta em andamento (ver calcularIndiceInicialFala). É reiniciado
+        // sempre que uma volta nova começa (mais acima, em falarProximaLinha).
+        const idxProprioSubpos = rep.blocoEl.dataset.secaoIdx;
+        if(idxProprioSubpos != null){
+          const chaveSubpos = `subpos_${oracaoAtualId}_${idxProprioSubpos}`;
+          const posAtual = parseInt(localStorage.getItem(chaveSubpos) || '0', 10);
+          localStorage.setItem(chaveSubpos, posAtual + 1);
+        }
+
         const proxRep = proximoItem && proximoItem.historicoRepeticoes 
           ? proximoItem.historicoRepeticoes.find(r => r.blocoEl === rep.blocoEl)
           : null;
