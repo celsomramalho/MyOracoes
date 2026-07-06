@@ -52,16 +52,13 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mqv9bs4r",
     "titulo": "São José dormindo",
-    "texto": "V. São José dormindo, com o evangelho aprendemos que mais do que dormir, durante a noite, escutas-te a voz de Deus com a prontidão de praticá-la.\nHoje confiante em tua preciosa intercessão consagro-te as alegrias e as tristezas de cada dia. Consagro-te minha vida, minha casa, família e trabalho.\nAjuda-me a te imitar sendo uma pessoa de bem, vivendo o amor, o perdão e a verdade. Quero seguir o teu caminho de fé.\nAgora eu te peço São José dormindo sonha com este pedido junto de Deus. Intercede por mim alcançando-me esta graça (com confiança fazer seu pedido).\nComo és padroeiro da Igreja, com o auxílio do Espírito Santo assumo diante de ti o voto de não faltar à missa dominical, rezar todos os dias com a Bíblia, confessar-me regularmente e viver como um bom cristão. \nR. Amém",
-    "oculta": false,
-    "colapsarNaFala": false
+    "texto": "V. São José dormindo, com o evangelho aprendemos que mais do que dormir, durante a noite, escutas-te a voz de Deus com a prontidão de praticá-la.\nHoje confiante em tua preciosa intercessão consagro-te as alegrias e as tristezas de cada dia. Consagro-te minha vida, minha casa, família e trabalho.\nAjuda-me a te imitar sendo uma pessoa de bem, vivendo o amor, o perdão e a verdade. Quero seguir o teu caminho de fé.\nAgora eu te peço São José dormindo sonha com este pedido junto de Deus. Intercede por mim alcançando-me esta graça (com confiança fazer seu pedido).\nComo és padroeiro da Igreja, com o auxílio do Espírito Santo assumo diante de ti o voto de não faltar à missa dominical, rezar todos os dias com a Bíblia, confessar-me regularmente e viver como um bom cristão. \nR. Amém"
   },
   {
     "id": "oficial_mqv9fuo3",
     "titulo": "Santíssimos corações de Jesus e Maria",
     "texto": "V. Santíssimos corações de Jesus e Maria, unidos no amor perfeito,\ncomo nos olhais com carinho e misericórdia, consagramos nossos corações, nossas vidas, e nossas famílias a Vós.\nConhecemos que o belo exemplo de Vosso lar em Nazaré foi um modelo\npara cada uma de nossas famílias.\nEsperamos obter, com Vossa ajuda, a união e o amor forte e perdurável\nque vos destes.\nQue nosso lar seja cheio de alegria. Que o afeto sincero, a paciência, a tolerância, e o respeito mútuo sejam dados livremente a todos.\nQue nossas orações incluam as necessidades dos outros, não somente as nossas. E que sempre estejamos próximos dos sacramentos.\nAbençoai a todos os presentes e também aos ausentes, tantos os vivos como os defuntos; que a paz estejam conosco, e quando formos provados, concedei a resignação cristã à vontade de Deus.\nMantende nossas famílias perto de Vossos Corações; que Vossa proteção especial esteja sempre conosco.\nSagrados Corações de Jesus e Maria, escutai nossa oração.\nR. Amém.",
-    "oculta": false,
-    "colapsarNaFala": false
+    "oculta": false
   },
   {
     "id": "oficial_mqv9rxby",
@@ -185,6 +182,20 @@ var ORACOES_OFICIAIS_DATA = [
     "titulo": "Coroa das lágrimas (contas grandes)",
     "texto": "V. Vêde, ó Jesus, que são as lágrimas dAquela que mais Vos amou na Terra,\nR. e que mais Vos ama no Céu.",
     "oculta": true,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr97efyh",
+    "titulo": "Exorcismo de Santo Antônio (pequeno)",
+    "texto": "V. Eis a Cruz do Senhor!\nR. Eis a Cruz do Senhor!\nV. Fugi, potências inimigas!\nR. Fugi, potências inimigas!\nV. Venceu o Leão da tribo de Judá,\nR. Venceu o Leão da tribo de Judá,\nV. A raiz de Davi. Aleluia!\nR. A raiz de Davi. Aleluia!",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr97jmdw",
+    "titulo": "Exorcismo de São Bento (pequeno)",
+    "texto": "V. A Cruz Sagrada seja a minha luz,\nR. A Cruz Sagrada seja a minha luz,\nV. Não seja o dragão o meu guia.\nR. Não seja o dragão o meu guia.\nV. Retira-te, Satanás!\n[pausa]{1}\nR. Retira-te, Satanás!\n[pausa]{1}\nV. Nunca me aconselhes coisas vãs.\nR. Nunca me aconselhes coisas vãs.\nV. É mau o que tu me ofereces,\nR. É mau o que tu me ofereces,\nV. Bebe tu mesmo o teu veneno.\nR. Bebe tu mesmo o teu veneno.",
+    "oculta": false,
     "colapsarNaFala": false
   }
 ];
