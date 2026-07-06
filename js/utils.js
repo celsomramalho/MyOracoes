@@ -32,3 +32,45 @@ function primeiraLinhaUtil(texto){
 function normalizarBusca(texto){
   return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 }
+
+// ===================== BOTÃO "X" PARA LIMPAR CAMPOS DE BUSCA =====================
+// Identifica automaticamente todo campo de busca (placeholder com o emoji 🔎),
+// envolve o input num wrapper e injeta um botão "✕" à direita para limpar o
+// texto digitado. Não é preciso alterar cada tela: basta o input já existir
+// no HTML com um placeholder que comece com 🔎.
+function inicializarBotoesLimparBusca(raiz){
+  const escopo = raiz || document;
+  const campos = escopo.querySelectorAll('input[type="text"]');
+
+  campos.forEach(input => {
+    if (!input.placeholder || !input.placeholder.includes('🔎')) return;
+    if (input.dataset.limparBuscaPronto) return; // evita duplicar se a função rodar mais de uma vez
+    input.dataset.limparBuscaPronto = '1';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'campo-busca-wrapper';
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    const btnLimpar = document.createElement('button');
+    btnLimpar.type = 'button';
+    btnLimpar.className = 'btn-limpar-busca';
+    btnLimpar.setAttribute('aria-label', 'Limpar busca');
+    btnLimpar.textContent = '✕';
+    wrapper.appendChild(btnLimpar);
+
+    function atualizarVisibilidade(){
+      btnLimpar.classList.toggle('visivel', input.value.length > 0);
+    }
+
+    btnLimpar.addEventListener('click', () => {
+      input.value = '';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.focus();
+      atualizarVisibilidade();
+    });
+
+    input.addEventListener('input', atualizarVisibilidade);
+    atualizarVisibilidade();
+  });
+}

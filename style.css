@@ -319,6 +319,41 @@ html,body{
   border-color: var(--ouro);
 }
 
+/* ---------- WRAPPER + BOTÃO "X" DE LIMPAR BUSCA ----------
+   Aplicado automaticamente pelo JS (inicializarBotoesLimparBusca) a
+   qualquer input de busca (placeholder com 🔎), em qualquer tela. */
+.campo-busca-wrapper{
+  position: relative;
+}
+.campo-busca-wrapper input{
+  padding-right: 40px !important;
+}
+.btn-limpar-busca{
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+.btn-limpar-busca.visivel{
+  display: flex;
+}
+.btn-limpar-busca:hover{
+  background: var(--superficie-alta);
+  color: var(--texto);
+}
+
 /* Espaço entre a linha do bloco fixo e a lista de favoritas que vem depois. */
 #lista-favoritas{
   margin-top: 16px;

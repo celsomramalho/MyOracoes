@@ -523,6 +523,7 @@ renderizarTodas();
 carregarOficiais();
 renderizarFavoritas(); // Garante o carregamento inicial correto das favoritas oficiais na Home
 verificarLinkImportacao();
+inicializarBotoesLimparBusca(); // Botão "X" nos campos de busca (js/utils.js)
 
 // ===================== PWA: SERVICE WORKER =====================
 if('serviceWorker' in navigator){

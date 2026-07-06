@@ -600,3 +600,6 @@ btnVoltarFormAdmin.addEventListener('click', () => {
   limparContasDoId(ID_PREVIEW);
   mostrarView('view-admin-form');
 });
+
+// ===================== INICIALIZAÇÃO =====================
+inicializarBotoesLimparBusca(); // Botão "X" nos campos de busca (js/utils.js)
