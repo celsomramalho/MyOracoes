@@ -294,11 +294,19 @@ function itemJaConcluido(item){
 
   // Cadeia de blocos repetidos, do mais externo para o mais interno
   if(item.historicoRepeticoes && item.historicoRepeticoes.length){
+    const concluidasSecoes = progressoLeitura[oracaoAtualId] || [];
     for(const rep of item.historicoRepeticoes){
       const secaoIdxBloco = rep.blocoEl && rep.blocoEl.dataset.secaoIdx != null
         ? parseInt(rep.blocoEl.dataset.secaoIdx, 10)
         : -1;
       if(secaoIdxBloco < 0) continue;
+
+      // O bloco repetido inteiro foi marcado manualmente como concluído
+      // (check verde no próprio bloco) — todas as voltas e tudo dentro
+      // dele conta como já feito, independente do contador de voltas.
+      if(concluidasSecoes.includes(secaoIdxBloco)){
+        return true;
+      }
 
       const contasConcluidas = parseInt(
         localStorage.getItem(`contas_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
@@ -357,7 +365,10 @@ function calcularIndiceInicialFala(fila){
     let decidido = false;
 
     if(item.historicoRepeticoes && item.historicoRepeticoes.length){
-      for(const rep of item.historicoRepeticoes){
+      const repeticoes = item.historicoRepeticoes;
+      for(let n = 0; n < repeticoes.length; n++){
+        const rep = repeticoes[n];
+        const ehNivelMaisInterno = n === repeticoes.length - 1;
         const secaoIdxBloco = rep.blocoEl && rep.blocoEl.dataset.secaoIdx != null
           ? parseInt(rep.blocoEl.dataset.secaoIdx, 10)
           : -1;
@@ -373,6 +384,15 @@ function calcularIndiceInicialFala(fila){
 
         if(secaoIdxBloco < 0 || decidido) continue;
 
+        // O bloco repetido inteiro foi marcado manualmente como concluído
+        // (check verde no próprio bloco) — pula tudo dentro dele, mesmo que
+        // o contador de voltas (contas_) não tenha sido incrementado.
+        if(concluidas.includes(secaoIdxBloco)){
+          jaConcluido = true;
+          decidido = true;
+          continue;
+        }
+
         const contasConcluidas = parseInt(
           localStorage.getItem(`contas_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
         );
@@ -383,18 +403,49 @@ function calcularIndiceInicialFala(fila){
           jaConcluido = true;
           decidido = true;
         }else if(rep.contaIdx === contasConcluidas + 1){
-          // Volta em andamento neste nível: usa a posição salva para saber
-          // exatamente até onde já foi falado DENTRO dela.
-          const subposConcluida = parseInt(
-            localStorage.getItem(`subpos_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
-          );
-          jaConcluido = posicaoAntes < subposConcluida;
-          decidido = true;
+          // Volta em andamento neste nível. Se houver um nível mais interno
+          // ainda por checar (ex: "setena x7" contendo "contas pequenas
+          // x7"), NÃO decide aqui — deixa o próximo laço checar o contador
+          // de voltas do nível interno, que é mais preciso (foi ele que o
+          // usuário marcou manualmente, por exemplo).
+          if(ehNivelMaisInterno){
+            // Último nível da cadeia para ESTE item (ex: uma linha fixa
+            // como "Coroa das lágrimas (pai)", que não é ela mesma um
+            // bloco repetido). Antes de usar a posição salva (subpos),
+            // verifica se existe um bloco repetido ANINHADO dentro desta
+            // mesma volta que já tenha pelo menos uma volta própria
+            // concluída (contas > 0). Se sim, isso implica que o conteúdo
+            // fixo desta volta — que sempre vem ANTES do aninhado na
+            // ordem de leitura — já foi necessariamente falado, mesmo que
+            // o subpos ainda não saiba disso (ex: quando o progresso foi
+            // marcado manualmente pelas contas, em vez de pela fala real).
+            const avancouEmNivelAninhado = Array.from(
+              rep.blocoEl.querySelectorAll('.bloco-ref[data-secao-idx]')
+            ).some(blocoAninhado => {
+              const idxAninhado = parseInt(blocoAninhado.dataset.secaoIdx, 10);
+              if(Number.isNaN(idxAninhado)) return false;
+              const contasAninhadas = parseInt(
+                localStorage.getItem(`contas_${oracaoAtualId}_${idxAninhado}`) || '0', 10
+              );
+              return contasAninhadas > 0;
+            });
+
+            if(avancouEmNivelAninhado){
+              jaConcluido = true;
+            }else{
+              const subposConcluida = parseInt(
+                localStorage.getItem(`subpos_${oracaoAtualId}_${secaoIdxBloco}`) || '0', 10
+              );
+              jaConcluido = posicaoAntes < subposConcluida;
+            }
+            decidido = true;
+          }
         }
         // rep.contaIdx > contasConcluidas + 1: estado inesperado — não
         // decide aqui, mantém jaConcluido=false (trata como pendente).
       }
     }
+
 
     if(!jaConcluido) return i;
   }

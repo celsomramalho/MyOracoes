@@ -59,16 +59,24 @@ function criarContextoProgresso(oracaoId){
 }
 
 // Remove do localStorage todas as chaves de contagem de contas/terço
-// ("contas_<id>_<secao>") pertencentes a um id específico. Usado tanto para
-// reiniciar o progresso real de uma oração (usuário) quanto para limpar o
-// "lixo" acumulado sob o id de preview isolado a cada nova sessão de teste
-// (admin) — hoje eram dois laços idênticos escrevendo a mesma coisa duas
-// vezes (limparProgressoLeitura em render-tree.js e limparContasPreview em
-// admin.html).
+// ("contas_<id>_<secao>") E de posição-dentro-da-volta ("subpos_<id>_<secao>")
+// pertencentes a um id específico. Usado tanto para reiniciar o progresso
+// real de uma oração (usuário) quanto para limpar o "lixo" acumulado sob o
+// id de preview isolado a cada nova sessão de teste (admin) — hoje eram dois
+// laços idênticos escrevendo a mesma coisa duas vezes (limparProgressoLeitura
+// em render-tree.js e limparContasPreview em admin.html).
+//
+// IMPORTANTE: "subpos_" precisa ser limpo junto com "contas_". Ele guarda a
+// posição exata dentro da volta em andamento (usada por calcularIndiceInicialFala
+// em js/speech.js para retomar depois de uma pausa). Se ficasse órfão de uma
+// sessão anterior, um valor antigo poderia "vazar" para uma nova rodada de
+// progresso marcado manualmente e fazer a fala retomar num ponto errado.
 function limparContasDoId(id){
   for(let i = localStorage.length - 1; i >= 0; i--){
     const chave = localStorage.key(i);
-    if(chave && chave.startsWith(`contas_${id}_`)) localStorage.removeItem(chave);
+    if(chave && (chave.startsWith(`contas_${id}_`) || chave.startsWith(`subpos_${id}_`))){
+      localStorage.removeItem(chave);
+    }
   }
 }
 

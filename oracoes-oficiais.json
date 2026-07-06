@@ -50,7 +50,9 @@
   {
     "id": "oficial_mqv9bs4r",
     "titulo": "São José dormindo",
-    "texto": "V. São José dormindo, com o evangelho aprendemos que mais do que dormir, durante a noite, escutas-te a voz de Deus com a prontidão de praticá-la.\nHoje confiante em tua preciosa intercessão consagro-te as alegrias e as tristezas de cada dia. Consagro-te minha vida, minha casa, família e trabalho.\nAjuda-me a te imitar sendo uma pessoa de bem, vivendo o amor, o perdão e a verdade. Quero seguir o teu caminho de fé.\nAgora eu te peço São José dormindo sonha com este pedido junto de Deus. Intercede por mim alcançando-me esta graça (com confiança fazer seu pedido).\nComo és padroeiro da Igreja, com o auxílio do Espírito Santo assumo diante de ti o voto de não faltar à missa dominical, rezar todos os dias com a Bíblia, confessar-me regularmente e viver como um bom cristão. \nR. Amém"
+    "texto": "V. São José dormindo, com o evangelho aprendemos que mais do que dormir, durante a noite, escutas-te a voz de Deus com a prontidão de praticá-la.\nHoje confiante em tua preciosa intercessão consagro-te as alegrias e as tristezas de cada dia. Consagro-te minha vida, minha casa, família e trabalho.\nAjuda-me a te imitar sendo uma pessoa de bem, vivendo o amor, o perdão e a verdade. Quero seguir o teu caminho de fé.\nAgora eu te peço São José dormindo sonha com este pedido junto de Deus. Intercede por mim alcançando-me esta graça\n[seu pedido|oficial_mr9c3zpa]{opcional}\n[pausa]{3}\nComo és padroeiro da Igreja, com o auxílio do Espírito Santo assumo diante de ti o voto de não faltar à missa dominical, rezar todos os dias com a Bíblia, confessar-me regularmente e viver como um bom cristão. \nR. Amém",
+    "oculta": false,
+    "colapsarNaFala": false
   },
   {
     "id": "oficial_mqv9fuo3",
@@ -79,7 +81,7 @@
   },
   {
     "id": "oficial_mqva6v5p",
-    "titulo": "Coroa das lágrimas (contas pequenas)",
+    "titulo": "Coroa das lágrimas (ave)",
     "texto": "V. Meu Jesus, ouvi os nossos rogos\nR. pelas Lágrimas de Vossa Mãe Santíssima.",
     "oculta": true,
     "colapsarNaFala": false
@@ -107,15 +109,15 @@
   },
   {
     "id": "oficial_mr0sp1pa",
-    "titulo": "Terço da Sagrada Face (dezena)",
-    "texto": "V. Por tudo quanto sofrestes por nossa salvação, \nR. ponde fim à nossa mágoa! Alívio à nossa aflição!\n[Terço da Sagrada Face (contas)]{10}\nV. Face de Jesus, \nR. suavizai a nossa Cruz!",
+    "titulo": "Terço da Sagrada Face (pai)",
+    "texto": "V. Por tudo quanto sofrestes por nossa salvação, \nR. ponde fim à nossa mágoa! Alívio à nossa aflição!\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mr0sugzb",
     "titulo": "Terço da Sagrada Face",
-    "texto": "[Sinal da cruz]\n\nOferecimento:\nÓ Sagrada Face adorável do Divino Redentor, Espelho de sofrimento, emblema santo de dor, Pelos tormentos atrozes sofridos em Vossa Cruz, Aceitai nossas torturas, para consolar-Vos, Jesus.\n\n[Credo (Símbolo dos Apóstolos)]\n\nV. Por tudo quanto sofrestes por nossa salvação, \nR. ponde fim à nossa mágoa! Alívio à nossa aflição!\nV. Sagrada Face do Senhor, Inflamai-nos Vosso Amor! {3}\nV. Face de Jesus, \nR. suavizai a nossa Cruz!\n\n[Terço da Sagrada Face (dezena)]{5}\n\nConsagração:\nÓ meu bom Jesus, que quiseres salvar o mundo de hoje com aquele infinito amor com que foi criado e redimido, incluí-me também entre aqueles que querem trabalhar pelo triunfo de Vosso reino de amor na terra.\nRecebei, para este fim, a total entrega de todo o meu ser. Disponde de mim. Quero difundir a imagem de Vossa Divina Face, para que em todas as almas Vossa imagem se renove. Jesus, operai milagres de conversão. Chamai apóstolos para esta nova era, que por sua vez se encarreguem dessa nova missão. Que as ondas de Vosso misericordioso amor se espalhem sobre o mundo inteiro e, afundando e destruindo os males, renovem a terra e façam com que os homens, ao sentir seus corações tomados de caridade, voltem a viver o Santo Evangelho à luz deste sol que é a Vossa Face.\n[pausa]{2}\n[Terço Sagrada Face (ladainha)]\n\n",
+    "texto": "[Sinal da cruz]\n\nOferecimento:\nÓ Sagrada Face adorável do Divino Redentor, Espelho de sofrimento, emblema santo de dor, Pelos tormentos atrozes sofridos em Vossa Cruz, Aceitai nossas torturas, para consolar-Vos, Jesus.\n\n[Credo (Símbolo dos Apóstolos)]\n\n[Terço da Sagrada Face (pai)|oficial_mr0sp1pa]\n[Terço da Sagrada Face (ave)|oficial_mr0zd26q]{3}\n[Terço da Sagrada Face (gloria)|oficial_mr9cwpru]\n\nNo primeiro mistério contemplamos a agonia de Nosso Senhor Jesus Cristo no monte das oliveiras onde suou sangue percorrendo por toda a terra na extrema angustia.\n[Terço da Sagrada Face (dezena)|oficial_mr9cy94s]\n\nNo segundo mistério contemplamos a dura flagelação de Nosso Senhor Jesus Cristo atado à coluna.\n[Terço da Sagrada Face (dezena)|oficial_mr9cy94s]\n\nNo terceiro mistério contemplamos a coroação de espinho de Nosso Senhor Jesus Cristo.\n[Terço da Sagrada Face (dezena)|oficial_mr9cy94s]\n\nNo quarto mistério contemplamos Nosso Senhor Jesus Cristo carregado a pesada Cruz rumo ao calvário, pedimos pelos méritos das Santas Chagas do ombro de Nosso Senhor Jesus Cristo.\n[Terço da Sagrada Face (dezena)|oficial_mr9cy94s]\n\nNo quinto mistério contemplamos a crucificação e morte de Nosso Senhor Jesus Cristo.\n[Terço da Sagrada Face (dezena)|oficial_mr9cy94s]\n[pausa]{2}\n\nConsagração:\nÓ meu bom Jesus, que quiseres salvar o mundo de hoje com aquele infinito amor com que foi criado e redimido, incluí-me também entre aqueles que querem trabalhar pelo triunfo de Vosso reino de amor na terra.\nRecebei, para este fim, a total entrega de todo o meu ser. Disponde de mim. Quero difundir a imagem de Vossa Divina Face, para que em todas as almas Vossa imagem se renove. Jesus, operai milagres de conversão. Chamai apóstolos para esta nova era, que por sua vez se encarreguem dessa nova missão. Que as ondas de Vosso misericordioso amor se espalhem sobre o mundo inteiro e, afundando e destruindo os males, renovem a terra e façam com que os homens, ao sentir seus corações tomados de caridade, voltem a viver o Santo Evangelho à luz deste sol que é a Vossa Face.\n[pausa]{2}\n[Terço Sagrada Face (ladainha)]\n\n",
     "oculta": false,
     "colapsarNaFala": false
   },
@@ -128,7 +130,7 @@
   },
   {
     "id": "oficial_mr0zd26q",
-    "titulo": "Terço da Sagrada Face (contas)",
+    "titulo": "Terço da Sagrada Face (ave)",
     "texto": "V. Sagrada Face do Senhor, \nR. Aliviai a nossa dor!",
     "oculta": true,
     "colapsarNaFala": false
@@ -177,7 +179,7 @@
   },
   {
     "id": "oficial_mr3x3u53",
-    "titulo": "Coroa das lágrimas (contas grandes)",
+    "titulo": "Coroa das lágrimas (pai)",
     "texto": "V. Vêde, ó Jesus, que são as lágrimas dAquela que mais Vos amou na Terra,\nR. e que mais Vos ama no Céu.",
     "oculta": true,
     "colapsarNaFala": false
@@ -193,6 +195,48 @@
     "id": "oficial_mr97jmdw",
     "titulo": "Exorcismo de São Bento (pequeno)",
     "texto": "V. A Cruz Sagrada seja a minha luz,\nR. A Cruz Sagrada seja a minha luz,\nV. Não seja o dragão o meu guia.\nR. Não seja o dragão o meu guia.\nV. Retira-te, Satanás!\n[pausa]{1}\nR. Retira-te, Satanás!\n[pausa]{1}\nV. Nunca me aconselhes coisas vãs.\nR. Nunca me aconselhes coisas vãs.\nV. É mau o que tu me ofereces,\nR. É mau o que tu me ofereces,\nV. Bebe tu mesmo o teu veneno.\nR. Bebe tu mesmo o teu veneno.",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr9c3zpa",
+    "titulo": "fazer seu pedido",
+    "texto": "com confiança fazer seu pedido",
+    "oculta": true,
+    "colapsarNaFala": true
+  },
+  {
+    "id": "oficial_mr9cwpru",
+    "titulo": "Terço da Sagrada Face (gloria)",
+    "texto": "V. Face de Jesus, \nR. suavizai a nossa Cruz!",
+    "oculta": true,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr9cy94s",
+    "titulo": "Terço da Sagrada Face (dezena)",
+    "texto": "[Terço da Sagrada Face (pai)|oficial_mr0sp1pa]\n[Terço da Sagrada Face (ave)|oficial_mr0zd26q]{10}\n[Terço da Sagrada Face (gloria)|oficial_mr9cwpru]\n",
+    "oculta": true,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr9jahah",
+    "titulo": "Terço de São Miguel Arcanjo (ou Coroa Angélica)",
+    "texto": "[Sinal da cruz|oficial_mr0skuf2]\nV. Deus, vinde em nosso auxílio\nR. Senhor, socorrei-nos e salvai-nos.\n[pausa]{2}\nPrimeira saudação\nPela intercessão de São Miguel e do coro celeste dos Serafins, fazei-nos Senhor dignos de sermos inflamados por uma perfeita caridade.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[pausa]{2}\nSegunda saudação\nPela intercessão de São Miguel e do coro celeste dos Querubins, concedei-nos Senhor, a graça de abandonarmos a estrada do pecado e trilharmos a estrada da perfeição cristã.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[pausa]{2}\nTerceira saudação\nPela intercessão de São Miguel e do coro celeste dos Tronos, derramai Senhor em nossos corações o espírito de uma verdadeira e sincera humildade.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[pausa]{2}\nQuarta saudação\nPela intercessão de São Miguel e do coro celeste das Dominações, dai-nos Senhor a graça de podermos dominar os nossos sentidos e corrigir as nossas más paixões.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[pausa]{2}\nQuinta saudação\nPela intercessão de São Miguel e do coro celeste das Potestades, guardai-nos Senhor as nossas almas, das emboscadas e tentações do demônio.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[pausa]{2}\nSexta saudação\nPela intercessão de São Miguel e do coro celeste das Virtudes Celestes, concedei-nos Senhor a graça de não sermos vencidos no combate perigoso das tentações mas livrai-nos do mal.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[pausa]{2}\nSétima saudação\nPela intercessão de São Miguel e do coro celeste dos Principados, enchei Senhor, nossas almas, com o espírito de uma verdadeira e sincera obediência.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[pausa]{2}\nOitava saudação\nPela intercessão de São Miguel e do coro celeste dos Arcanjos, concedei-nos Senhor que estes espíritos bem aventurados nos guardem durante essa vida mortal, para nos conduzirem depois à glória eterna do céu.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[pausa]{2}\nNona saudação\nPela intercessão de São Miguel e do coro celeste dos Anjos, concedei-nos Senhor o dom da perseverança na fé e nas boas obras para podermos chegar à glória do Paraiso.\nR. Amém.\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\nUm Pai Nosso em honra a São Miguel\n[Pai Nosso|oficial_pai_nosso]\nUm Pai Nosso em honra a São Gabriel\n[Pai Nosso|oficial_pai_nosso]\nUm Pai Nosso em honra a São Rafael\n[Pai Nosso|oficial_pai_nosso]\nUm Pai Nosso em honra ao nosso Anjo da Guarda\n[Pai Nosso|oficial_pai_nosso]\nRezemos a antífona:\nÓ Gloriosíssimo São Miguel, chefe e príncipe das milícias celestes, guarda fiel das almas, vencedor dos demônios, favorito da casa de Deus, Vós que acima de todos os anjos sois admirável protetor nosso, dotado de sobre-humana e excelência virtude, dignai-vos livrar-nos de todos os males, já que a vós recorremos com toda confiança e alcançai-nos com a vossa incomparável proteção, que avancemos cada dia na fidelidade em servir a Deus.\nRogai por nós, ó bem aventurado São Miguel, príncipe da Igreja de Jesus Cristo, para que sejamos dignos de suas promessas.\nV. Oremos.\nDeus todo poderoso e eterno. Que por um prodígio de bondade e misericórdia, para a salvação comum dos homens, escolhestes para defensor da Vossa Igreja, o glorioso Arcanjo São Miguel, fazei nós vos suplicamos que sejamos dignos de ser libertados pela sua benéfica proteção de todos os nossos inimigos e que nenhum deles nos possa inquietar na hora da nossa morte e que nos seja concedido ser por ele conduzidos à presença da Vossa Excelsa e Divina Majestade.\nPelos méritos de Jesus Cristo Nosso Senhor.\nR. Amém.\nEm nome do Pai, do Filho e do Espírito Santo.\nR. Amém.\n",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr9onqxi",
+    "titulo": "Consagração ao Imaculado Coração de Maria",
+    "texto": "Ó coração imaculado da virgem puríssima maria, nossa mãe, eu, pobre pecador, encerro o meu coração fraco, manchado pelos pecados, em vós! Acolhei-me para sempre, segurai-me firmemente e nunca mais me largueis do vosso poder amoroso, para que eu seja protegido de mim mesmo e aconchegado na vossa misericórdia.\nConsagro-vos toda a minha vida e a minha morte, todos os meus pensamentos, palavras e atos.\nQuero amar como vós amais. quero oferecer como vós ofereceis. quero silenciar como vós silenciais. \nQuero perdoar como vós perdoais. E quero ser assim como vós quereis que eu seja, a fim de que possais guiar-me até ao meu senhor e meu deus, ao seu coração amoroso, que é a meta e a felicidade de todos nós. \nE também a vós, santos e grandes anjos, peço que vos lembreis desta minha consagração a maria, que me admoesteis, me advirtais, me guieis e nunca mais me deixeis cair. \nSanto e fiel anjo da guarda todos vós, auxiliadores e irmãos celestes, acolhei-me como um grão de semente que é confiado à vossa custódia. \nE que, cuidado por vós, há de dar fruto para a eternidade. \nR. Amém.\n",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mr9ot8x6",
+    "titulo": "Couraça de São Patrício",
+    "texto": "Hoje me levanto com poderosa força e invoco à Santíssima Trindade com Trinitária fé professando a unidade do Criador e da criatura.\nHoje me levanto com a força do nascimento de Cristo, com a graça do seu batismo, com a força de sua crucificação e morte, com a força de sua ressurreição e ascensão, com a força de seu retorno no dia do juízo.\nHoje me levanto com a força do amor do Querubim, obediente aos anjos, a serviço dos arcanjos, na esperança da ressurreição para encontrar consolo com as orações dos patriarcas, as predições dos profetas, os ensinamentos dos apóstolos, a fé dos confessores, a inocência das santas virgens, os feitos dos homens de bem.\nHoje me levanto com a força dos céus: a luz do sol, o brilho da lua, o esplendor do fogo, a velocidade do trovão, a rapidez do vento, a profundidade dos mares, a permanência da terra, a firmeza da rocha.\nHoje me levanto com a força de Deus que me guia: sua grandeza que me apoia, sua sabedoria que me guia, seu olho que me cuida, seu ouvido que me escuta, sua palavra que me fala, sua mão que me defende, seu caminho para segui-lo, seu escudo para proteger-me, sua Eucaristia para livrar-me das armadilhas do demônio, da tentação dos vícios, daqueles que me desejam o mal, longe ou perto, só ou acompanhado.\nInvoco hoje estes poderes para que se levantem entre mim e estes males, contra todos e cruéis infames poderes que desejam o mal, para meu corpo, contra as invocações dos falsos profetas, contra as nefastas leis da pagania, contra as falsas leis da heresia, contra as artes da idolatria, contra os feitiços das bruxas, quiromantes e feiticeiros, contra todo conhecimento que corrompe o corpo e a alma.\nCristo que me protege hoje contra o veneno, contra o fogo, contra morrer afogado, contra ser ferido, para que assim venha a mim abundante consolo.\n\nCristo comigo,\nCristo à minha frente,\nCristo atrás de mim,\nCristo em mim,\nCristo abaixo de mim,\nCristo sobre mim,\nCristo à minha direita,\nCristo à minha esquerda,\nCristo quando me deito,\nCristo quando me sento,\nCristo quando me levanto,\nCristo no coração de todo homem que pensa em mim,\nCristo na boca de quem fale de mim,\nCristo em todo olho que me vê,\nCristo em todo ouvido que me ouve.\n\nHoje me levanto com poderosa força e invoco à Santíssima Trindade com trinitária fé professando a unidade do Criador e da criatura. \nR. Amém.",
     "oculta": false,
     "colapsarNaFala": false
   }
