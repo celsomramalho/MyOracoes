@@ -5,6 +5,11 @@
 // ao pausar/parar, pra não deixar a tela sempre acesa à toa gastando bateria.
 let wakeLockAtivo = null;
 
+// Ver alternarFala() mais abaixo: evita que um segundo toque no botão de
+// fala, feito enquanto o primeiro ainda está preparando (aguardando vozes
+// do navegador), inicie uma segunda cadeia de fala em paralelo.
+let iniciandoFala = false;
+
 async function ativarWakeLock(){
   if(!('wakeLock' in navigator)) return; // navegador sem suporte (ex: iOS antigo) — segue sem travar nada
   try{
@@ -259,8 +264,25 @@ async function alternarFala(){
     return;
   }
 
+  // Proteção contra "duplo toque": iniciarFala() é assíncrona (espera as vozes
+  // do navegador ficarem disponíveis antes de marcar `falando = true`). Se o
+  // usuário tocar no botão de novo durante essa pequena espera, `falando`
+  // ainda está false e um SEGUNDO iniciarFala() começaria em paralelo com o
+  // primeiro — duas cadeias de fala simultâneas disputando a mesma fila
+  // (`indiceFalaAtual`/`filaFala`), cada uma avançando e marcando progresso
+  // no onend da outra. Resultado: quase nada é ouvido (as falas se cancelam
+  // uma à outra) e a oração inteira é marcada como lida em poucos segundos.
+  // `iniciandoFala` fecha essa janela: enquanto o primeiro toque ainda está
+  // preparando tudo, toques extras são ignorados.
+  if(iniciandoFala) return;
+
   if(!falando){
-    await iniciarFala();
+    iniciandoFala = true;
+    try{
+      await iniciarFala();
+    }finally{
+      iniciandoFala = false;
+    }
   }else if(pausado){
     continuarFala();
   }else{
