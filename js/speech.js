@@ -797,6 +797,33 @@ function falarPausa(item){
   }, item.segundos * 1000);
 }
 
+// Verifica se a oração inteira já está concluída — usando o MESMO critério
+// que decide se a fala já terminou (calcularIndiceInicialFala retornando
+// null: todo secaoIdx marcado e todo bloco repetido com as contas em dia).
+// Se sim, marca "rezada hoje", exatamente como acontece ao ouvir a oração
+// inteira por voz até o fim. Sem isso, marcar manualmente cada check (sem
+// nunca dar play) nunca disparava esse marco, mesmo com a oração 100%
+// concluída — só a fala natural fazia isso.
+function verificarConclusaoTotalEMarcarRezada(oracaoId){
+  if(!oracaoId || oracaoId !== oracaoAtualId) return;
+  if(rezadasDiarias[oracaoId]) return; // já marcada hoje, nada a fazer
+
+  const fila = obterLinhasParaFalar();
+  if(!fila.length) return;
+  if(calcularIndiceInicialFala(fila) !== null) return; // ainda falta algo
+
+  const hoje = obterDataLocalHoje();
+  const d = new Date();
+  const hora = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  rezadasDiarias[oracaoId] = `${hora}:${min}`;
+  salvarRezadasDiarias({ data: hoje, ids: rezadasDiarias });
+  atualizarBotaoMarcarRezada();
+  renderizarTudo();
+  atualizarProgressoDiario();
+  mostrarToast('Oração concluída e marcada como rezada!', 'sucesso');
+}
+
 function pararFala(){
   falando = false;
   pausado = false;

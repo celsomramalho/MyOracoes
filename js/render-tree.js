@@ -659,6 +659,12 @@ function marcarSecao(oracaoId, idx){
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
   }
+  // Se essa marcação completou a oração inteira (mesmo critério usado pela
+  // fala para saber que terminou), marca "rezada hoje" também — ver
+  // verificarConclusaoTotalEMarcarRezada em js/speech.js.
+  if(typeof verificarConclusaoTotalEMarcarRezada === 'function'){
+    verificarConclusaoTotalEMarcarRezada(oracaoId);
+  }
 }
 
 function desmarcarSecao(oracaoId, idx){
