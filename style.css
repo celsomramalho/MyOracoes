@@ -916,11 +916,20 @@ html,body{
   background: var(--texto-suave);
   transition: transform 0.2s, background 0.2s;
 }
-.bloco-opcional.aberto .bloco-opcional-switch{
+/* Escopo com ">" pro título direto (não ".titulo" solta) — do mesmo jeito
+   que já era feito pra ".bloco-opcional-conteudo" logo abaixo. Sem o ">",
+   este seletor casava com QUALQUER interruptor descendente, inclusive o de
+   uma leitura opcional aninhada dentro de outra (ex: os 2 interruptores de
+   meditação dentro de um mistério do Santo Rosário): assim que o mistério
+   de fora abria, os dois pareciam "ligados e travados" na tela mesmo
+   estando de fato desligados (e respondendo certo por baixo dos panos) —
+   só o CSS que mentia visualmente por cima do estado real.
+*/
+.bloco-opcional.aberto > .bloco-opcional-titulo .bloco-opcional-switch{
   background: var(--opcional);
   border-color: var(--opcional);
 }
-.bloco-opcional.aberto .bloco-opcional-switch::after{
+.bloco-opcional.aberto > .bloco-opcional-titulo .bloco-opcional-switch::after{
   transform: translateX(14px);
   background: var(--bg-alto);
 }

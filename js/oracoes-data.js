@@ -74,40 +74,74 @@ function importarOracoesDeArquivo(){
         return;
       }
 
-      let importadas = 0;
-      const bloqueadas = [];
+      // Primeira passada: separa em 3 grupos antes de tocar em qualquer coisa.
+      // "mesmoId" = já existe uma oração pessoal com este id (candidata a
+      // atualização, não duplicata de verdade — provavelmente é a mesma
+      // oração, exportada de novo depois de editada).
+      const novas = [];
+      const mesmoId = []; // { existente, novo }
+      const bloqueadasTitulo = [];
 
       lista.forEach(o => {
         if(!o.titulo || typeof o.titulo !== 'string') return;
         const nomeLower = o.titulo.trim().toLowerCase();
 
+        const existentePorId = o.id ? ORACOES.find(x => x.id === o.id) : null;
+        if(existentePorId){
+          mesmoId.push({ existente: existentePorId, novo: o });
+          return;
+        }
+
         const duplicadaPessoal = ORACOES.find(x => x.titulo.trim().toLowerCase() === nomeLower);
         const duplicadaOficial = ORACOES_OFICIAIS.find(x => x.titulo.trim().toLowerCase() === nomeLower);
 
         if(duplicadaPessoal || duplicadaOficial){
-          bloqueadas.push(o.titulo);
+          bloqueadasTitulo.push(o.titulo);
           return;
         }
 
+        novas.push(o);
+      });
+
+      // Um único confirm pra todo o grupo "mesmoId" (não um por oração).
+      let atualizadas = 0;
+      let ignoradasPorId = 0;
+      if(mesmoId.length > 0){
+        const sobrescrever = confirm(
+          `${mesmoId.length} oração(ões) do arquivo já existe(m) no seu app (mesmo identificador). Substituir pela versão do arquivo?`
+        );
+        if(sobrescrever){
+          mesmoId.forEach(({ existente, novo }) => {
+            // Preserva o favorita atual — a pessoa já decidiu isso localmente.
+            existente.titulo = novo.titulo.trim();
+            existente.texto = novo.texto || '';
+          });
+          atualizadas = mesmoId.length;
+        }else{
+          ignoradasPorId = mesmoId.length;
+        }
+      }
+
+      novas.forEach(o => {
         ORACOES.push({
-          id: gerarId(),
+          id: o.id || gerarId(),
           titulo: o.titulo.trim(),
           texto: o.texto || '',
-          favorita: !!o.favorita
+          favorita: true
         });
-        importadas++;
       });
 
       salvarOracoes(ORACOES);
       renderizarTudo();
 
-      let msg = '';
-      if(importadas > 0) msg += `${importadas} oração(ões) importada(s) com sucesso!`;
-      if(bloqueadas.length > 0){
-        msg += `${msg ? '\n' : ''}${bloqueadas.length} bloqueada(s) por título já existente: "${bloqueadas.join('", "')}"`;
-      }
-      if(!msg) msg = 'Nenhuma oração nova encontrada no arquivo.';
-      mostrarToast(msg, importadas > 0 ? 'sucesso' : '');
+      const partes = [];
+      if(novas.length > 0) partes.push(`${novas.length} nova(s)`);
+      if(atualizadas > 0) partes.push(`${atualizadas} atualizada(s)`);
+      if(bloqueadasTitulo.length > 0) partes.push(`${bloqueadasTitulo.length} bloqueada(s) por título já existente: "${bloqueadasTitulo.join('", "')}"`);
+      if(ignoradasPorId > 0) partes.push(`${ignoradasPorId} ignorada(s) (já existiam)`);
+
+      const msg = partes.length > 0 ? partes.join('\n') : 'Nenhuma oração nova encontrada no arquivo.';
+      mostrarToast(msg, (novas.length > 0 || atualizadas > 0) ? 'sucesso' : '');
 
     }catch(e){
       mostrarToast('Erro ao ler o arquivo. Certifique-se de que é um JSON válido.');
@@ -150,7 +184,10 @@ function compartilharOracao(id){
 
   try{
     // Codificação segura para UTF-8 (suporta acentos do português)
-    const dadosStr = JSON.stringify({ titulo: o.titulo, texto: o.texto });
+    // Leva o id junto: é o que permite reconhecer, do outro lado, que uma
+    // reimportação é "a mesma oração" (ex: o autor corrigiu o texto e
+    // reenviou o link) em vez de tratar como duplicata por título.
+    const dadosStr = JSON.stringify({ id: o.id, titulo: o.titulo, texto: o.texto });
     const base64 = btoa(unescape(encodeURIComponent(dadosStr)));
     const link = `${window.location.origin}${window.location.pathname}?importar=${base64}`;
 
@@ -205,17 +242,34 @@ function verificarLinkImportacao(){
       return;
     }
 
-    exibirModalImportacaoLink(dados.titulo, dados.texto || '');
+    // dados.id pode não existir em links gerados antes desta versão —
+    // nesse caso cai no fluxo normal de "oração nova" (sem checagem por id).
+    exibirModalImportacaoLink(dados.id || null, dados.titulo, dados.texto || '');
   }catch(e){
     mostrarToast('Não foi possível ler os dados do link de compartilhamento.');
   }
 }
 
-function exibirModalImportacaoLink(titulo, texto){
+function exibirModalImportacaoLink(id, titulo, texto){
   const modal = document.getElementById('modal-importar-link');
   if(!modal) return;
 
+  const existente = id ? ORACOES.find(o => o.id === id) : null;
+
   document.getElementById('importar-link-titulo').textContent = `"${titulo}"`;
+
+  if(existente){
+    document.getElementById('importar-link-emoji-titulo').textContent = '🔄 Oração já importada';
+    document.getElementById('importar-link-intro').textContent = 'Você já tem esta oração nas suas orações pessoais:';
+    document.getElementById('importar-link-pergunta').textContent = 'Importar assim mesmo e atualizar com esta versão?';
+    document.getElementById('btn-importar-link-sim').textContent = 'Sim, atualizar';
+  }else{
+    document.getElementById('importar-link-emoji-titulo').textContent = '🎁 Oração compartilhada';
+    document.getElementById('importar-link-intro').textContent = 'Alguém compartilhou uma oração com você:';
+    document.getElementById('importar-link-pergunta').textContent = 'Deseja adicioná-la às suas orações pessoais?';
+    document.getElementById('btn-importar-link-sim').textContent = 'Sim, adicionar';
+  }
+
   modal.classList.remove('hidden');
 
   // Remove listeners antigos para evitar duplicação
@@ -228,12 +282,25 @@ function exibirModalImportacaoLink(titulo, texto){
 
   novoSim.addEventListener('click', () => {
     modal.classList.add('hidden');
-    importarUmaOracao(titulo, texto);
+    importarUmaOracao(id, titulo, texto);
   });
   novoNao.addEventListener('click', () => modal.classList.add('hidden'));
 }
 
-function importarUmaOracao(titulo, texto){
+function importarUmaOracao(id, titulo, texto){
+  const existentePorId = id ? ORACOES.find(o => o.id === id) : null;
+
+  if(existentePorId){
+    // Mesma oração de antes (mesmo id) — atualiza no lugar, preservando o
+    // favorita que a pessoa já tinha decidido localmente.
+    existentePorId.titulo = titulo.trim();
+    existentePorId.texto = texto || '';
+    salvarOracoes(ORACOES);
+    renderizarTudo();
+    mostrarToast(`Oração "${titulo}" atualizada!`, 'sucesso');
+    return;
+  }
+
   const nomeLower = titulo.trim().toLowerCase();
   const duplicadaPessoal = ORACOES.find(o => o.titulo.trim().toLowerCase() === nomeLower);
   const duplicadaOficial = ORACOES_OFICIAIS.find(o => o.titulo.trim().toLowerCase() === nomeLower);
@@ -243,8 +310,10 @@ function importarUmaOracao(titulo, texto){
     return;
   }
 
-  ORACOES.push({ id: gerarId(), titulo: titulo.trim(), texto: texto || '', favorita: false });
+  // Mantém o id original do link (em vez de gerar um novo) — é o que
+  // permite reconhecer uma reimportação futura desta mesma oração.
+  ORACOES.push({ id: id || gerarId(), titulo: titulo.trim(), texto: texto || '', favorita: true });
   salvarOracoes(ORACOES);
   renderizarTudo();
-  mostrarToast(`Oração "${titulo}" adicionada às suas orações!`, 'sucesso');
+  mostrarToast(`Oração "${titulo}" adicionada às suas orações favoritas!`, 'sucesso');
 }

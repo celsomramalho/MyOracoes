@@ -158,7 +158,7 @@ function construirArvore(texto, titulosVisitados, estado){
           // Leitura opcional: começa sempre oculta e fora da fala; o usuário
           // decide, na hora, se quer abrir/ouvir (não é lembrado depois).
           const filhos = construirArvore(encontrada.texto, novosVisitados);
-          nos.push({ tipo: 'opcional', rotulo: encontrada.titulo, filhos });
+          nos.push({ tipo: 'opcional', rotulo: encontrada.titulo, refId: encontrada.id, filhos });
         }else if(quantidade > 1){
           const filhos = construirArvore(encontrada.texto, novosVisitados);
           nos.push({ tipo: 'repetido', rotulo: encontrada.titulo, quantidade, filhos, colapsarNaFala: !!encontrada.colapsarNaFala });
@@ -292,7 +292,7 @@ function agruparNos(nos){
   return grupos;
 }
 
-function renderizarNos(nos, container, ctx, ctxRepetidoAninhado){
+function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
   // ctxRepetidoAninhado: o ctx de progresso "real" mais próximo, propagado por
   // baixo de qualquer nível de repetição — serve só para dar identidade
   // própria (idx e entrada em elementos) a um bloco REPETIDO aninhado dentro
@@ -306,6 +306,20 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado){
   // e a fala automática interpretava a repetição inteira do nível de cima
   // como concluída assim que saía do primeiro filho para o repetido aninhado.
   if(ctxRepetidoAninhado === undefined) ctxRepetidoAninhado = ctx;
+
+  // oracaoIdAtual: o id da oração raiz sendo rezada, propagado para TODO
+  // nível de recursão — inclusive dentro de blocos "opcional", onde `ctx`
+  // vira null de propósito (para não ganharem check de progresso). Antes,
+  // qualquer leitura opcional aninhada dentro de OUTRA leitura opcional (ex:
+  // "1 mistério gozoso (meditado)" dentro de "Mistérios Dolorosos", no Santo
+  // Rosário) perdia o acesso ao id da oração junto com o ctx nulado, e por
+  // isso nunca conseguia olhar (nem gravar) sua preferência lembrada comum —
+  // sempre voltava fechada, ignorando o que o usuário tinha salvo. Mantendo
+  // oracaoIdAtual vivo independente do ctx de progresso, a preferência comum
+  // volta a funcionar normalmente pra essas leituras aninhadas, e continua
+  // sendo A MESMA preferência (uma só chave) não importa qual dos 4
+  // mistérios do dia esteja envolvendo-a no momento.
+  if(oracaoIdAtual === undefined) oracaoIdAtual = ctx && ctx.oracaoId;
 
   agruparNos(nos).forEach(g => {
     if(g.tipo === 'grupo-linhas'){
@@ -440,7 +454,7 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado){
         // Filhos diretos (linhas soltas) continuam sem checks próprios (null),
         // mas ctxProprio segue disponível como ctxRepetidoAninhado para caso
         // haja outro repetido mais interno ainda.
-        renderizarNos(g.filhos, divConteudo, null, ctxProprio);
+        renderizarNos(g.filhos, divConteudo, null, ctxProprio, oracaoIdAtual);
 
       }else{
         // Bloco simples (referência sem repetição): renderiza os filhos
@@ -451,7 +465,7 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado){
         // cabeçalho do bloco passa a marcar automaticamente tudo que está
         // dentro dele também.
         ctxProprio = ctx;
-        renderizarNos(g.filhos, divConteudo, ctx, ctxRepetidoAninhado);
+        renderizarNos(g.filhos, divConteudo, ctx, ctxRepetidoAninhado, oracaoIdAtual);
         idx = ctx ? ctx.n++ : -1;
       }
 
@@ -477,10 +491,45 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado){
 
     }else if(g.tipo === 'opcional'){
       // Leitura opcional: citação de outra oração, oculta e fora da fala por
-      // padrão. O usuário liga um interruptor para mostrar/ouvir na hora —
-      // essa escolha não é lembrada; ao reabrir a oração, volta a ficar oculta.
+      // padrão. O usuário liga um interruptor para mostrar/ouvir na hora.
+      // Essa escolha é lembrada automaticamente (por oração + rótulo da
+      // leitura) para a próxima vez que a oração for aberta — ver
+      // leiturasOpcionaisPreferidas em state.js.
+      //
+      // EXCEÇÃO — mistério do dia: se esta oração é "Santo Rosário" e este
+      // opcional é um dos 4 mistérios, ele não usa a preferência memorizada
+      // comum. Em vez disso vem ativo por padrão só se for o mistério
+      // tradicional do dia da semana; uma troca manual do usuário vale
+      // apenas para o dia corrente (ver misterioDiaOverride em state.js).
+      const tipoMisterio = oracaoIdAtual
+        ? obterTipoMisterioDoDiaSeAplicavel(oracaoIdAtual, g.refId)
+        : null;
+
+      let chavePreferencia = null;
+      let chaveOverrideMisterio = null;
+      let preferenciaSalva;
+
+      if(tipoMisterio){
+        const hoje = obterDataLocalHoje();
+        chaveOverrideMisterio = `${oracaoIdAtual}::${tipoMisterio}`;
+        const overrideValidoHoje = misterioDiaOverride && misterioDiaOverride.data === hoje
+          ? misterioDiaOverride.valores || {}
+          : {};
+
+        if(Object.prototype.hasOwnProperty.call(overrideValidoHoje, chaveOverrideMisterio)){
+          preferenciaSalva = overrideValidoHoje[chaveOverrideMisterio];
+        }else{
+          const tipoDeHoje = MISTERIO_DO_DIA_POR_DIA_SEMANA[new Date().getDay()];
+          preferenciaSalva = (tipoMisterio === tipoDeHoje);
+        }
+      }else{
+        chavePreferencia = oracaoIdAtual ? `${oracaoIdAtual}::${g.rotulo}` : null;
+        preferenciaSalva = chavePreferencia ? leiturasOpcionaisPreferidas[chavePreferencia] : undefined;
+      }
+
       const divBloco = document.createElement('div');
       divBloco.className = 'bloco-opcional';
+      if(preferenciaSalva === true) divBloco.classList.add('aberto');
 
       const divTitulo = document.createElement('div');
       divTitulo.className = 'bloco-opcional-titulo';
@@ -498,18 +547,43 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado){
       const switchEl = document.createElement('span');
       switchEl.className = 'bloco-opcional-switch';
       switchEl.setAttribute('role', 'switch');
-      switchEl.setAttribute('aria-checked', 'false');
+      switchEl.setAttribute('aria-checked', String(preferenciaSalva === true));
       divTitulo.appendChild(switchEl);
 
       const divConteudo = document.createElement('div');
       divConteudo.className = 'bloco-opcional-conteudo';
       // Conteúdo opcional não recebe checks de progresso (ctx: null) —
-      // não é obrigatório para considerar a oração concluída.
-      renderizarNos(g.filhos, divConteudo, null);
+      // não é obrigatório para considerar a oração concluída. Mas o id da
+      // oração (oracaoIdAtual) continua propagado, para que uma leitura
+      // opcional aninhada aqui dentro (ex: meditação de um mistério do
+      // Rosário) ainda consiga olhar sua própria preferência lembrada.
+      renderizarNos(g.filhos, divConteudo, null, undefined, oracaoIdAtual);
 
       divTitulo.addEventListener('click', () => {
         const ativo = divBloco.classList.toggle('aberto');
         switchEl.setAttribute('aria-checked', String(ativo));
+
+        if(chaveOverrideMisterio){
+          // Mistério do dia: a troca vale só para hoje. Se o override salvo
+          // for de um dia diferente, começa um objeto novo (descarta o
+          // antigo) antes de gravar a escolha de hoje.
+          const hoje = obterDataLocalHoje();
+          if(!misterioDiaOverride || misterioDiaOverride.data !== hoje){
+            misterioDiaOverride = { data: hoje, valores: {} };
+          }
+          misterioDiaOverride.valores[chaveOverrideMisterio] = ativo;
+          salvarMisterioDiaOverride();
+        }else if(chavePreferencia){
+          leiturasOpcionaisPreferidas[chavePreferencia] = ativo;
+          salvarLeiturasOpcionaisPreferidas();
+
+          if(localStorage.getItem(CHAVE_DICA_LEITURA_OPCIONAL_MOSTRADA) !== '1'){
+            localStorage.setItem(CHAVE_DICA_LEITURA_OPCIONAL_MOSTRADA, '1');
+            if(typeof mostrarToast === 'function'){
+              mostrarToast('Preferência salva — essa leitura vai continuar assim da próxima vez.');
+            }
+          }
+        }
       });
 
       divBloco.appendChild(divTitulo);
