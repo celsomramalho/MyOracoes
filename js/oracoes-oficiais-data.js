@@ -311,5 +311,33 @@ var ORACOES_OFICIAIS_DATA = [
     "texto": "No dia 13 de Janeiro de 1864, o Bem-aventurado Padre Luís-Eduardo Cestac foi subitamente atingido por um raio da luz divina. Ele viu demônios espalhados por toda a terra, causando uma imensa confusão. Ao mesmo tempo, ele teve uma visão da Virgem Maria. Nossa Senhora lhe revelou que realmente o poder dos demônios fora desencadeado em todo o mundo e que então, mais do que nunca, era necessário rezar à Rainha dos Anjos e pedir a ela que enviasse as legiões dos santos anjos para combater e derrotar os poderes do inferno.\n\n“Minha Mãe\", disse o padre, “vós sois tão bondosa, por que então não enviais por vós mesma estes anjos, sem que ninguém vos peça?\"\n\n“Não\", respondeu a Santíssima Virgem, “a oração é uma condição estabelecida pelo próprio Deus para a obter esta graça.\"\n\n“Então, Mãe santíssima – disse o sacerdote – ensinai-me como quereis que se vos peça!\"\n\nFoi então que o Bem-aventurado Luís-Eduardo Cestac recebeu a oração “Augusta Rainha dos céus\". “Meu primeiro dever – disse ele – era apresentar esta oração a Monsenhor La Croix, bispo de Bayonne, que se dignou a aprová-la. Cumprido este dever, fiz imprimir 500.000 cópias, e providenciei que fossem distribuídas em todos os lugares. (...) Não devemos esquecer que, da primeira vez que as imprimimos, a máquina impressora chegou a quebrar duas vezes\".\n\nEsta oração foi indulgenciada pelo Papa São Pio X no dia 8 de julho de 1908. Recomenda-se que seja aprendida de cor.",
     "oculta": true,
     "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mrdgwiha",
+    "titulo": "Terço Libertação Pe. Pio",
+    "texto": "[Credo (Símbolo dos Apóstolos)|oficial_mr0slyu2]\n[Pai Nosso|oficial_pai_nosso]\n[Ave Maria|oficial_ave_maria]{3}\n[Glória ao Pai|oficial_gloria]\nPrimeiro Mistério: Livrai-nos do orgulho e da soberba\n[Terço Libertação Pe. Pio (dezena)|oficial_mrdgxzfk]\n[pausa]{2}\nSegundo Mistério: Livrai-nos da luxuria e da impuraza\n[Terço Libertação Pe. Pio (dezena)|oficial_mrdgxzfk]\n[pausa]{2}\nTerceiro Mistério: Livrai-nos da mágoa e da falta de perdão\n[Terço Libertação Pe. Pio (dezena)|oficial_mrdgxzfk]\n[pausa]{2}\nQuarto Mistério: Livrai-nos da idolatria e da falsidade\n[Terço Libertação Pe. Pio (dezena)|oficial_mrdgxzfk]\n[pausa]{2}\nQuinto Mistério: Livrai-nos da ira e do ódio\n[Terço Libertação Pe. Pio (dezena)|oficial_mrdgxzfk]\n[pausa]{2}\n[Terço Libertação Pe. Pio (final)|oficial_mrdh0tcs]{3}\n\n",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mrdgxzfk",
+    "titulo": "Terço Libertação Pe. Pio (dezena)",
+    "texto": "V. É o coração de Jesus Cristo que lhe ordena satanás:\nR. deixe-nos em Paz\n[Terço Libertação Pe. Pio (ave)|oficial_mrdgzmrq]{10}\nV. Sangue de Cristo que lava e liberta, \nR. lavai-nos e libertai-nos de todo mal.",
+    "oculta": true,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mrdgzmrq",
+    "titulo": "Terço Libertação Pe. Pio (ave)",
+    "texto": "V. O Coração Eucarístico de Jesus,\nR. livrai-nos cada vez mais das insídias de satanás.",
+    "oculta": true,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_mrdh0tcs",
+    "titulo": "Terço Libertação Pe. Pio (final)",
+    "texto": "V. Jesus, manso e humilde de coração, fazei nosso coração semelhante ao vosso, \nR. e que eu vos ame cada vez mais.",
+    "oculta": true,
+    "colapsarNaFala": false
   }
 ];

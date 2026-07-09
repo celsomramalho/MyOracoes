@@ -214,7 +214,7 @@ const editorOracao = criarEditorOracao({
   listarReferencias(termo) {
     const pessoais = ORACOES.filter(o => o.id !== editandoId)
       .map(o => ({ ...o, _tipo: 'pessoal' }));
-    const oficiais = ORACOES_OFICIAIS.map(o => ({ ...o, _tipo: 'oficial' }));
+    const oficiais = ORACOES_OFICIAIS.filter(o => !o.oculta).map(o => ({ ...o, _tipo: 'oficial' }));
     let lista = [...pessoais, ...oficiais]
       .sort((a,b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
     const norm = normalizarBusca(termo || '');
