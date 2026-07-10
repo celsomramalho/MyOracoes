@@ -464,9 +464,16 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
         // marcarSecao() preenche tudo de 0 até o índice clicado, marcar o
         // cabeçalho do bloco passa a marcar automaticamente tudo que está
         // dentro dele também.
-        ctxProprio = ctx;
-        renderizarNos(g.filhos, divConteudo, ctx, ctxRepetidoAninhado, oracaoIdAtual);
-        idx = ctx ? ctx.n++ : -1;
+        //
+        // ATENÇÃO: quando este bloco está dentro de um bloco REPETIDO, ctx é null
+        // (o repetido pai passa ctx=null para seus filhos de propósito — linhas
+        // soltas não ganham check próprio). Mas um bloco SIMPLES aninhado dentro
+        // de um repetido ainda deve ganhar seu próprio check (ícone de círculo),
+        // pois tem conteúdo independente. Nesse caso, usamos ctxRepetidoAninhado
+        // como fallback para ctxProprio, garantindo idx e entrada em ctx.elementos.
+        ctxProprio = ctx || ctxRepetidoAninhado;
+        renderizarNos(g.filhos, divConteudo, ctxProprio, ctxRepetidoAninhado, oracaoIdAtual);
+        idx = ctxProprio ? ctxProprio.n++ : -1;
       }
 
       if(idx >= 0) divBloco.dataset.secaoIdx = idx;
@@ -478,15 +485,19 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
         ctxProprio.elementos.push({ idx, el: divBloco, btn });
       }
 
-      divTitulo.addEventListener('click', (e) => {
-        if(e.target.classList.contains('btn-check-secao')) return;
+      const divCabecalho = document.createElement('div');
+      divCabecalho.className = 'bloco-ref-cabecalho';
+      if(fileira) divCabecalho.appendChild(fileira);
+      divCabecalho.appendChild(divTitulo);
+
+      divCabecalho.addEventListener('click', (e) => {
+        if(e.target.closest('.btn-check-secao') || e.target.closest('.fileira-contas')) return;
         const aberto = divBloco.classList.toggle('aberto');
         icone.textContent = aberto ? '▾' : '▸';
       });
 
-      divBloco.appendChild(divTitulo);
+      divBloco.appendChild(divCabecalho);
       divBloco.appendChild(divConteudo);
-      if(fileira) divBloco.prepend(fileira);
       container.appendChild(divBloco);
 
     }else if(g.tipo === 'opcional'){
@@ -552,12 +563,15 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
 
       const divConteudo = document.createElement('div');
       divConteudo.className = 'bloco-opcional-conteudo';
-      // Conteúdo opcional não recebe checks de progresso (ctx: null) —
-      // não é obrigatório para considerar a oração concluída. Mas o id da
-      // oração (oracaoIdAtual) continua propagado, para que uma leitura
-      // opcional aninhada aqui dentro (ex: meditação de um mistério do
-      // Rosário) ainda consiga olhar sua própria preferência lembrada.
-      renderizarNos(g.filhos, divConteudo, null, undefined, oracaoIdAtual);
+      // Conteúdo opcional recebe o mesmo ctx do pai — assim as orações
+      // dentro de um bloco opcional (ex: Pai Nosso, Ave Maria, Glória dentro
+      // de um mistério do Rosário) ganham check buttons e têm o progresso
+      // rastreado normalmente. O bloco opcional em si não ganha check próprio
+      // (não é obrigatório para concluir a oração), mas seu conteúdo sim.
+      // oracaoIdAtual continua propagado para que leituras opcionais aninhadas
+      // (ex: meditação de mistério dentro de outro opcional) encontrem suas
+      // preferências salvas corretamente.
+      renderizarNos(g.filhos, divConteudo, ctx, ctxRepetidoAninhado, oracaoIdAtual);
 
       divTitulo.addEventListener('click', () => {
         const ativo = divBloco.classList.toggle('aberto');
@@ -782,6 +796,13 @@ function limparProgressoLeitura(){
   salvarProgressoLeitura();
 
   limparContasDoId(oracaoAtualId); // js/rezar-core.js
+
+  // Zera visualmente todas as contas (bolinhas) na DOM — limparContasDoId
+  // apaga só o localStorage, mas os elementos .conta-terco já renderizados
+  // precisam perder a classe 'concluida' para deixar de aparecer verdes.
+  document.querySelectorAll('#rezar-texto .conta-terco').forEach(c => {
+    c.classList.remove('concluida');
+  });
 
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoAtualId){
     atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
