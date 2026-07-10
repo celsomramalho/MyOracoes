@@ -733,11 +733,26 @@ function marcarSecao(oracaoId, idx){
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
     
-    // Auto-expande a PRÓXIMA seção ainda não rezada (comportamento de fala transposto para o clique manual)
-    const setAtualizado = new Set(progressoLeitura[oracaoId]);
-    const proximoItem = secaoCtxAtual.elementos.find(e => !setAtualizado.has(e.idx));
-    if (proximoItem && typeof expandirParaElemento === 'function') {
-      expandirParaElemento(proximoItem.el);
+    // Auto-expande a PRÓXIMA seção ainda não rezada ao marcar manualmente —
+    // mas NUNCA durante o modo de fala (quando falando=true), pois o motor
+    // de fala já gerencia a abertura dos acordeões por conta própria e uma
+    // segunda chamada a expandirParaElemento causaria conflito, fechando blocos
+    // que a fala está tentando exibir e disparando progressos fora de ordem.
+    const modoFalaAtivo = typeof falando !== 'undefined' && falando;
+    if (!modoFalaAtivo) {
+      const setAtualizado = new Set(progressoLeitura[oracaoId]);
+      const proximoItem = secaoCtxAtual.elementos.find(e => !setAtualizado.has(e.idx));
+      if (proximoItem && typeof expandirParaElemento === 'function') {
+        // expandirParaElemento abre apenas os ANCESTRAIS de el (sobe pelo parentElement).
+        // Se o próprio proximoItem.el é um bloco-ref (oração composta), ele não seria
+        // incluído nos ancestrais — precisamos passar um filho interno para que
+        // o bloco seja tratado como ancestral e aberto.
+        const elAlvo = proximoItem.el;
+        const elParaExpandir = elAlvo.classList && elAlvo.classList.contains('bloco-ref')
+          ? (elAlvo.querySelector('.bloco-ref-conteudo') || elAlvo)
+          : elAlvo;
+        expandirParaElemento(elParaExpandir);
+      }
     }
   }
   // Se essa marcação completou a oração inteira (mesmo critério usado pela
