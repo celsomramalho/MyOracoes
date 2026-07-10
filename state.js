@@ -7,8 +7,13 @@ const CHAVE_VOZES = 'minhas_oracoes_vozes_v1';
 const CHAVE_REZADAS_DIARIAMENTE = 'minhas_oracoes_rezadas_diarias_v1';
 const CHAVE_PROGRESSO_LEITURA = 'minhas_oracoes_progresso_leitura_v1';
 const CHAVE_VELOCIDADE = 'minhas_oracoes_velocidade_v1';
+const CHAVE_MODO_LEITURA = 'minhas_oracoes_modo_leitura_v1';
+const CHAVE_ZOOM_FONTE = 'minhas_oracoes_zoom_fonte_v1';
 const OPCOES_VELOCIDADE = [0.8, 1.0, 1.25, 1.5, 1.75, 2.0];
 let velocidadeAtual = parseFloat(localStorage.getItem(CHAVE_VELOCIDADE)) || 1.0;
+let modoLeituraAtivo = localStorage.getItem(CHAVE_MODO_LEITURA) === 'true';
+let zoomFonteRezar = parseFloat(localStorage.getItem(CHAVE_ZOOM_FONTE)) || 1.12;
+
 
 // ===================== PREFERÊNCIA DE LEITURA OPCIONAL =====================
 // Lembra se cada leitura opcional (identificada por oração + rótulo) deve

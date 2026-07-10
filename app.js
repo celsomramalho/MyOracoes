@@ -357,6 +357,10 @@ const telaRezarUsuario = criarTelaRezar({
     const viewRezar = document.getElementById('view-rezar');
     viewRezar.dataset.origem = origemRezar;
     viewRezar.dataset.tipo = oracaoAtualTipo;
+
+    // Aplica as preferências de Modo Leitura e Zoom salvas
+    aplicarModoLeitura();
+    aplicarZoomFonte();
   },
 
   mostrarTela(){
@@ -366,6 +370,40 @@ const telaRezarUsuario = criarTelaRezar({
 
 function abrirRezar(id, origem, tipo){
   telaRezarUsuario.abrir(id, origem, tipo);
+}
+
+function aplicarModoLeitura() {
+  const viewRezar = document.getElementById('view-rezar');
+  const btnClaro = document.getElementById('btn-ler-claro');
+  const btnEscuro = document.getElementById('btn-ler-escuro');
+  if (viewRezar) {
+    viewRezar.classList.toggle('modo-leitura-ativo', modoLeituraAtivo);
+  }
+  if (btnClaro && btnEscuro) {
+    btnClaro.classList.toggle('ativo', modoLeituraAtivo);
+    btnEscuro.classList.toggle('ativo', !modoLeituraAtivo);
+  }
+}
+
+function setModoLeitura(ativo) {
+  modoLeituraAtivo = ativo;
+  localStorage.setItem(CHAVE_MODO_LEITURA, modoLeituraAtivo.toString());
+  aplicarModoLeitura();
+}
+
+
+function aplicarZoomFonte() {
+  const container = document.getElementById('rezar-texto');
+  if (container) {
+    container.style.setProperty('--tamanho-fonte-rezar', `${zoomFonteRezar}rem`);
+  }
+}
+
+function alterarZoomFonte(delta) {
+  // Limites saudáveis de zoom (de 0.9rem até 2.8rem)
+  zoomFonteRezar = Math.min(2.8, Math.max(0.9, zoomFonteRezar + delta));
+  localStorage.setItem(CHAVE_ZOOM_FONTE, zoomFonteRezar.toString());
+  aplicarZoomFonte();
 }
 
 function atualizarEstrelaRezar(){
@@ -443,6 +481,7 @@ function alternarVelocidade(){
 // renderização em si para o núcleo compartilhado com o preview do admin
 // (js/rezar-core.js, Etapa 2 do PLANO-UNIFICACAO-TELA-REZAR.md).
 function renderizarTextoRezar(textoOriginal){
+
   const container = document.getElementById('rezar-texto');
   const ctx = criarContextoProgresso(oracaoAtualId);
   secaoCtxAtual = ctx;
@@ -507,7 +546,10 @@ document.getElementById('btn-favoritar-rezar').addEventListener('click', () => {
 });
 document.getElementById('btn-compartilhar-atual').addEventListener('click', () => compartilharOracao(oracaoAtualId));
 document.getElementById('btn-falar').addEventListener('click', alternarFala);
-document.getElementById('btn-ler').addEventListener('click', pararFala);
+document.getElementById('btn-ler-escuro').addEventListener('click', () => setModoLeitura(false));
+document.getElementById('btn-ler-claro').addEventListener('click', () => setModoLeitura(true));
+document.getElementById('btn-zoom-in').addEventListener('click', () => alterarZoomFonte(0.1));
+document.getElementById('btn-zoom-out').addEventListener('click', () => alterarZoomFonte(-0.1));
 document.getElementById('btn-marcar-rezada').addEventListener('click', alternarRezadaManualmente);
 document.getElementById('btn-reiniciar-progresso').addEventListener('click', limparProgressoLeitura);
 document.getElementById('btn-velocidade').addEventListener('click', alternarVelocidade);

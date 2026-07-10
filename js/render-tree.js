@@ -732,6 +732,13 @@ function marcarSecao(oracaoId, idx){
   tentarMarcarBlocosPaiAutomaticamente(oracaoId, idx);
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
+    
+    // Auto-expande a PRÓXIMA seção ainda não rezada (comportamento de fala transposto para o clique manual)
+    const setAtualizado = new Set(progressoLeitura[oracaoId]);
+    const proximoItem = secaoCtxAtual.elementos.find(e => !setAtualizado.has(e.idx));
+    if (proximoItem && typeof expandirParaElemento === 'function') {
+      expandirParaElemento(proximoItem.el);
+    }
   }
   // Se essa marcação completou a oração inteira (mesmo critério usado pela
   // fala para saber que terminou), marca "rezada hoje" também — ver
@@ -740,6 +747,7 @@ function marcarSecao(oracaoId, idx){
     verificarConclusaoTotalEMarcarRezada(oracaoId);
   }
 }
+
 
 function desmarcarSecao(oracaoId, idx){
   if(!progressoLeitura[oracaoId]) return;
