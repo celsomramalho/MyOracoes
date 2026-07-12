@@ -152,7 +152,7 @@ function obterLinhasParaFalar(){
 
     if (el.classList.contains('bloco-ref')) {
       const secaoAtualIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : secaoIdx;
-      const fileira = el.querySelector(':scope > .fileira-contas');
+      const fileira = el.querySelector(':scope > .bloco-ref-cabecalho > .fileira-contas, :scope > .fileira-contas');
       const conteudoDiv = el.querySelector(':scope > .bloco-ref-conteudo');
 
       if (fileira && conteudoDiv) {
@@ -627,12 +627,15 @@ function falarProximaLinha(){
           }
         }
 
-        if (entrandoNovaVolta && rep.contaIdx === 1) {
-          fileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
-          const blocoSecaoIdxProprio = rep.blocoEl.dataset.secaoIdx;
-          if (blocoSecaoIdxProprio != null) {
-            localStorage.removeItem(`contas_${oracaoAtualId}_${blocoSecaoIdxProprio}`);
+        if (entrandoNovaVolta) {
+          if (rep.contaIdx === 1) {
+            fileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
+            const blocoSecaoIdxProprio = rep.blocoEl.dataset.secaoIdx;
+            if (blocoSecaoIdxProprio != null) {
+              localStorage.removeItem(`contas_${oracaoAtualId}_${blocoSecaoIdxProprio}`);
+            }
           }
+          
           rep.blocoEl.querySelectorAll('.fileira-contas').forEach(subFileira => {
             if (subFileira !== fileira) {
               subFileira.querySelectorAll('.conta-terco').forEach(c => c.classList.remove('concluida'));
@@ -645,6 +648,33 @@ function falarProximaLinha(){
               }
             }
           });
+          
+          // Remove do progressoLeitura todos os índices dos sub-blocos dentro
+          // deste bloco repetido, sem disparar atualizarVisuaisProgresso para
+          // cada item. Isso garante que itemJaConcluido (logo abaixo) enxergue
+          // o estado zerado antes de decidir pular a próxima linha.
+          const paiIdxStr = rep.blocoEl.dataset.secaoIdx;
+          const idxsParaRemover = new Set();
+          rep.blocoEl.querySelectorAll('.btn-check-secao').forEach(btn => {
+            const btnIdxStr = btn.dataset.idx;
+            if (btnIdxStr != null && btnIdxStr !== paiIdxStr) {
+              idxsParaRemover.add(parseInt(btnIdxStr, 10));
+            }
+          });
+          rep.blocoEl.querySelectorAll('[data-secao-idx]').forEach(el => {
+            const elIdxStr = el.dataset.secaoIdx;
+            if (elIdxStr != null && elIdxStr !== paiIdxStr) {
+              idxsParaRemover.add(parseInt(elIdxStr, 10));
+            }
+          });
+          if (idxsParaRemover.size > 0 && progressoLeitura[oracaoAtualId]) {
+            progressoLeitura[oracaoAtualId] = progressoLeitura[oracaoAtualId]
+              .filter(i => !idxsParaRemover.has(i));
+            salvarProgressoLeitura();
+            if (secaoCtxAtual) {
+              atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
+            }
+          }
         }
       }
     });

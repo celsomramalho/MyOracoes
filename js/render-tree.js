@@ -541,6 +541,11 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
       const divBloco = document.createElement('div');
       divBloco.className = 'bloco-opcional';
       if(preferenciaSalva === true) divBloco.classList.add('aberto');
+      
+      if(tipoMisterio){
+        divBloco.dataset.misterioId = tipoMisterio;
+        divBloco.dataset.grupoExclusivo = 'misterio';
+      }
 
       const divTitulo = document.createElement('div');
       divTitulo.className = 'bloco-opcional-titulo';
@@ -585,6 +590,24 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
           if(!misterioDiaOverride || misterioDiaOverride.data !== hoje){
             misterioDiaOverride = { data: hoje, valores: {} };
           }
+
+          if(ativo){
+            // Comportamento exclusivo: se ativou este mistério, fecha os outros
+            const containerRaiz = divBloco.closest('#rezar-texto') || document.body;
+            containerRaiz.querySelectorAll('.bloco-opcional[data-grupo-exclusivo="misterio"]').forEach(outroBloco => {
+              if(outroBloco !== divBloco && outroBloco.classList.contains('aberto')){
+                outroBloco.classList.remove('aberto');
+                const outroSwitch = outroBloco.querySelector('.bloco-opcional-switch');
+                if(outroSwitch) outroSwitch.setAttribute('aria-checked', 'false');
+                
+                const outroMisterio = outroBloco.dataset.misterioId;
+                if(outroMisterio){
+                  misterioDiaOverride.valores[`${oracaoIdAtual}::${outroMisterio}`] = false;
+                }
+              }
+            });
+          }
+
           misterioDiaOverride.valores[chaveOverrideMisterio] = ativo;
           salvarMisterioDiaOverride();
         }else if(chavePreferencia){

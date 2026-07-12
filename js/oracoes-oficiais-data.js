@@ -259,7 +259,7 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mrc0jvb9",
     "titulo": "Santo Rosário (início)",
-    "texto": "[Sinal da cruz|oficial_mr0skuf2]\n[Ato de contrição|oficial_mrc0klx5]\n[Adoção Espiritual|oficial_mrc0dso9]{opcional}\n\n\n\n\n",
+    "texto": "[Sinal da cruz|oficial_mr0skuf2]\n[Ato de contrição|oficial_mrc0klx5]\n[Credo (Símbolo dos Apóstolos)|oficial_mr0slyu2]\n[Adoção Espiritual|oficial_mrc0dso9]{opcional}\n\n\n\n\n",
     "oculta": true,
     "colapsarNaFala": false
   },
