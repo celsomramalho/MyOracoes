@@ -265,6 +265,14 @@
   function atualizarBotaoMarcarRezada(){
     atualizarBotaoMarcarRezadaAdmin();
   }
+
+  // Fallbacks de variáveis de estado do state.js necessárias para o render-tree.js
+  const leiturasOpcionaisPreferidas = {};
+  const misterioDiaOverride = null;
+  const CHAVE_DICA_LEITURA_OPCIONAL_MOSTRADA = 'myoracoes_dica_leitura_opcional_mostrada_v1';
+  function obterTipoMisterioDoDiaSeAplicavel() { return null; }
+  function salvarMisterioDiaOverride() {}
+  function salvarLeiturasOpcionaisPreferidas() {}
 </script>
 
 <script src="js/components/toast.js"></script>
