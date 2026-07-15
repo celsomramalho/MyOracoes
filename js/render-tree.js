@@ -108,7 +108,7 @@ function construirArvore(texto, titulosVisitados, estado){
   const nos = [];
   // O modificador entre chaves aceita um número (repetição) ou a palavra
   // reservada "opcional" (leitura opcional, oculta por padrão).
-  const regex = /\[([^\[\]]+)\](?:\{(\d+|opcional)\})?(?:\{depende:([^\}]+)\})?/gi;
+  const regex = /\[([^[\]]+)\](?:\{(\d+|opcional)\})?(?:\{depende:([^}]+)\})?/gi;
   let ultimoIndice = 0;
   let match;
 
@@ -778,7 +778,7 @@ function tentarMarcarBlocosPaiAutomaticamente(oracaoId, idxAlterado){
 
   let mudou = false;
 
-  while(true){
+  while(entradaAtual){
     const idxPai = encontrarIdxPaiDireto(entradaAtual.el);
     if(idxPai == null) break;
     const entradaPai = elementos.find(e => e.idx === idxPai);
@@ -815,7 +815,7 @@ function tentarDesmarcarBlocosPaiAutomaticamente(oracaoId, idxAlterado){
 
   let mudou = false;
 
-  while(true){
+  while(entradaAtual){
     const idxPai = encontrarIdxPaiDireto(entradaAtual.el);
     if(idxPai == null) break;
     const entradaPai = elementos.find(e => e.idx === idxPai);

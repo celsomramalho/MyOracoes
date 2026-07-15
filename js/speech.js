@@ -478,6 +478,8 @@ function calcularIndiceInicialFala(fila){
 }
 
 async function iniciarFala(){
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  
   const vozesDisponiveis = await aguardarVozesDisponiveis();
   if(!configVozes.v && !configVozes.r && vozesDisponiveis.length){
     configVozes = escolherVozesAutomaticas(vozesDisponiveis);
@@ -739,8 +741,23 @@ function falarProximaLinha(){
     utterancia.pitch = item.voz2 ? 1.25 : 1.0;
   }
 
+  const tempoInicioSpeak = Date.now();
+
   utterancia.onend = () => {
     if(!falando || pausado) return;
+    
+    // Proteção contra bug do Chrome (desktop): se o motor TTS falhar silenciosamente 
+    // (ex: voz incompatível ou engine travada), ele dispara onend quase instantaneamente. 
+    // Sem essa trava, o app entra num loop que marca toda a oração como lida em 1 segundo.
+    if (Date.now() - tempoInicioSpeak < 50) {
+      falando = false;
+      if (typeof atualizarBotaoFala === 'function') atualizarBotaoFala();
+      if (typeof mostrarToast === 'function') {
+        mostrarToast('Erro no motor de voz do navegador (pulando falas). Verifique as configurações de voz ou recarregue a página.');
+      }
+      return;
+    }
+
     const secaoIdxAtual = item.secaoIdx;
     
     const proximoItem = filaFala[indiceFalaAtual + 1];
@@ -873,3 +890,35 @@ function pararFala(){
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
   atualizarBotaoFala();
 }
+
+// ===================== VELOCIDADE DA VOZ =====================
+function atualizarTextosVelocidade(){
+  const text = `⚡ ${velocidadeAtual.toFixed(2).replace('.00', '.0')}x`;
+  
+  const btnUser = document.getElementById('btn-velocidade');
+  if(btnUser) btnUser.textContent = text;
+  
+  const btnAdmin = document.getElementById('btn-velocidade-admin');
+  if(btnAdmin) btnAdmin.textContent = text;
+}
+
+function alternarVelocidadeVoz(){
+  let index = OPCOES_VELOCIDADE.indexOf(velocidadeAtual);
+  if(index === -1) index = 1; // fallback para 1.0
+  
+  index = (index + 1) % OPCOES_VELOCIDADE.length;
+  velocidadeAtual = OPCOES_VELOCIDADE[index];
+  
+  localStorage.setItem(CHAVE_VELOCIDADE, velocidadeAtual.toString());
+  atualizarTextosVelocidade();
+  
+  if(falando && !pausado){
+    if(utteranciaAtual){
+      utteranciaAtual.onend = null;
+      utteranciaAtual.onerror = null;
+    }
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    falarProximaLinha();
+  }
+}
+

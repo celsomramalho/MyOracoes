@@ -12,10 +12,7 @@ const ICONES_TELA = {
 };
 
 function mostrarView(id){
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('view-active'));
-  document.getElementById(id).classList.add('view-active');
-  pararFala();
-  window.scrollTo(0,0);
+  trocarViewAtiva(id);
 
   // Marca a tela ativa no #app (controla via CSS: vela só aparece na Home)
   const appEl = document.getElementById('app');
@@ -74,18 +71,6 @@ function mostrarView(id){
   // extras), então remedimos depois que o navegador aplicar a troca de tela
   requestAnimationFrame(atualizarAlturaTopbar);
 }
-
-// Mede a altura real da topbar e guarda numa variável CSS, para o
-// cabeçalho fixo do Modo Rezar encaixar exatamente abaixo dela
-// (refeito a cada redimensionamento/zoom, já que pode variar com a fonte do usuário)
-function atualizarAlturaTopbar(){
-  const topbar = document.querySelector('.topbar');
-  if (!topbar) return;
-  document.documentElement.style.setProperty('--topbar-altura', topbar.offsetHeight + 'px');
-}
-window.addEventListener('resize', atualizarAlturaTopbar);
-window.addEventListener('load', atualizarAlturaTopbar);
-atualizarAlturaTopbar();
 
 // Sombra nos cabeçalhos fixos (Modo Rezar / busca de Orações Oficiais)
 // quando o conteúdo é rolado
@@ -350,7 +335,7 @@ const telaRezarUsuario = criarTelaRezar({
     tituloEl.title = o.titulo;
     atualizarEstrelaRezar();
     atualizarBotaoMarcarRezada();
-    atualizarBotaoVelocidade();
+    atualizarTextosVelocidade();
     renderizarTextoRezar(o.texto);
 
     // Botão compartilhar: apenas em pessoais
@@ -456,32 +441,7 @@ function alternarRezadaManualmente(){
   atualizarProgressoDiario();
 }
 
-function atualizarBotaoVelocidade(){
-  const btn = document.getElementById('btn-velocidade');
-  if(btn) {
-    btn.textContent = `⚡ ${velocidadeAtual.toFixed(2).replace('.00', '.0')}x`;
-  }
-}
 
-function alternarVelocidade(){
-  let index = OPCOES_VELOCIDADE.indexOf(velocidadeAtual);
-  if(index === -1) index = 1; // fallback para 1.0
-  
-  index = (index + 1) % OPCOES_VELOCIDADE.length;
-  velocidadeAtual = OPCOES_VELOCIDADE[index];
-  
-  localStorage.setItem(CHAVE_VELOCIDADE, velocidadeAtual.toString());
-  atualizarBotaoVelocidade();
-  
-  if(falando && !pausado){
-    if(utteranciaAtual){
-      utteranciaAtual.onend = null;
-      utteranciaAtual.onerror = null;
-    }
-    window.speechSynthesis.cancel();
-    falarProximaLinha();
-  }
-}
 
 // Monta o contexto de progresso a partir da oração aberta agora e delega a
 // renderização em si para o núcleo compartilhado com o preview do admin
@@ -558,7 +518,7 @@ document.getElementById('btn-zoom-in').addEventListener('click', () => alterarZo
 document.getElementById('btn-zoom-out').addEventListener('click', () => alterarZoomFonte(-0.1));
 document.getElementById('btn-marcar-rezada').addEventListener('click', alternarRezadaManualmente);
 document.getElementById('btn-reiniciar-progresso').addEventListener('click', limparProgressoLeitura);
-document.getElementById('btn-velocidade').addEventListener('click', alternarVelocidade);
+document.getElementById('btn-velocidade').addEventListener('click', alternarVelocidadeVoz);
 document.getElementById('btn-config-vozes').addEventListener('click', abrirConfigVozes);
 document.getElementById('btn-fechar-modal-vozes').addEventListener('click', fecharModalVozes);
 document.getElementById('btn-salvar-vozes').addEventListener('click', salvarConfigVozesModal);

@@ -9,6 +9,7 @@ const CHAVE_PROGRESSO_LEITURA = 'minhas_oracoes_progresso_leitura_v1';
 const CHAVE_VELOCIDADE = 'minhas_oracoes_velocidade_v1';
 const CHAVE_MODO_LEITURA = 'minhas_oracoes_modo_leitura_v1';
 const CHAVE_ZOOM_FONTE = 'minhas_oracoes_zoom_fonte_v1';
+const CHAVE_ULTIMO_ACESSO = 'minhas_oracoes_ultimo_acesso_v1';
 const OPCOES_VELOCIDADE = [0.8, 1.0, 1.25, 1.5, 1.75, 2.0];
 let velocidadeAtual = parseFloat(localStorage.getItem(CHAVE_VELOCIDADE)) || 1.0;
 let modoLeituraAtivo = localStorage.getItem(CHAVE_MODO_LEITURA) === 'true';
@@ -100,6 +101,31 @@ function obterDataLocalHoje() {
   const dia = String(d.getDate()).padStart(2, '0');
   return `${ano}-${mes}-${dia}`;
 }
+
+function executarResetDiarioSeNecessario() {
+  const hoje = obterDataLocalHoje();
+  const ultimoAcesso = localStorage.getItem(CHAVE_ULTIMO_ACESSO);
+  if (ultimoAcesso !== hoje) {
+    // Virou o dia (ou é o primeiríssimo acesso): 
+    // Zera os progressos de leitura internos (os checks verdes de cada parágrafo/conta)
+    localStorage.removeItem(CHAVE_PROGRESSO_LEITURA);
+    
+    // Zera também as contas e posições de fala individuais salvas soltas
+    const keysParaRemover = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith('contas_') || k.startsWith('subpos_'))) {
+        keysParaRemover.push(k);
+      }
+    }
+    keysParaRemover.forEach(k => localStorage.removeItem(k));
+  }
+  // Grava o dia atual
+  localStorage.setItem(CHAVE_ULTIMO_ACESSO, hoje);
+}
+
+// Roda assim que o script inicializa, ANTES de carregar do localStorage
+executarResetDiarioSeNecessario();
 
 function carregarRezadasDiarias() {
   try {

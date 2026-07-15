@@ -16,7 +16,7 @@ function obterInicial(titulo){
 // Remove marcações internas do texto (ex: [Título|id]{n} -> Título; [pausa]{n} -> removido)
 // para exibição em listagens/prévias. O id após "|" é controle interno e nunca deve aparecer.
 function limparMarcacoesTexto(texto){
-  return (texto || '').replace(/\[([^\[\]]+)\](?:\{(?:\d+|opcional)\})?/gi, (match, conteudo) => {
+  return (texto || '').replace(/\[([^[\]]+)\](?:\{(?:\d+|opcional)\})?/gi, (match, conteudo) => {
     const partes = conteudo.split('|');
     const titulo = partes[0].trim();
     return /^pausa$/i.test(titulo) ? '' : titulo;
@@ -73,4 +73,27 @@ function inicializarBotoesLimparBusca(raiz){
     input.addEventListener('input', atualizarVisibilidade);
     atualizarVisibilidade();
   });
+}
+
+// ===================== TOPBAR =====================
+function atualizarAlturaTopbar(){
+  const topbar = document.querySelector('.topbar');
+  if (!topbar) return;
+  document.documentElement.style.setProperty('--topbar-altura', topbar.offsetHeight + 'px');
+}
+
+function inicializarAlturaTopbar(){
+  window.addEventListener('resize', atualizarAlturaTopbar);
+  window.addEventListener('load', atualizarAlturaTopbar);
+  atualizarAlturaTopbar();
+}
+
+inicializarAlturaTopbar();
+
+// ===================== NAVEGAÇÃO =====================
+function trocarViewAtiva(id){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('view-active'));
+  document.getElementById(id).classList.add('view-active');
+  if (typeof pararFala === 'function') pararFala();
+  window.scrollTo(0,0);
 }

@@ -1,0 +1,25 @@
+{
+  "name": "myoracoes",
+  "version": "1.0.0",
+  "description": "MyOrações é um **PWA (Progressive Web App) em JavaScript vanilla**, sem frameworks e sem build step, para guardar, organizar e rezar orações — tanto orações pessoais criadas pelo próprio usuário quanto um acervo de \"Orações Oficiais\" (Pai Nosso, Ave Maria, ladainhas, novenas etc.) mantido pelo administrador do app.",
+  "main": "app.js",
+  "scripts": {
+    "lint": "eslint \"js/**/*.js\" \"*.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/celsomramalho/MyOracoes.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/celsomramalho/MyOracoes/issues"
+  },
+  "homepage": "https://github.com/celsomramalho/MyOracoes#readme",
+  "devDependencies": {
+    "eslint": "^8.57.1"
+  }
+}

@@ -81,8 +81,7 @@ function atualizarTopbarTituloAdmin(id) {
 }
 
 function mostrarView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('view-active'));
-  document.getElementById(id).classList.add('view-active');
+  trocarViewAtiva(id);
 
   // Controla visibilidade das ações de rezar na topbar do admin
   const topbarAcoesRezarAdmin = document.getElementById('topbar-acoes-rezar-admin');
@@ -121,23 +120,10 @@ function mostrarView(id) {
   atualizarTopbarTituloAdmin(id);
   const listaFixo = document.querySelector('.admin-lista-fixo');
   if (listaFixo) listaFixo.classList.remove('com-sombra');
-  window.scrollTo(0,0);
   // A altura da topbar pode variar (ex: botão de logout aparecendo/sumindo),
   // então remedimos depois que o navegador aplicar a troca de tela
-  requestAnimationFrame(atualizarAlturaTopbarAdmin);
+  requestAnimationFrame(atualizarAlturaTopbar);
 }
-
-// Mede a altura real da topbar do admin e guarda numa variável CSS, para a
-// fileira de ações fixa (.form-acoes-topo) encaixar exatamente abaixo dela
-// (mesmo mecanismo usado em app.js para .rezar-fixo / .busca-fixa)
-function atualizarAlturaTopbarAdmin(){
-  const topbar = document.querySelector('.topbar');
-  if (!topbar) return;
-  document.documentElement.style.setProperty('--topbar-altura', topbar.offsetHeight + 'px');
-}
-window.addEventListener('resize', atualizarAlturaTopbarAdmin);
-window.addEventListener('load', atualizarAlturaTopbarAdmin);
-atualizarAlturaTopbarAdmin();
 
 // Sombra nas fileiras de ações fixas quando o conteúdo é rolado
 window.addEventListener('scroll', () => {
@@ -522,33 +508,7 @@ document.getElementById('input-busca-editar').addEventListener('input', e => {
   renderizarListaAdmin();
 });
 
-// Atualiza o botão de velocidade do admin
-function atualizarBotaoVelocidadeAdmin(){
-  const btn = document.getElementById('btn-velocidade-admin');
-  if(btn) {
-    btn.textContent = `⚡ ${velocidadeAtual.toFixed(2).replace('.00', '.0')}x`;
-  }
-}
 
-function alternarVelocidadeAdmin(){
-  let index = OPCOES_VELOCIDADE.indexOf(velocidadeAtual);
-  if(index === -1) index = 1; // fallback para 1.0
-  
-  index = (index + 1) % OPCOES_VELOCIDADE.length;
-  velocidadeAtual = OPCOES_VELOCIDADE[index];
-  
-  localStorage.setItem(CHAVE_VELOCIDADE, velocidadeAtual.toString());
-  atualizarBotaoVelocidadeAdmin();
-  
-  if(falando && !pausado){
-    if(utteranciaAtual){
-      utteranciaAtual.onend = null;
-      utteranciaAtual.onerror = null;
-    }
-    window.speechSynthesis.cancel();
-    falarProximaLinha();
-  }
-}
 
 // Instancia o controlador da tela Rezar unificada para o contexto do admin
 const telaRezarAdmin = criarTelaRezar({
@@ -573,7 +533,7 @@ const telaRezarAdmin = criarTelaRezar({
     };
     renderizarTextoNaTela(oracao.texto, container, ctx, 'Esta oração ainda não tem texto.');
     secaoCtxAtual = ctx;
-    atualizarBotaoVelocidadeAdmin();
+    atualizarTextosVelocidade();
   },
   mostrarTela() {
     mostrarView('view-rezar-admin');
@@ -582,7 +542,7 @@ const telaRezarAdmin = criarTelaRezar({
 
 // Botões de ação da tela Rezar do admin
 document.getElementById('btn-falar').addEventListener('click', alternarFala);
-document.getElementById('btn-velocidade-admin').addEventListener('click', alternarVelocidadeAdmin);
+document.getElementById('btn-velocidade-admin').addEventListener('click', alternarVelocidadeVoz);
 
 document.getElementById('btn-rezar-admin-reiniciar').addEventListener('click', () => {
   pararFala();
