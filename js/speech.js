@@ -46,6 +46,57 @@ function estaVisivel(el, margem = 80) {
   return r.top >= margem && r.bottom <= (window.innerHeight - margem);
 }
 
+function rolarParaElemento(el) {
+  const topbar = document.querySelector('.topbar');
+  const topbarAltura = topbar ? topbar.offsetHeight : 60;
+  const rezarFixo = document.querySelector('.rezar-fixo');
+  const rezarFixoAltura = (rezarFixo && getComputedStyle(rezarFixo).position === 'sticky') ? rezarFixo.offsetHeight : 0;
+  const margemSuperior = topbarAltura + rezarFixoAltura + 12;
+  const margemInferior = 20;
+
+  const elRect = el.getBoundingClientRect();
+  const elAbsTop = elRect.top + window.scrollY;
+
+  // Monta lista de blocos ancestrais do mais externo ao mais interno
+  let blocos = [];
+  let cur = el.closest('.bloco-ref, .bloco-opcional');
+  while (cur) {
+    blocos.unshift(cur);
+    cur = cur.parentElement ? cur.parentElement.closest('.bloco-ref, .bloco-opcional') : null;
+  }
+
+  // Tenta proteger o topo do bloco mais externo possível
+  for (const b of blocos) {
+    const blocoRect = b.getBoundingClientRect();
+
+    // Topo do bloco já está visível (na área útil)?
+    if (blocoRect.top >= margemSuperior) {
+      // Bloco ok — só rola se o elemento também não estiver visível
+      if (elRect.top >= margemSuperior && elRect.bottom <= window.innerHeight - margemInferior) return;
+      break; // El fora da tela → sair e usar scroll de centralização abaixo
+    }
+
+    // Topo do bloco está escondido acima — tenta grudar no topo da área útil
+    const blocoAbsTop = blocoRect.top + window.scrollY;
+    const scrollParaBloco = blocoAbsTop - margemSuperior;
+    const elPosNaTela = elAbsTop - scrollParaBloco;
+
+    if (elPosNaTela >= 0 && elPosNaTela + el.offsetHeight <= window.innerHeight - margemInferior) {
+      // Funciona! Rola para mostrar o topo deste bloco mantendo el visível
+      window.scrollTo({ top: Math.max(0, scrollParaBloco), behavior: 'smooth' });
+      return;
+    }
+    // Bloco externo grande demais → tenta o próximo bloco mais interno
+  }
+
+  // Fallback: elemento fora da tela → centraliza na área útil
+  if (elRect.top < margemSuperior || elRect.bottom > window.innerHeight - margemInferior) {
+    const areaUtil = window.innerHeight - margemSuperior;
+    const targetScroll = elAbsTop - margemSuperior - (areaUtil / 2) + (el.offsetHeight / 2);
+    window.scrollTo({ top: Math.max(0, targetScroll), behavior: 'smooth' });
+  }
+}
+
 // ===================== VOZES (uma para V., outra para R.) =====================
 let configVozes = JSON.parse(localStorage.getItem(CHAVE_VOZES) || 'null') || { v: null, r: null };
 
@@ -709,10 +760,10 @@ function falarProximaLinha(){
     // Oração conhecida (Ave Maria, Pai Nosso...) e está fechada: destaca o
     // bloco inteiro (inclui contas) em vez de abrir e destacar a linha lá dentro.
     blocoFechado.classList.add('titulo-falando');
-    if(!estaVisivel(blocoFechado)) blocoFechado.scrollIntoView({ behavior:'smooth', block:'center' });
+    rolarParaElemento(blocoFechado);
   }else{
     item.elemento.classList.add('linha-falando');
-    if(!estaVisivel(item.elemento)) item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
+    rolarParaElemento(item.elemento);
   }
 
   if (item.repetido && item.historicoRepeticoes) {
@@ -835,7 +886,7 @@ function falarProximaLinha(){
 function falarPausa(item){
   utteranciaAtual = null;
   if(item.elemento){
-    if(!estaVisivel(item.elemento)) item.elemento.scrollIntoView({ behavior:'smooth', block:'center' });
+    rolarParaElemento(item.elemento);
     item.elemento.classList.add('linha-falando');
   }
   timeoutPausaAtual = setTimeout(() => {

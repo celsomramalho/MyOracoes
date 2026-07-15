@@ -165,7 +165,7 @@
   },
   {
     "id": "oficial_mr3ve9o0",
-    "titulo": "1 mistério gozoso (meditado)",
+    "titulo": "meditado (mistério gozoso1)",
     "texto": "“No sexto mês, o anjo Gabriel foi enviado por Deus a uma cidade da Galileia, chamada Nazaré, a uma virgem desposada com um homem que se chamava José, da casa de Davi e o nome da virgem era Maria.” (Lc 1, 26-27) ",
     "oculta": true,
     "colapsarNaFala": false
@@ -278,21 +278,21 @@
   {
     "id": "oficial_mrc4c7cg",
     "titulo": "Mistérios Dolorosos",
-    "texto": "Primeiro Mistério: \nA oração no horto\n[1 mistério gozoso (meditado)|oficial_mr3ve9o0]{opcional}\n[1 mistério gozoso (São Josemaria)|oficial_mr3vkvfu]{opcional}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nA flagelação do Senhor\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \nA coroação de espinhos\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA cruz as costas\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nJesus morre na cruz\n[Santo Rosário (dezena)|oficial_mria0ch6]",
+    "texto": "Primeiro Mistério: \nA oração no horto\n[São Josemaria (mistério doloroso1)|oficial_mrjcrqcb]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nA flagelação do Senhor\n[São Josemaria (mistério doloroso2)|oficial_mrjcsb9t]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \nA coroação de espinhos\n[São Josemaria (mistério doloroso3)|oficial_mrjcsugn]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA cruz as costas\n[São Josemaria (mistério doloroso4)|oficial_mrjctigv]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nJesus morre na cruz\n[São Josemaria (mistério doloroso5)|oficial_mrjctxxt]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]",
     "oculta": false,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrc4do0v",
     "titulo": "Mistérios Luminosos",
-    "texto": "Primeiro Mistério: \nO batismo do Senhor\n[1 mistério gozoso (meditado)|oficial_mr3ve9o0]{opcional}\n[1 mistério gozoso (São Josemaria)|oficial_mr3vkvfu]{opcional}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nAs bodas de Caná\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \nAnúncio da boa nova\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA transfiguração do Senhor\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nA instituição da Santa Eucaristia\n[Santo Rosário (dezena)|oficial_mria0ch6]",
+    "texto": "Primeiro Mistério: \nO batismo do Senhor\n[São Josemaria (mistério luminoso1)|oficial_mrjd0jxv]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nAs bodas de Caná\n[São Josemaria (mistério luminoso2)|oficial_mrjd14qf]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \nAnúncio da boa nova\n[São Josemaria (mistério luminoso3)|oficial_mrjd1o9t]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA transfiguração do Senhor\n[São Josemaria (mistério luminoso4)|oficial_mrjd28cn]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nA instituição da Santa Eucaristia\n[São Josemaria (mistério luminoso5)|oficial_mrjd2r3h]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]",
     "oculta": false,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrc4e06s",
     "titulo": "Mistérios Gloriosos",
-    "texto": "Primeiro Mistério: \nA ressurreição do Senhor\n[1 mistério gozoso (meditado)|oficial_mr3ve9o0]{opcional}\n[1 mistério gozoso (São Josemaria)|oficial_mr3vkvfu]{opcional}\n[Pai Nosso]\n[Ave Maria]{10}\n[Glória ao Pai]\n[Oração de Fátima|oficial_mr28kql4]\n[pausa]{2}\nSegundo Mistério: \nA ascensão do Senhor aos céus\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \nA vinda do Espírito Santo\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA assunção de Nossa Senhora\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nA coroação de Maria Santíssima\n[Santo Rosário (dezena)|oficial_mria0ch6]",
+    "texto": "Primeiro Mistério: \nA ressurreição do Senhor\n[São Josemaria (mistério glorioso1)|oficial_mrjcvfsp]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nA ascensão do Senhor aos céus\n[São Josemaria (mistério glorioso2)|oficial_mrjcw1nd]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \nA vinda do Espírito Santo\n[São Josemaria (mistério glorioso3)|oficial_mrjcwgg3]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA assunção de Nossa Senhora\n[São Josemaria (mistério glorioso4)|oficial_mrjcx48h]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nA coroação de Maria Santíssima\n[São Josemaria (mistério glorioso5)|oficial_mrjcxkrv]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]",
     "oculta": false,
     "colapsarNaFala": false
   },
@@ -446,7 +446,7 @@
   {
     "id": "oficial_mrjd0jxv",
     "titulo": "São Josemaria (mistério luminoso1)",
-    "texto": "Então Jesus veio da Galileia ao Jordão, para ser batizado por João [...]. E uma voz dos céus disse: Este é o meu Filho, o amado, em quem pus as minhas complacências (Mt III, 13.17).\n\nPelo Batismo, o nosso Pai-Deus tomou posse das nossas vidas, incorporou-nos à vida de Cristo e enviou-nos o Espírito Santo.\n\nA força e o poder de Deus iluminam a face da terra.\n\nFaremos com que o mundo arda, nas chamas do fogo que vieste trazer à terra... E a luz da tua verdade, Jesus nosso, iluminará as inteligências, num dia sem fi m.\n\nOuço-te clamar, meu Rei, com voz viva, que ainda vibra: Ignem veni mittere in terram, et quid volo nisi ut accendatur? ﻿–﻿ e respondo ﻿–﻿ todo eu ﻿–﻿ com os meus sentidos e as minhas potências: Ecce ego: quia vocasti me! O Senhor pôs na tua alma um selo indelével, por meio do Batismo: és filho de Deus.\n\nMenino: não ardes em desejos de fazer que todos O amem?\n",
+    "texto": "Então Jesus veio da Galileia ao Jordão, para ser batizado por João [...]. E uma voz dos céus disse: Este é o meu Filho, o amado, em quem pus as minhas complacências (Mt III, 13.17).\n\nPelo Batismo, o nosso Pai-Deus tomou posse das nossas vidas, incorporou-nos à vida de Cristo e enviou-nos o Espírito Santo.\n\nA força e o poder de Deus iluminam a face da terra.\n\nFaremos com que o mundo arda, nas chamas do fogo que vieste trazer à terra... E a luz da tua verdade, Jesus nosso, iluminará as inteligências, num dia sem fim.\n\nOuço-te clamar, meu Rei, com voz viva, que ainda vibra: Ignem veni mittere in terram, et quid volo nisi ut accendatur? ﻿–﻿ e respondo ﻿–﻿ todo eu ﻿–﻿ com os meus sentidos e as minhas potências: Ecce ego: quia vocasti me! O Senhor pôs na tua alma um selo indelével, por meio do Batismo: és filho de Deus.\n\nMenino: não ardes em desejos de fazer que todos O amem?\n",
     "oculta": true,
     "colapsarNaFala": false
   },
@@ -460,7 +460,7 @@
   {
     "id": "oficial_mrjd1o9t",
     "titulo": "São Josemaria (mistério luminoso3)",
-    "texto": "Cumpriu-se o tempo e o Reino de Deus está para chegar: convertei-vos e crede no Evangelho (Mc I, 15).\n\nToda a multidão ia até Ele, e Ele os ensinava (Mc II, 13).\n\nJesus vê aquelas barcas na margem e sobe numa delas [...]. Com que naturalidade se mete Jesus na barca de cada um de nós!\n\nQuanto te aproximares do Senhor, pensa que Ele está muito perto de ti, em ti: regnum Dei intra vos est (Lc XVII, 21). Encontrá-lo-ás no teu coração.\n\nCristo deve reinar, acima de tudo, na nossa alma. Para que Ele reine em mim, preciso da sua graça em abundância: só assim é que até o último latejo do coração, até o último alento, até o olhar menos intenso, até a palavra mais intranscendente, até a sensação mais elementar se traduzirão num hosanna ao meu Cristo-Rei.\n\nDuc in altum ﻿–﻿ Mar adentro! ﻿–﻿ Repele o pessimismo que te torna covarde. Et laxate retia vestra in capturam ﻿–﻿ e lança as redes para pescar.\n\nDevemos confiar nessas palavras do Senhor, entrar na barca, empunhar os remos, içar as velas e lançar-nos a esse mar do mundo que Cristo nos entrega em herança.\n\nEt regni ejus non erit finis. ﻿—﻿ O seu Reino não terá fim!\n\nNão te dá alegria trabalhar por um reinado assim?\n",
+    "texto": "Cumpriu-se o tempo e o Reino de Deus está para chegar: convertei-vos e crede no Evangelho (Mc I, 15).\n\nToda a multidão ia até Ele, e Ele os ensinava (Mc II, 13).\n\nJesus vê aquelas barcas na margem e sobe numa delas [...]. Com que naturalidade se mete Jesus na barca de cada um de nós!\n\nQuando te aproximares do Senhor, pensa que Ele está muito perto de ti, em ti: regnum Dei intra vos est (Lc XVII, 21). Encontrá-lo-ás no teu coração.\n\nCristo deve reinar, acima de tudo, na nossa alma. Para que Ele reine em mim, preciso da sua graça em abundância: só assim é que até o último latejo do coração, até o último alento, até o olhar menos intenso, até a palavra mais intranscendente, até a sensação mais elementar se traduzirão num hosanna ao meu Cristo-Rei.\n\nDuc in altum ﻿–﻿ Mar adentro! ﻿–﻿ Repele o pessimismo que te torna covarde. Et laxate retia vestra in capturam ﻿–﻿ e lança as redes para pescar.\n\nDevemos confiar nessas palavras do Senhor, entrar na barca, empunhar os remos, içar as velas e lançar-nos a esse mar do mundo que Cristo nos entrega em herança.\n\nEt regni ejus non erit finis. ﻿—﻿ O seu Reino não terá fim!\n\nNão te dá alegria trabalhar por um reinado assim?\n",
     "oculta": true,
     "colapsarNaFala": false
   },
