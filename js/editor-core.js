@@ -54,6 +54,7 @@ function montarMarcadorLink(url){
 function criarControladorInsercao(config) {
   let posicaoCursorSalva = null;
   let modoInserirOpcional = false;
+  let modoInserirCondicional = false;
   let aoConfirmarNumero = null;
 
   // Cache dos elementos DOM
@@ -131,27 +132,36 @@ function criarControladorInsercao(config) {
     if (e.key === 'Escape') fecharMenuInserir();
   });
 
-  // Modal 1: Inserir Oração / Leitura Opcional
-  function abrirModalInserir(opcional) {
-    modoInserirOpcional = !!opcional;
+  // Modal 1: Inserir Oração / Leitura Opcional / Oração Condicional
+  function abrirModalInserir(modo) {
+    modoInserirOpcional = (modo === 'opcional');
+    modoInserirCondicional = (modo === 'condicional');
     if (!dom.textarea) return;
-
+ 
     if (!config.rastrearCursorContinuamente) {
       posicaoCursorSalva = dom.textarea.selectionStart;
     }
     if (posicaoCursorSalva == null) {
       posicaoCursorSalva = dom.textarea.value.length;
     }
-
+ 
     if (dom.modalInserirTitulo) {
-      dom.modalInserirTitulo.textContent = modoInserirOpcional ? 'Inserir leitura opcional' : 'Inserir oração';
+      if (modoInserirCondicional) {
+        dom.modalInserirTitulo.textContent = 'Vincular a Opção';
+      } else {
+        dom.modalInserirTitulo.textContent = modoInserirOpcional ? 'Inserir leitura opcional' : 'Inserir oração';
+      }
     }
     if (dom.modalInserirDica) {
-      dom.modalInserirDica.textContent = modoInserirOpcional 
-        ? 'Toque em uma oração para inseri-la como leitura opcional: fica oculta e fora da fala até o usuário decidir mostrar na hora de rezar.'
-        : 'Toque em uma oração para inserir a referência a ela no texto.';
+      if (modoInserirCondicional) {
+        dom.modalInserirDica.textContent = 'Toque em uma oração para inseri-la vinculada a uma opção/dependência.';
+      } else {
+        dom.modalInserirDica.textContent = modoInserirOpcional 
+          ? 'Toque em uma oração para inseri-la como leitura opcional: fica oculta e fora da fala até o usuário decidir mostrar na hora de rezar.'
+          : 'Toque em uma oração para inserir a referência a ela no texto.';
+      }
     }
-
+ 
     if (dom.inputBuscaInserir) dom.inputBuscaInserir.value = '';
     renderizarLista('');
     if (dom.modalInserir) dom.modalInserir.classList.remove('hidden');
@@ -185,6 +195,18 @@ function criarControladorInsercao(config) {
         if (modoInserirOpcional) {
           inserirTextoNoCursor(montarMarcadorOpcional(o) + sufixo);
           fecharModalInserir();
+        } else if (modoInserirCondicional) {
+          abrirModalNumero({
+            titulo: 'Repetir oração',
+            dica: `Quantas vezes repetir "${o.titulo}"? Use 1 para uma única vez.`,
+            valorInicial: 1,
+            min: 1,
+            max: 200,
+            aoConfirmar: (quantidade) => {
+              fecharModalInserir();
+              abrirModalChaveDepende(o, quantidade);
+            }
+          });
         } else {
           abrirModalNumero({
             titulo: 'Repetir oração',
@@ -206,13 +228,19 @@ function criarControladorInsercao(config) {
   if (dom.btnInserirOracao) {
     dom.btnInserirOracao.addEventListener('click', () => {
       fecharMenuInserir();
-      abrirModalInserir(false);
+      abrirModalInserir('oracao');
     });
   }
   if (dom.btnInserirOpcional) {
     dom.btnInserirOpcional.addEventListener('click', () => {
       fecharMenuInserir();
-      abrirModalInserir(true);
+      abrirModalInserir('opcional');
+    });
+  }
+  if (dom.btnInserirCondicional) {
+    dom.btnInserirCondicional.addEventListener('click', () => {
+      fecharMenuInserir();
+      abrirModalInserir('condicional');
     });
   }
   if (dom.btnFecharModalInserir) {
@@ -280,6 +308,65 @@ function criarControladorInsercao(config) {
     dom.inputLinkUrl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') confirmarLink();
       if (e.key === 'Escape') fecharModalLink();
+    });
+  }
+
+  // Modal 4: Selecionar chave de dependência (substitui o prompt() no modo condicional)
+  let oracaoCondicionalPendente = null;
+  let quantidadeCondicionalPendente = 1;
+
+  function renderizarListaChaveDepende(termo) {
+    if (!dom.listaModalChaveDepende) return;
+    dom.listaModalChaveDepende.innerHTML = '';
+    const disponiveis = config.listarOracoes(termo);
+    if (disponiveis.length === 0) {
+      dom.listaModalChaveDepende.innerHTML = '<p class="dica">Nenhuma oração encontrada.</p>';
+      return;
+    }
+    disponiveis.forEach(opcao => {
+      const item = document.createElement('div');
+      item.className = 'item-modal';
+      if (config.renderizarItemLista) {
+        item.innerHTML = config.renderizarItemLista(opcao);
+      } else {
+        item.textContent = opcao.titulo;
+      }
+      item.addEventListener('click', () => {
+        const negado = dom.checkboxDependeNegado ? dom.checkboxDependeNegado.checked : false;
+        // Usa o formato "Título|id" — igual ao padrão [Oração|id] do sistema,
+        // garantindo que renomeações futuras não quebrem a ligação.
+        const chaveBase = `${opcao.titulo}|${opcao.id}`;
+        const chave = negado ? `!${chaveBase}` : chaveBase;
+        let marcador = montarMarcadorReferencia(oracaoCondicionalPendente, quantidadeCondicionalPendente);
+        marcador += `{depende:${chave}}`;
+        inserirTextoNoCursor(marcador + sufixo);
+        fecharModalChaveDepende();
+      });
+      dom.listaModalChaveDepende.appendChild(item);
+    });
+  }
+
+  function abrirModalChaveDepende(oracao, quantidade) {
+    oracaoCondicionalPendente = oracao;
+    quantidadeCondicionalPendente = quantidade;
+    if (dom.checkboxDependeNegado) dom.checkboxDependeNegado.checked = false;
+    if (dom.inputBuscaChaveDepende) dom.inputBuscaChaveDepende.value = '';
+    renderizarListaChaveDepende('');
+    if (dom.modalChaveDepende) dom.modalChaveDepende.classList.remove('hidden');
+    if (dom.inputBuscaChaveDepende) dom.inputBuscaChaveDepende.focus();
+  }
+
+  function fecharModalChaveDepende() {
+    if (dom.modalChaveDepende) dom.modalChaveDepende.classList.add('hidden');
+    oracaoCondicionalPendente = null;
+  }
+
+  if (dom.btnCancelarChaveDepende) {
+    dom.btnCancelarChaveDepende.addEventListener('click', fecharModalChaveDepende);
+  }
+  if (dom.inputBuscaChaveDepende) {
+    dom.inputBuscaChaveDepende.addEventListener('input', (e) => {
+      renderizarListaChaveDepende(e.target.value);
     });
   }
 

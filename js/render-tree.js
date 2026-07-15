@@ -108,7 +108,7 @@ function construirArvore(texto, titulosVisitados, estado){
   const nos = [];
   // O modificador entre chaves aceita um número (repetição) ou a palavra
   // reservada "opcional" (leitura opcional, oculta por padrão).
-  const regex = /\[([^\[\]]+)\](?:\{(\d+|opcional)\})?/gi;
+  const regex = /\[([^\[\]]+)\](?:\{(\d+|opcional)\})?(?:\{depende:([^\}]+)\})?/gi;
   let ultimoIndice = 0;
   let match;
 
@@ -120,12 +120,13 @@ function construirArvore(texto, titulosVisitados, estado){
     const tituloRef = ref.titulo;
     const nomeLower = tituloRef.toLowerCase();
     const modificador = match[2] ? match[2].toLowerCase() : null;
+    const depende = match[3] ? match[3].trim() : null;
     const ehOpcional = modificador === 'opcional';
     const quantidade = ehOpcional ? 1 : Math.min(Math.max(parseInt(modificador || '1', 10) || 1, 1), 200);
 
     const urlLink = extrairUrlReferenciaLink(tituloRef);
     if(urlLink){
-      nos.push({ tipo: 'link', url: urlLink });
+      nos.push({ tipo: 'link', url: urlLink, depende });
       ultimoIndice = match.index + match[0].length;
       continue;
     }
@@ -133,7 +134,7 @@ function construirArvore(texto, titulosVisitados, estado){
     if(nomeLower === 'pausa'){
       // Palavra reservada: não é uma citação de oração, é uma pequena pausa.
       // Reaproveita a mesma sintaxe [Título]{n}, mas "n" aqui é em segundos.
-      nos.push({ tipo: 'pausa', segundos: quantidade });
+      nos.push({ tipo: 'pausa', segundos: quantidade, depende });
       ultimoIndice = match.index + match[0].length;
       continue;
     }
@@ -141,13 +142,13 @@ function construirArvore(texto, titulosVisitados, estado){
     const encontrada = encontrarOracaoReferenciada(ref);
 
     if(!encontrada){
-      nos.push({ tipo: 'erro', texto: `(oração "${tituloRef}" não encontrada)` });
+      nos.push({ tipo: 'erro', texto: `(oração "${tituloRef}" não encontrada)`, depende });
     }else{
       const chaveIdEncontrada = `id:${encontrada.id}`;
       const chaveTituloEncontrada = `titulo:${encontrada.titulo.trim().toLowerCase()}`;
 
       if(titulosVisitados.has(chaveIdEncontrada) || titulosVisitados.has(chaveTituloEncontrada)){
-        nos.push({ tipo: 'erro', texto: `(referência circular: ${encontrada.titulo})` });
+        nos.push({ tipo: 'erro', texto: `(referência circular: ${encontrada.titulo})`, depende });
       }else{
         const novosVisitados = new Set(titulosVisitados);
         novosVisitados.add(chaveIdEncontrada);
@@ -158,13 +159,13 @@ function construirArvore(texto, titulosVisitados, estado){
           // Leitura opcional: começa sempre oculta e fora da fala; o usuário
           // decide, na hora, se quer abrir/ouvir (não é lembrado depois).
           const filhos = construirArvore(encontrada.texto, novosVisitados);
-          nos.push({ tipo: 'opcional', rotulo: encontrada.titulo, refId: encontrada.id, filhos });
+          nos.push({ tipo: 'opcional', rotulo: encontrada.titulo, refId: encontrada.id, filhos, depende });
         }else if(quantidade > 1){
           const filhos = construirArvore(encontrada.texto, novosVisitados);
-          nos.push({ tipo: 'repetido', rotulo: encontrada.titulo, quantidade, filhos, colapsarNaFala: !!encontrada.colapsarNaFala });
+          nos.push({ tipo: 'repetido', rotulo: encontrada.titulo, quantidade, filhos, colapsarNaFala: !!encontrada.colapsarNaFala, depende });
         }else{
           const filhos = construirArvore(encontrada.texto, novosVisitados);
-          nos.push({ tipo: 'bloco', rotulo: encontrada.titulo, filhos, colapsarNaFala: !!encontrada.colapsarNaFala });
+          nos.push({ tipo: 'bloco', rotulo: encontrada.titulo, filhos, colapsarNaFala: !!encontrada.colapsarNaFala, depende });
         }
       }
     }
@@ -292,6 +293,41 @@ function agruparNos(nos){
   return grupos;
 }
 
+// Resolve o rótulo real a partir de uma chave {depende:} que pode ter
+// o formato "Título" (legado/simples) ou "Título|id" (com id, preferível).
+// Quando há |id, busca a oração pelo id para obter o título atual
+// (imune a renomeações). Retorna o título que deve ser comparado com
+// g.rotulo nos blocos opcionais (chave de leiturasOpcionaisPreferidas).
+function resolverRotuloDepende(chave) {
+  const partes = chave.split('|');
+  if (partes.length >= 2) {
+    const refId = partes[partes.length - 1].trim();
+    const titulo = partes.slice(0, -1).join('|').trim();
+    const encontrada = encontrarOracaoReferenciada({ titulo, id: refId });
+    if (encontrada) return encontrada.titulo;
+  }
+  return chave.trim();
+}
+
+function verificarDependenciaAtiva(dependeStr, oracaoIdAtual){
+  if(!dependeStr) return true;
+  let negado = false;
+  let chave = dependeStr.trim();
+  if(chave.startsWith('!')){
+    negado = true;
+    chave = chave.slice(1).trim();
+  }
+
+  const rotulo = resolverRotuloDepende(chave);
+  const chavePreferencia = oracaoIdAtual ? `${oracaoIdAtual}::${rotulo}` : null;
+  const preferenciaSalva = (chavePreferencia && typeof leiturasOpcionaisPreferidas !== 'undefined')
+    ? leiturasOpcionaisPreferidas[chavePreferencia]
+    : undefined;
+
+  const ativa = (preferenciaSalva === true);
+  return negado ? !ativa : ativa;
+}
+
 function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
   // ctxRepetidoAninhado: o ctx de progresso "real" mais próximo, propagado por
   // baixo de qualquer nível de repetição — serve só para dar identidade
@@ -306,7 +342,7 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
   // e a fala automática interpretava a repetição inteira do nível de cima
   // como concluída assim que saía do primeiro filho para o repetido aninhado.
   if(ctxRepetidoAninhado === undefined) ctxRepetidoAninhado = ctx;
-
+ 
   // oracaoIdAtual: o id da oração raiz sendo rezada, propagado para TODO
   // nível de recursão — inclusive dentro de blocos "opcional", onde `ctx`
   // vira null de propósito (para não ganharem check de progresso). Antes,
@@ -320,8 +356,25 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
   // sendo A MESMA preferência (uma só chave) não importa qual dos 4
   // mistérios do dia esteja envolvendo-a no momento.
   if(oracaoIdAtual === undefined) oracaoIdAtual = ctx && ctx.oracaoId;
-
+ 
   agruparNos(nos).forEach(g => {
+    // Para nós com {depende:X}: sempre renderiza, mas guarda info para tagging
+    // e controle de visibilidade dinâmica (o switch altera display ao ser alternado).
+    let dependeRotulo = null;
+    let dependeNegado = false;
+    let dependeAtivo = true;
+    if (g.depende) {
+      let chaveDepende = g.depende.trim();
+      if (chaveDepende.startsWith('!')) {
+        dependeNegado = true;
+        chaveDepende = chaveDepende.slice(1).trim();
+      }
+      dependeRotulo = resolverRotuloDepende(chaveDepende);
+      const chavePreferenciaDepende = oracaoIdAtual ? `${oracaoIdAtual}::${dependeRotulo}` : null;
+      const prefSalvaDepende = chavePreferenciaDepende ? leiturasOpcionaisPreferidas[chavePreferenciaDepende] : undefined;
+      const baseAtivo = (prefSalvaDepende === true);
+      dependeAtivo = dependeNegado ? !baseAtivo : baseAtivo;
+    }
     if(g.tipo === 'grupo-linhas'){
       const idx = ctx ? ctx.n++ : -1;
       const wrapper = document.createElement('div');
@@ -614,6 +667,18 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
           leiturasOpcionaisPreferidas[chavePreferencia] = ativo;
           salvarLeiturasOpcionaisPreferidas();
 
+          // Atualiza visibilidade de todos os blocos condicionais {depende:} que
+          // dependem deste opcional (mesmo nome de rótulo, mesma oração raiz).
+          const containerRaizDepende = divBloco.closest('#rezar-texto') || divBloco.closest('.bloco-opcional-conteudo') || document.body;
+          containerRaizDepende.querySelectorAll('[data-depende-rotulo]').forEach(elDep => {
+            if (elDep.dataset.dependeRotulo === g.rotulo &&
+                (!oracaoIdAtual || elDep.dataset.dependeOracaoId === String(oracaoIdAtual))) {
+              const negado = elDep.dataset.dependeNegado === '1';
+              const mostrar = negado ? !ativo : ativo;
+              elDep.style.display = mostrar ? '' : 'none';
+            }
+          });
+
           if(localStorage.getItem(CHAVE_DICA_LEITURA_OPCIONAL_MOSTRADA) !== '1'){
             localStorage.setItem(CHAVE_DICA_LEITURA_OPCIONAL_MOSTRADA, '1');
             if(typeof mostrarToast === 'function'){
@@ -665,6 +730,15 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
       p.style.opacity = '0.6';
       p.textContent = g.texto;
       container.appendChild(p);
+    }
+
+    // Tagging de dependência: aplica ao último elemento adicionado ao container
+    if (dependeRotulo && container.lastElementChild) {
+      const elDep = container.lastElementChild;
+      elDep.dataset.dependeRotulo = dependeRotulo;
+      if (oracaoIdAtual) elDep.dataset.dependeOracaoId = oracaoIdAtual;
+      if (dependeNegado) elDep.dataset.dependeNegado = '1';
+      if (!dependeAtivo) elDep.style.display = 'none';
     }
   });
 }

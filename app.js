@@ -184,6 +184,7 @@ const editorOracao = criarEditorOracao({
   idsModais: {
       btnInserirOracao:      'btn-inserir-oracao',
       btnInserirOpcional:    'btn-inserir-opcional',
+      btnInserirCondicional: 'btn-inserir-condicional',
       btnInserirLink:        'btn-inserir-link',
       btnInserirPausa:       'btn-inserir-pausa',
       modalInserir:          'modal-inserir',
@@ -201,7 +202,12 @@ const editorOracao = criarEditorOracao({
       modalNumeroDica:       'modal-numero-dica',
       inputNumero:           'input-numero',
       btnCancelarNumero:     'btn-cancelar-numero',
-      btnConfirmarNumero:    'btn-confirmar-numero'
+      btnConfirmarNumero:    'btn-confirmar-numero',
+      modalChaveDepende:          'modal-chave-depende',
+      inputBuscaChaveDepende:     'input-busca-chave-depende',
+      listaModalChaveDepende:     'lista-modal-chave-depende',
+      btnCancelarChaveDepende:    'btn-cancelar-chave-depende',
+      checkboxDependeNegado:      'checkbox-depende-negado'
   },
   recursos: {
     mostrarCamposAdmin: false,

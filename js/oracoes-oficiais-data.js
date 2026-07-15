@@ -34,7 +34,7 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mqtzl9dc",
     "titulo": "Mistérios Gozosos",
-    "texto": "[mistério gozoso (São Josemaria)|oficial_mrjd6kg1]{opcional}\n\nPrimeiro Mistério: \nA Encarnação do Senhor\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nA visitação de Nossa Senhora à sua prima Santa Isabel\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA purificação de Nossa Senhora\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nJesus perdido e achado no templo\n[Santo Rosário (dezena)|oficial_mria0ch6]\n",
+    "texto": "Primeiro Mistério: \nA Encarnação do Senhor\n[São Josemaria (mistério gozoso1)|oficial_mr3vkvfu]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nA visitação de Nossa Senhora à sua prima Santa Isabel\n[São Josemaria (mistério gozoso2)|oficial_mrjclx7y]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \n[São Josemaria (mistério gozoso3)|oficial_mrjcmxrj]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA purificação de Nossa Senhora\n[São Josemaria (mistério gozoso4)|oficial_mrjcopm7]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nJesus perdido e achado no templo\n[São Josemaria (mistério gozoso5)|oficial_mrjcpbpn]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\n",
     "oculta": false,
     "colapsarNaFala": false
   },
@@ -174,7 +174,7 @@ var ORACOES_OFICIAIS_DATA = [
   },
   {
     "id": "oficial_mr3vkvfu",
-    "titulo": "1 mistério gozoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério gozoso1)",
     "texto": "Não te esqueças, meu amigo, de que somos crianças. A Senhora do doce nome, Maria, está recolhida em oração.\n\nTu és, naquela casa, o que quiseres ser: um amigo, um criado, um curioso, um vizinho… - Eu por agora não me atrevo a ser nada. Escondo-me atrás de ti e, pasmado, contemplo a cena.\n\nO Arcanjo comunica a sua mensagem… - Quomodo fiet istud, quoniam virum non cognosco? - Como se fará isso, se não conheço varão? (Lc 1, 34).\n\nA voz da nossa Mãe traz à minha memória, por contraste, todas as impurezas dos homens…, as minhas também.\n\nE como odeio então essas baixas misérias da terra!… Que propósitos!\nFiat mihi secundum verbum tuum. - Faça-se em mim segundo a tua palavra (Lc 1, 38). Ao encanto destas palavras virginais, o Verbo se fez carne.\n\nVai terminar a primeira dezena… Ainda tenho tempo de dizer ao meu Deus, antes que nenhum mortal: Jesus, eu Te amo.\n",
     "oculta": true,
     "colapsarNaFala": false
@@ -273,7 +273,7 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mrc4ar32",
     "titulo": "Santo Rosário",
-    "texto": "[Santo Rosário (início)|oficial_mrc0jvb9]\n\n[Mistérios Gozosos|oficial_mqtzl9dc]{opcional}\n[Mistérios Dolorosos|oficial_mrc4c7cg]{opcional}\n[Mistérios Luminosos|oficial_mrc4do0v]{opcional}\n[Mistérios Gloriosos|oficial_mrc4e06s]{opcional}\n\n[Santo Rosário (ladainha)|oficial_mqy7tofl]\n\n",
+    "texto": "[Santo Rosário (início)|oficial_mrc0jvb9]\n[mistério gozoso (São Josemaria)|oficial_mrjd6kg1]{opcional}\n[Mistérios Gozosos|oficial_mqtzl9dc]{opcional}\n[Mistérios Dolorosos|oficial_mrc4c7cg]{opcional}\n[Mistérios Luminosos|oficial_mrc4do0v]{opcional}\n[Mistérios Gloriosos|oficial_mrc4e06s]{opcional}\n\n[Santo Rosário (ladainha)|oficial_mqy7tofl]\n\n",
     "oculta": false,
     "colapsarNaFala": false
   },
@@ -349,141 +349,141 @@ var ORACOES_OFICIAIS_DATA = [
   },
   {
     "id": "oficial_mrjclx7y",
-    "titulo": "2 mistério gozoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério gozoso2)",
     "texto": "Agora, meu pequeno amigo, espero que já saibas mexer-te. - Acompanha alegremente José e Santa Maria… e escutarás tradições da Casa de Davi.\n\nOuvirás falar de Isabel e de Zacarias, enternecer-te-ás com o amor puríssimo de José, e baterá fortemente o teu coração cada vez que pronunciarem o nome do Menino que nascerá em Belém…\n\nCaminhamos apressadamente em direção às montanhas, até uma aldeia da tribo de Judá (Lc 1, 39).\n\nChegamos. - É a casa onde vai nascer João Batista. - Isabel aclama, agradecida, a Mãe do seu Redentor: Bendita és tu entre as mulheres e bendito é o fruto do teu ventre! A que devo tamanho bem, que venha visitar-me a Mãe do meu Senhor? (Lc 1, 42-43).\n\nO Batista, ainda por nascer, estremece… (Lc 1, 41). - A humildade de Maria derrama-se no Magnificat… - E tu e eu, que somos - que éramos - uns soberbos, prometemos ser humildes.\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcmxrj",
-    "titulo": "3 mistério gozoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério gozoso3)",
     "texto": "Foi promulgado um edito de César Augusto, que manda recensear toda a gente. Para isso, cada qual tem de ir à terra dos seus antepassados. - Como José é da casa e da família de Davi, vai, com a Virgem Maria, de Nazaré à cidade chamada Belém, na Judéia (Lc 2, 1-5).\n\nE em Belém nasce o nosso Deus: Jesus Cristo! - Não há lugar na pousada: num estábulo. - E sua Mãe envolve-O em panos e reclina-O no presépio (Lc 2, 7).\n\nFrio. - Pobreza. - Sou um escravozinho de José. - Que bom é José! - Trata-me como um pai a seu filho. - Até me perdoa, se tomo o Menino em meus braços e fico, horas e horas, dizendo-Lhe coisas doces e ardentes!…\n\nE beijo-O - beija-O tu -, e O embalo, e canto para Ele, e Lhe chamo Rei, Amor, meu Deus, meu Único, meu Tudo!… Que lindo é o Menino… e que curta a dezena!\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcopm7",
-    "titulo": "4 mistério gozoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério gozoso4)",
     "texto": "Completado o tempo da purificação da Mãe, segundo a Lei de Moisés, é preciso ir com o Menino a Jerusalém para apresentá-Lo ao Senhor (Lc 2, 22).\n\nE desta vez serás tu, meu amigo, quem leve a gaiola das rolas. - Estás vendo? Ela - a Imaculada! - submete-se à Lei como se estivesse imunda.\n\nAprenderás com este exemplo, menino bobo, a cumprir a Santa Lei de Deus, apesar de todos os sacrifícios pessoais?\n\nPurificação! Tu e eu, sim, é que precisamos de purificação! Expiação, e, acima da expiação, o Amor. - Um amor que seja cautério, que abrase a imundície da nossa alma, e fogo que incendeie com chamas divinas a miséria do nosso coração.\n\nUm homem justo e temente a Deus, que, conduzido pelo Espírito Santo, viera ao Templo - tinha-lhe sido revelado que não morreria antes de ver o Cristo -, toma o Messias em seus braços e diz-Lhe: - Agora, Senhor, agora já podes levar em paz deste mundo o teu servo, conforme a tua promessa…, porque meus olhos viram o Salvador (Lc 2, 25-30).",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcpbpn",
-    "titulo": "5 mistério gozoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério gozoso5)",
     "texto": "Onde está Jesus? - Senhora: o Menino!… Onde está?\n\nMaria chora. - Bem que corremos tu e eu, de grupo em grupo, de caravana em caravana: não O viram. - José, depois de fazer esforços inúteis para não chorar, chora também… E tu… E eu.\n\nEu, como sou um criadinho tosco, choro sem parar e clamo ao céu e à terra…, pelas vezes em que O perdi por minha culpa e não clamei.\n\nJesus! Que eu nunca mais Te perca… E então a desgraça e a dor nos unem, como nos uniu o pecado, e saem de todo o nosso ser gemidos de profunda contrição e frases ardentes, que a pena não pode, não deve registrar.\n\nE ao nos consolarmos com a alegria de encontrar Jesus - três dias de ausência! - disputando com os Mestres de Israel (Lc 2, 46), ficará bem gravada na tua alma e na minha a obrigação de deixarmos os da nossa casa para servir o Pai Celestial.\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcrqcb",
-    "titulo": "1 mistério doloroso (São Josemaria)",
+    "titulo": "São Josemaria (mistério doloroso1)",
     "texto": "Orai, para não entrardes em tentação. - E Pedro adormeceu. - E os demais Apóstolos. - E adormeceste tu, meu pequeno amigo…, e eu fui também outro Pedro dorminhoco.\n\nJesus, só e triste, sofria e empapava a terra com o seu sangue.\n\nDe joelhos sobre a terra dura, persevera em oração… Chora por ti… e por mim: esmaga-O o peso dos pecados dos homens.\n\nPater, si vis, transfer calicem istum a me. - Pai, se quiseres, faz com que se afaste de Mim este cálice… Não se faça, porém, a minha vontade, sed tua fiat, mas a tua (Lc 22, 42).\n\nUm Anjo do céu O conforta. - Jesus está em agonia. - Continua prolixius, orando mais intensamente… Aproxima-se de nós, que dormimos: - Levantai-vos, orai - repete-nos -, para não cairdes em tentação (Lc 22, 46).\n\nJudas, o traidor: um beijo. - A espada de Pedro brilha na noite. - Jesus fala: - Vindes buscar-Me como um ladrão? (Mc 14, 48).\n\nSomos covardes: seguimo-Lo de longe. Mas acordados e orando. - Oração… Oração…\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcsb9t",
-    "titulo": "2 mistério doloroso (São Josemaria)",
+    "titulo": "São Josemaria (mistério doloroso2)",
     "texto": "Fala Pilatos: - Tendes o costume de que vos solte alguém pela Páscoa. Quem havemos de pôr em liberdade? Barrabás - ladrão, preso com outros por homicídio - ou Jesus? (Mt 27, 17). - Manda matar este e solta Barrabás, clama o povo incitado pelos seus príncipes (Lc 23, 18).\n\nPilatos fala de novo: - Então que farei de Jesus, que se chama o Cristo? (Mt 27, 22). - Crucifige eum! - Crucifica-O! (Mc 15, 14).\n\nDiz-lhes Pilatos, pela terceira vez: - Mas que mal fez Ele? Não encontro nEle causa alguma de morte (Lc 23, 22).\n\nAumentava o clamor da multidão: - Crucifica-O, crucifica-O! (Mc 15, 14).\n\nE Pilatos, desejando contentar o povo, solta-lhes Barrabás e manda açoitar Jesus.\n\nAtado à coluna. Cheio de chagas.\n\nOuvem-se os golpes dos azorragues na sua carne rasgada, na sua carne sem mancha, que padece pela tua carne pecadora. - Mais golpes. Mais sanha. Mais ainda… É o cúmulo da crueldade humana.\n\nPor fim, rendidos, desprendem Jesus. E o corpo de Cristo rende-se também à dor e cai, como um verme, truncado e meio morto.\n\nTu e eu não podemos falar. - Não são precisas palavras. Olha para Ele, olha para Ele… devagar.\n\nDepois… serás capaz de ter medo à expiação?\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcsugn",
-    "titulo": "3 mistério doloroso (São Josemaria)",
+    "titulo": "São Josemaria (mistério doloroso3)",
     "texto": "Vai ficando satisfeita a ânsia de sofrer do nosso Rei!\n\n- Levam o meu Senhor ao pátio do pretório, e ali convocam toda a coorte (Mc 15, 16). - A soldadesca brutal desnudou a sua carne puríssima. - Com um farrapo de púrpura, velho e sujo, cobrem Jesus. - Por cetro, uma cana na mão direita…\n\nA coroa de espinhos, cravada a marteladas, faz dEle um Rei de comédia… Ave Rex iudaeorum! - Salve, Rei dos judeus (Mc 15, 18). E, à força de pancadas, ferem-Lhe a cabeça. E esbofeteiam-nO… e cospem nEle.\n\nCoroado de espinhos e vestido com andrajos de púrpura, Jesus é mostrado ao povo judeu: Ecce homo! Aí tendes o homem. E de novo os pontífices e seus ministros rompem aos gritos, clamando: - Crucifica-O!, crucifica-O! (Jo 19, 5-6).\n\n- Tu e eu não teremos voltado a coroá-Lo de espinhos, a esbofeteá-Lo e a cuspir-Lhe?\n\nNunca mais, Jesus, nunca mais… E um propósito firme e concreto põe fim a estas dez Ave-Marias.\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjctigv",
-    "titulo": "4 mistério doloroso (São Josemaria)",
+    "titulo": "São Josemaria (mistério doloroso4)",
     "texto": "Com a sua Cruz às costas, caminha para o Calvário, lugar que em hebraico é chamado Gólgota (Jo 19, 17). E lançam mão de um tal Simão, natural de Cirene, que volta de uma granja, e o carregam com a Cruz, para que a leve atrás de Jesus (Lc 23, 26).\n\nCumpriu-se o que Isaías tinha dito (53, 12): cum sceleratis reputatus est, foi contado entre os malfeitores - porque levaram, para fazê-lo morrer com Ele, outros dois homens, que eram ladrões (Lc 23, 32).\n\nSe alguém quiser vir após Mim… Menino amigo: estamos tristes, vivendo a Paixão de Jesus, Nosso Senhor. - Olha com que amor se abraça à Cruz. - Aprende com Ele. - Jesus leva a Cruz por ti; tu… leva-a por Jesus.\n\nMas não leves a Cruz de rastos… Leva-a erguida a prumo, porque a tua Cruz, levada assim, não será uma Cruz qualquer: será… a Santa Cruz. Não te resignes com a Cruz. Resignação é palavra pouco generosa. Quer a Cruz. Quando de verdade a quiseres, a tua Cruz será… uma Cruz sem Cruz.\n\nE, com toda a certeza, tal como Ele, encontrarás Maria no caminho.\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjctxxt",
-    "titulo": "5 mistério doloroso (São Josemaria)",
+    "titulo": "São Josemaria (mistério doloroso5)",
     "texto": "Jesus Nazareno, Rei dos judeus, já tem preparado o trono triunfador. Tu e eu não O vemos contorcer-se, ao ser pregado; sofrendo tudo quanto se pode sofrer, estende os braços com gesto de Sacerdote Eterno.\n\nOs soldados tomam as santas vestes e fazem quatro partes. - Para não dividirem a túnica, sorteiam-na para ver a quem tocará. - E assim, uma vez mais, se cumpre a Escritura que diz: Repartiram entre si as minhas vestes e sobre elas lançaram sortes (Jo 19, 23 e 24).\n\nJá está no alto… - E, junto de seu Filho, ao pé da Cruz, Santa Maria… e Maria, mulher de Cléofas, e Maria Madalena. E João, o discípulo que Ele amava. Ecce mater tua! - Aí tens a tua Mãe! Dá-nos a sua Mãe por Mãe nossa.\n\nTinham-Lhe oferecido antes vinho misturado com fel, mas, tendo-o provado, não o bebeu (Mt 27, 34).\n\nAgora tem sede… de amor, de almas.\n\nConsummatum est. - Tudo está consumado (Jo 19, 30).\n\nMenino bobo, olha: tudo isto…, tudo, sofreu por ti… e por mim. - Não choras?\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcvfsp",
-    "titulo": "1 mistério glorioso (São Josemaria)",
+    "titulo": "São Josemaria (mistério glorioso1)",
     "texto": "Ao cair da tarde de Sábado, Maria Madalena, e Maria, mãe de Tiago, e Salomé compraram perfumes para irem embalsamar o corpo morto de Jesus. - No outro dia, de manhã cedo, chegam ao sepulcro, nascido já o sol (Mc 16, 1-2). E entrando, ficam consternadas, porque não encontram o corpo do Senhor. - Um jovem, coberto de vestes brancas, diz-lhes: - Não temais; sei que procurais Jesus Nazareno. Non est hic, surrexit enim sicut dixit - não está aqui porque ressuscitou, como tinha anunciado (Mt 28, 5).\n\nRessuscitou! - Jesus ressuscitou. Não está no sepulcro. A Vida pôde mais do que a morte.\n\nApareceu a sua Mãe Santíssima. - Apareceu a Maria de Magdala, que está louca de amor. - E a Pedro e aos demais Apóstolos. - E a ti e a mim, que somos seus discípulos e mais loucos que Madalena. Que coisas Lhe dissemos!\n\nQue nunca morramos pelo pecado; que seja eterna a nossa ressurreição espiritual. - E, antes de terminar a dezena, beijaste as chagas dos seus pés…, e eu, mais atrevido - por ser mais criança -, pus os meus lábios no seu lado aberto.\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcw1nd",
-    "titulo": "2 mistério glorioso (São Josemaria)",
+    "titulo": "São Josemaria (mistério glorioso2)",
     "texto": "Mestre ensina agora os seus discípulos: abriu-lhes a inteligência, para que compreendam as\n\nEscrituras, e toma-os por testemunhas da sua vida e dos seus milagres, da sua paixão e morte, e da glória da sua ressurreição (Lc 24, 45.48).\n\nDepois, leva-os a caminho de Betânia, ergue as mãos e abençoa-os. - E, entretanto, vai-se afastando deles e eleva-se no céu (Lc 24, 50), até que uma nuvem O ocultou (At 1, 9).\n\nJesus foi para o Pai. - Dois Anjos de brancas vestes se aproximam de nós e nos dizem: - Homens da Galiléia, que fazeis olhando para o céu? (At 1, 11).\n\nPedro e os restantes voltam para Jerusalém - cum gaudio magno - com grande alegria (Lc 24, 52). - É justo que a Santa Humanidade de Cristo receba a homenagem, a aclamação e a adoração de todas as hierarquias dos Anjos e de todas as legiões dos bem-aventurados da Glória.\n\nMas tu e eu nos sentimos órfãos; estamos tristes, e vamos consolar-nos com Maria.\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcwgg3",
-    "titulo": "3 mistério glorioso (São Josemaria)",
+    "titulo": "São Josemaria (mistério glorioso3)",
     "texto": "O Senhor tinha dito: - Eu rogarei ao Pai, e Ele vos dará outro Paráclito, outro Consolador, para que permaneça convosco eternamente (Jo 14, 16).\n\nReunidos os discípulos todos juntos num mesmo lugar, de repente sobreveio do céu um ruído como que de vento impetuoso, que invadiu toda a casa onde se encontravam. - Ao mesmo tempo, umas línguas de fogo se repartiram e pousaram sobre cada um deles (At 2, 1-3).\n\nCheios do Espírito Santo, os Apóstolos estavam como bêbados (At 2, 13).\n\nE Pedro, rodeado pelos outros onze, levantou a voz e falou. - Ouvimo-lo pessoas de cem países. - Cada um o escuta na sua língua. - Tu e eu na nossa. - Fala-nos de Cristo Jesus e do Espírito Santo e do Pai.\n\nNão o apedrejam nem o metem na cadeia; convertem-se e são batizados três mil dos que o ouviram.\n\nTu e eu, depois de ajudarmos os Apóstolos a administrar os batismos, louvamos a Deus Pai, por seu Filho Jesus, e nos sentimos também ébrios do Espírito Santo.\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcx48h",
-    "titulo": "4 mistério glorioso (São Josemaria)",
+    "titulo": "São Josemaria (mistério glorioso4)",
     "texto": "Assumpta est Maria in coelum: gaudent angeli! - Maria foi levada por Deus, em corpo e alma, para o céu. E os Anjos se alegram!\n\nAssim canta a Igreja. - E assim, com esse clamor de regozijo, começamos nós a contemplação nesta dezena do Santo Rosário.\n\nAdormeceu a Mãe de Deus. - Em volta do seu leito encontram-se os doze Apóstolos. - Matias substituiu Judas.\n\nE nós, por graça que todos respeitam, estamos a seu lado também.\n\nMas Jesus quer ter a sua Mãe, em corpo e alma, na Glória. - E a Corte celestial mobiliza todo o seu esplendor para homenagear a Senhora. - Tu e eu - crianças, afinal - pegamos a cauda do esplêndido manto azul da Virgem, e assim podemos contemplar aquela maravilha.\n\nA Trindade Beatíssima recebe e cumula de honras a Filha, Mãe e Esposa de Deus… - E é tanta a majestade da Senhora, que os Anjos perguntam: - Quem é esta?\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjcxkrv",
-    "titulo": "5 mistério glorioso (São Josemaria)",
+    "titulo": "São Josemaria (mistério glorioso5)",
     "texto": "És toda formosa, e não há mancha em ti. - És horto cerrado, minha irmã, Esposa, horto cerrado, fonte selada. - Veni coronaberis. - Vem, serás coroada (Cant 4, 7, 12.8).\n\nSe tu e eu tivéssemos tido poder, tê-la-íamos feito também Rainha e Senhora de toda a criação.\n\nUm grande sinal apareceu no céu: uma mulher com uma coroa de doze estrelas sobre a cabeça. - O vestido, de sol. - A lua a seus pés (Ap 12, 1). Maria, Virgem sem mancha, reparou a queda de Eva; e esmagou com seu pé imaculado a cabeça do dragão infernal. Filha de Deus, Mãe de Deus, Esposa de Deus.\n\nO Pai, o Filho e o Espírito Santo coroam-na como Imperatriz que é do Universo.\n\nE rendem-lhe preito de vassalagem os Anjos…, e os patriarcas e os profetas e os Apóstolos…, e os mártires e os confessores e as virgens e todos os santos…, e todos os pecadores, e tu e eu.\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjd0jxv",
-    "titulo": "1 mistério luminoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério luminoso1)",
     "texto": "Então Jesus veio da Galileia ao Jordão, para ser batizado por João [...]. E uma voz dos céus disse: Este é o meu Filho, o amado, em quem pus as minhas complacências (Mt III, 13.17).\n\nPelo Batismo, o nosso Pai-Deus tomou posse das nossas vidas, incorporou-nos à vida de Cristo e enviou-nos o Espírito Santo.\n\nA força e o poder de Deus iluminam a face da terra.\n\nFaremos com que o mundo arda, nas chamas do fogo que vieste trazer à terra... E a luz da tua verdade, Jesus nosso, iluminará as inteligências, num dia sem fi m.\n\nOuço-te clamar, meu Rei, com voz viva, que ainda vibra: Ignem veni mittere in terram, et quid volo nisi ut accendatur? ﻿–﻿ e respondo ﻿–﻿ todo eu ﻿–﻿ com os meus sentidos e as minhas potências: Ecce ego: quia vocasti me! O Senhor pôs na tua alma um selo indelével, por meio do Batismo: és filho de Deus.\n\nMenino: não ardes em desejos de fazer que todos O amem?\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjd14qf",
-    "titulo": "2 mistério luminoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério luminoso2)",
     "texto": "Entre tantos convidados de uma dessas ruidosas bodas do meio rural, a que comparecem pessoas de vários povoados, Maria percebe que falta vinho (cf. Ioh II, 3). Só Ela o percebe, e imediatamente. Como se nos revelam familiares as cenas da vida de Cristo! Porque a grandeza de Deus convive com o normal e o corrente. É próprio de uma mulher e de uma diligente dona de casa notar um descuido, prestar atenção a esses pequenos detalhes que tornam agradável a existência humana: e foi assim que Maria se comportou.\n\n﻿–﻿ Fazei o que Ele vos disser (Ioh II, 5).\n\nImplete hydrias (Ioh II, 7), enchei as talhas, e o milagre vem. Assim, com essa simplicidade. Tudo normal. Aqueles cumpriam o seu ofício. A água estava ao alcance das mãos. E é a primeira manifestação da Divindade do Senhor. O mais vulgar converte-se em extraordinário, em sobrenatural, quando temos a boa vontade de atender ao que Deus nos pede.\n\nQuero, Senhor, abandonar todos os meus cuidados nas tuas mãos generosas. A nossa Mãe ﻿–﻿ a tua Mãe! ﻿–﻿, a estas horas, como em Caná, já fez soar aos teus ouvidos: ﻿–﻿ Não têm!...\n\nSe a nossa fé for débil, recorramos a Maria. Conta São João que, devido ao milagre das bodas de Caná, que Cristo realizou a pedido de sua Mãe, os seus discípulos creram nEle (Ioh II, 11). A nossa Mãe intercede sempre diante do seu Filho para que nos atenda e se nos revele de tal modo que possamos confessar: Tu és o Filho de Deus.\n\nDá-me, ó Jesus, essa fé, que de verdade desejo! Minha Mãe e Senhora minha, Maria Santíssima, faz que eu creia!\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjd1o9t",
-    "titulo": "3 mistério luminoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério luminoso3)",
     "texto": "Cumpriu-se o tempo e o Reino de Deus está para chegar: convertei-vos e crede no Evangelho (Mc I, 15).\n\nToda a multidão ia até Ele, e Ele os ensinava (Mc II, 13).\n\nJesus vê aquelas barcas na margem e sobe numa delas [...]. Com que naturalidade se mete Jesus na barca de cada um de nós!\n\nQuanto te aproximares do Senhor, pensa que Ele está muito perto de ti, em ti: regnum Dei intra vos est (Lc XVII, 21). Encontrá-lo-ás no teu coração.\n\nCristo deve reinar, acima de tudo, na nossa alma. Para que Ele reine em mim, preciso da sua graça em abundância: só assim é que até o último latejo do coração, até o último alento, até o olhar menos intenso, até a palavra mais intranscendente, até a sensação mais elementar se traduzirão num hosanna ao meu Cristo-Rei.\n\nDuc in altum ﻿–﻿ Mar adentro! ﻿–﻿ Repele o pessimismo que te torna covarde. Et laxate retia vestra in capturam ﻿–﻿ e lança as redes para pescar.\n\nDevemos confiar nessas palavras do Senhor, entrar na barca, empunhar os remos, içar as velas e lançar-nos a esse mar do mundo que Cristo nos entrega em herança.\n\nEt regni ejus non erit finis. ﻿—﻿ O seu Reino não terá fim!\n\nNão te dá alegria trabalhar por um reinado assim?\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjd28cn",
-    "titulo": "4 mistério luminoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério luminoso4)",
     "texto": "E transfigurou-se diante deles, de modo que o seu rosto se tornou resplandecente como o sol, e as suas vestes brancas como a luz (Mt XVI, 2).\n\nJesus: ver-Te, falar contigo! Permanecer assim, contemplando-Te, abismados na imensidade da tua formosura, e não cessar nunca, nunca, nessa contemplação! Oh, Cristo, quem Te pudesse ver! Quem Te pudesse ver, para ficar ferido de amor por Ti.\n\nE uma voz vinda da nuvem disse: Este é o meu Filho, o Amado, em quem tenho as minhas complacências; escutai-o (Mt XVII, 5).\n\nSenhor nosso, aqui nos tens dispostos a escutar tudo o que queiras dizer-nos. Fala-nos, estamos atentos à tua voz. Que as tuas palavras, caindo na nossa alma, abrasem a nossa vontade para que se lance fervorosamente a obedecer-Te.\n\nVultum tuum, Domine, requiram (Ps XXVI, 8), buscarei, Senhor, o teu rosto. Encanta-me fechar os olhos e pensar que chegará o momento, quando Deus quiser, em que poderei vê-lo, não como em um espelho, e sob imagens obscuras..., mas face a face (I Cor XIII, 12). Sim, o meu coração está sedento de Deus, do Deus vivo: quando irei e contemplarei a face de Deus? (Ps XLI, 3)\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjd2r3h",
-    "titulo": "5 mistério luminoso (São Josemaria)",
+    "titulo": "São Josemaria (mistério luminoso5)",
     "texto": "Na véspera da festa da Páscoa, como Jesus sabia que havia chegado a sua hora de passar deste mundo para o Pai, tendo amado os seus que estavam no mundo, amou-os até o fim (Ioh XII, 1).\n\nCaía a noite sobre o mundo, porque os velhos ritos, os antigos sinais da misericórdia infinita de Deus para com a humanidade se iam realizar plenamente, abrindo caminho a um verdadeiro amanhecer: a nova Páscoa. A Eucaristia foi instituída durante a noite, preparando de antemão a manhã da Ressurreição.\n\nJesus ficou na Eucaristia por amor..., por ti.\n\nFicou, sabendo como é que os homens O receberiam..., e como é que tu O recebes.\n\nFicou, para que O comas, para que O visites e Lhe contes as tuas coisas e, tratando-O com intimidade na oração junto do Sacrário e na recepção do Sacramento, te enamores mais de dia para dia, e faças que outras almas ﻿–﻿ muitas! ﻿–﻿ sigam o mesmo caminho.\n\nMenino bom: os apaixonados desta terra, como beijam as flores, a carta, uma lembrança da pessoa que amam!...\n\nE tu? Poderás esquecer-te alguma vez de que O tens sempre ao teu lado..., a Ele!? ﻿–﻿ Esquecerás... que O podes comer?\n\n﻿–﻿ Senhor, que eu não torne a voar colado à terra!, que esteja sempre iluminado pelos raios do divino Sol ﻿–﻿ Cristo ﻿–﻿ na Eucaristia!, que o meu voo não se interrompa enquanto não alcançar o descanso do teu Coração!\n",
     "oculta": true,
     "colapsarNaFala": false
   },
   {
     "id": "oficial_mrjd6kg1",
-    "titulo": "mistério gozoso (São Josemaria)",
-    "texto": "[1 mistério gozoso (São Josemaria)|oficial_mr3vkvfu]\n[2 mistério gozoso (São Josemaria)|oficial_mrjclx7y]\n[3 mistério gozoso (São Josemaria)|oficial_mrjcmxrj]\n[4 mistério gozoso (São Josemaria)|oficial_mrjcopm7]\n[5 mistério gozoso (São Josemaria)|oficial_mrjcpbpn]\n\n",
+    "titulo": "São Josemaria  (santo rosario)",
+    "texto": "Leitura tirada do livro: Santo Rosário de São Josemaria Escrivá\n",
     "oculta": true,
     "colapsarNaFala": false
   }

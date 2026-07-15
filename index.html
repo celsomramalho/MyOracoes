@@ -118,6 +118,7 @@
           <div id="menu-inserir" class="menu-inserir hidden" role="menu">
             <button id="btn-inserir-oracao" class="item-menu-inserir" type="button" role="menuitem">📜 Oração</button>
             <button id="btn-inserir-opcional" class="item-menu-inserir" type="button" role="menuitem">📖 Leitura opcional</button>
+            <button id="btn-inserir-condicional" class="item-menu-inserir" type="button" role="menuitem">🔗 Vincular a Opção</button>
             <button id="btn-inserir-link" class="item-menu-inserir" type="button" role="menuitem">🔗 Link</button>
             <button id="btn-inserir-pausa" class="item-menu-inserir" type="button" role="menuitem">⏸ Pausa</button>
           </div>
@@ -205,6 +206,29 @@
       <div class="modal-botoes">
         <button id="btn-cancelar-numero" class="btn-secundario btn-modal-flex" type="button">Cancelar</button>
         <button id="btn-confirmar-numero" class="btn-primario btn-modal-flex" type="button">Inserir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SELECIONAR CHAVE DE DEPENDÊNCIA -->
+  <div id="modal-chave-depende" class="modal hidden">
+    <div class="modal-conteudo modal-conteudo-fixo">
+      <div class="modal-cabecalho">
+        <div>
+          <h3>Selecionar opção de controle</h3>
+          <p class="dica">Toque no opcional que irá controlar a visibilidade desta oração.</p>
+        </div>
+        <button id="btn-cancelar-chave-depende" class="btn-secundario" type="button">Cancelar</button>
+      </div>
+      <div class="modal-busca">
+        <input id="input-busca-chave-depende" type="text" placeholder="🔎 Buscar opcional..." autocomplete="off">
+      </div>
+      <div id="lista-modal-chave-depende" class="lista-modal modal-lista-rolavel"></div>
+      <div class="modal-botoes" style="padding: 8px 16px 12px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:0.9rem;cursor:pointer;">
+          <input type="checkbox" id="checkbox-depende-negado" style="width:16px;height:16px;accent-color:var(--primaria);">
+          Inverter lógica — mostrar apenas quando o opcional estiver <strong>desativado</strong>
+        </label>
       </div>
     </div>
   </div>

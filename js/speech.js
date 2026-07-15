@@ -149,6 +149,8 @@ function obterLinhasParaFalar(){
 
   function extrairElemento(el, secaoIdx, infoRepeticao, ancestraisBloco) {
     if (!el || !el.classList) return;
+    // Elementos ocultos pelo sistema {depende:}: não entram na fala.
+    if (el.dataset.dependeRotulo && el.style.display === 'none') return;
 
     if (el.classList.contains('bloco-ref')) {
       const secaoAtualIdx = el.dataset.secaoIdx ? parseInt(el.dataset.secaoIdx, 10) : secaoIdx;
