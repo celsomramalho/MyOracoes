@@ -916,7 +916,8 @@ function atualizarVisuaisProgresso(oracaoId, elementos){
     btn.classList.toggle('ativo', marcada);
     btn.title = marcada ? 'Desmarcar' : 'Marcar como rezada';
 
-    const fileira = el.querySelector('.fileira-contas');
+    // Busca apenas a fileira de contas direta deste bloco (não de filhos aninhados)
+    const fileira = el.querySelector(':scope > .bloco-ref-cabecalho > .fileira-contas');
     if(fileira) {
       const chaveContas = `contas_${oracaoId}_${idx}`;
       if (marcada) {

@@ -65,15 +65,16 @@ function rolarParaElemento(el) {
     cur = cur.parentElement ? cur.parentElement.closest('.bloco-ref, .bloco-opcional') : null;
   }
 
-  // Tenta proteger o topo do bloco mais externo possível
-  for (const b of blocos) {
+  // Tenta proteger o topo do bloco mais interno possível primeiro
+  for (let i = blocos.length - 1; i >= 0; i--) {
+    const b = blocos[i];
     const blocoRect = b.getBoundingClientRect();
 
     // Topo do bloco já está visível (na área útil)?
     if (blocoRect.top >= margemSuperior) {
       // Bloco ok — só rola se o elemento também não estiver visível
       if (elRect.top >= margemSuperior && elRect.bottom <= window.innerHeight - margemInferior) return;
-      break; // El fora da tela → sair e usar scroll de centralização abaixo
+      continue; // Tenta o próximo nível se este não resolve
     }
 
     // Topo do bloco está escondido acima — tenta grudar no topo da área útil
