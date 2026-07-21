@@ -34,7 +34,7 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mqtzl9dc",
     "titulo": "Mistérios Gozosos",
-    "texto": "Primeiro Mistério: \nA Encarnação do Senhor\n[São Josemaria (mistério gozoso1)|oficial_mr3vkvfu]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nA visitação de Nossa Senhora à sua prima Santa Isabel\n[São Josemaria (mistério gozoso2)|oficial_mrjclx7y]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \n[São Josemaria (mistério gozoso3)|oficial_mrjcmxrj]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA purificação de Nossa Senhora\n[São Josemaria (mistério gozoso4)|oficial_mrjcopm7]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nJesus perdido e achado no templo\n[São Josemaria (mistério gozoso5)|oficial_mrjcpbpn]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\n",
+    "texto": "Primeiro Mistério: \nA Encarnação do Senhor\n[São Josemaria (mistério gozoso1)|oficial_mr3vkvfu]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nSegundo Mistério: \nA visitação de Nossa Senhora à sua prima Santa Isabel\n[São Josemaria (mistério gozoso2)|oficial_mrjclx7y]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nTerceiro Mistério: \nO Nascimento do Filho de Deus em Belém\n[São Josemaria (mistério gozoso3)|oficial_mrjcmxrj]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuarto Mistério: \nA purificação de Nossa Senhora\n[São Josemaria (mistério gozoso4)|oficial_mrjcopm7]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\nQuinto Mistério: \nJesus perdido e achado no templo\n[São Josemaria (mistério gozoso5)|oficial_mrjcpbpn]{depende:São Josemaria  (santo rosario)|oficial_mrjd6kg1}\n[Santo Rosário (dezena)|oficial_mria0ch6]\n",
     "oculta": false,
     "colapsarNaFala": false
   },
@@ -47,7 +47,9 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mqv3pt1h",
     "titulo": "Nossa Senhora Auxiliadora",
-    "texto": "V. Santíssima Virgem Maria a quem Deus constituiu Auxiliadora dos Cristãos, nós vos escolhemos como Senhora e Protetora desta casa.\nDignai-vos mostrar aqui Vosso auxílio poderoso.\nPreservai esta casa de todos os perigos: do incêndio, da inundação, do raio, das tempestades, dos ladrões, dos malfeitores, da guerra e de todas as outras calamidades que conheceis.\nAbençoai, protegei, defendei, guardai como coisa vossa as pessoas que vivem nesta casa.\nSobretudo concedei-lhes a graça mais importante, a de viverem sempre na amizade de Deus, evitando o pecado.\nDai-lhes a fé que tivestes na Palavra de Deus, e o amor que nutristes para com Vosso Filho Jesus e para com todos aqueles pelos quais Ele morreu na cruz.\nMaria, Auxílio dos Cristãos, rogai por todos que moram nesta casa que Vos foi consagrada.\nR. Amém"
+    "texto": "V. Santíssima Virgem Maria a quem Deus constituiu Auxiliadora dos Cristãos, nós vos escolhemos como Senhora e Protetora desta casa.\nDignai-vos mostrar aqui Vosso auxílio poderoso.\nPreservai esta casa de todos os perigos: do incêndio, da inundação, dos raios, das tempestades, dos ladrões, dos malfeitores, das guerras e de todas as outras calamidades que conheceis.\nAbençoai, protegei, defendei, guardai como coisa vossa as pessoas que vivem nesta casa.\nSobretudo concedei-lhes a graça mais importante, a de viverem sempre na amizade de Deus, evitando o pecado.\nDai-lhes a fé que tivestes na Palavra de Deus, e o amor que nutristes para com Vosso Filho Jesus e para com todos aqueles pelos quais Ele morreu na cruz.\nMaria, Auxílio dos Cristãos, rogai por todos que moram nesta casa que Vos foi consagrada.\nR. Amém",
+    "oculta": false,
+    "colapsarNaFala": false
   },
   {
     "id": "oficial_mqv9bs4r",
@@ -245,7 +247,7 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mrc0dso9",
     "titulo": "Adoção Espiritual",
-    "texto": "V. Oremos.\nSenhor Jesus, pela intercessão de Maria, Vossa Mãe, que Vos acolheu com amor, e pela intercessão de São José, homem de confiança que cuidou de Vós após o nascimento, peço-Vos por esta criança concebida, adotada espiritualmente por mim, que corre o perigo de ser abortada. Dai a sua mãe e aos outros familiares o amor e a coragem de deixá-la viver, Vós, que lhe concedestes a vida. \nR. Amém.\n\n[Adoção Espiritual (nota)|oficial_mrc0gddd]{opcional}\n\n",
+    "texto": "Adoção Espiritual.\nV. Oremos.\nSenhor Jesus, pela intercessão de Maria, Vossa Mãe, que Vos acolheu com amor, e pela intercessão de São José, homem de confiança que cuidou de Vós após o nascimento, peço-Vos por esta criança concebida, adotada espiritualmente por mim, que corre o perigo de ser abortada. Dai a sua mãe e aos outros familiares o amor e a coragem de deixá-la viver, Vós, que lhe concedestes a vida. \nR. Amém.\n\n[Adoção Espiritual (nota)|oficial_mrc0gddd]{opcional}\n\n",
     "oculta": false,
     "colapsarNaFala": false
   },
