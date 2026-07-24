@@ -1,4 +1,4 @@
-const CACHE_NOME = 'minhas-oracoes-v6';
+const CACHE_NOME = 'minhas-oracoes-v8';
 const ARQUIVOS_PARA_CACHE = [
   './',
   './index.html',

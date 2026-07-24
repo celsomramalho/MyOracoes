@@ -225,6 +225,26 @@ const editorOracao = criarEditorOracao({
   }
 });
 
+// Eventos dos botões de formatação do App Principal
+const btnFormatBold = document.getElementById('btn-format-bold');
+const btnFormatLeft = document.getElementById('btn-format-left');
+const btnFormatCenter = document.getElementById('btn-format-center');
+if(btnFormatBold){
+  btnFormatBold.addEventListener('click', () => {
+    editorOracao.toggleTagNaSelecao('<b>', '</b>');
+  });
+}
+if(btnFormatLeft){
+  btnFormatLeft.addEventListener('click', () => {
+    editorOracao.toggleTagNaSelecao('<left>', '</left>'); 
+  });
+}
+if(btnFormatCenter){
+  btnFormatCenter.addEventListener('click', () => {
+    editorOracao.toggleTagNaSelecao('<center>', '</center>');
+  });
+}
+
 function abrirEditor(id){
   editandoId = id || null;
   editorOracao.abrir(editandoId);
@@ -358,7 +378,6 @@ const telaRezarUsuario = criarTelaRezar({
     mostrarView('view-rezar');
   }
 });
-
 function abrirRezar(id, origem, tipo){
   telaRezarUsuario.abrir(id, origem, tipo);
 }

@@ -92,6 +92,53 @@ function criarControladorInsercao(config) {
     focarTextarea(pos + textoInserido.length);
   }
 
+  // Alterna uma formatação (ex: <b> e </b>) na seleção atual
+  function toggleTagNaSelecao(tagInicio, tagFim) {
+    const inputTexto = dom.textarea;
+    if (!inputTexto) return;
+
+    const start = inputTexto.selectionStart;
+    const end = inputTexto.selectionEnd;
+    const val = inputTexto.value;
+    
+    // Se não há seleção, aplica a tag onde o cursor está
+    if (start === end) {
+      // Opcional: checar se está dentro da tag para remover.
+      // Por simplicidade, vamos apenas inserir as tags vazias e colocar o cursor no meio.
+      const antes = val.slice(0, start);
+      const depois = val.slice(start);
+      inputTexto.value = antes + tagInicio + tagFim + depois;
+      inputTexto.setSelectionRange(start + tagInicio.length, start + tagInicio.length);
+      if (config.aoInserir) config.aoInserir();
+      return;
+    }
+
+    const selecao = val.slice(start, end);
+
+    // Checa se a seleção exata já está envolvida pelas tags
+    if (selecao.startsWith(tagInicio) && selecao.endsWith(tagFim)) {
+      // Remove tags
+      const conteudoLimpo = selecao.slice(tagInicio.length, selecao.length - tagFim.length);
+      inputTexto.value = val.slice(0, start) + conteudoLimpo + val.slice(end);
+      inputTexto.setSelectionRange(start, start + conteudoLimpo.length);
+    } else {
+      // Checa se as tags estão logo POR FORA da seleção atual
+      const textoAntes = val.slice(0, start);
+      const textoDepois = val.slice(end);
+      if (textoAntes.endsWith(tagInicio) && textoDepois.startsWith(tagFim)) {
+        // Remove tags de fora
+        inputTexto.value = textoAntes.slice(0, textoAntes.length - tagInicio.length) + selecao + textoDepois.slice(tagFim.length);
+        inputTexto.setSelectionRange(start - tagInicio.length, end - tagInicio.length);
+      } else {
+        // Adiciona tags
+        inputTexto.value = val.slice(0, start) + tagInicio + selecao + tagFim + val.slice(end);
+        inputTexto.setSelectionRange(start, end + tagInicio.length + tagFim.length);
+      }
+    }
+    if (config.aoInserir) config.aoInserir();
+    inputTexto.focus();
+  }
+
   // Rastreamento contínuo do cursor (usado no Admin)
   if (config.rastrearCursorContinuamente && dom.textarea) {
     const atualizarCursor = () => {
@@ -445,7 +492,8 @@ function criarControladorInsercao(config) {
   return {
     obterCursor() { return posicaoCursorSalva; },
     definirCursor(pos) { posicaoCursorSalva = pos; focarTextarea(pos); },
-    inserirTexto(txt) { inserirTextoNoCursor(txt); }
+    inserirTexto(txt) { inserirTextoNoCursor(txt); },
+    toggleTagNaSelecao
   };
 }
 
@@ -601,6 +649,7 @@ function criarEditorOracao(config) {
       return verificarAlteracao();
     },
 
+    toggleTagNaSelecao: controladorInsercao.toggleTagNaSelecao,
     controladorInsercao
   };
 }

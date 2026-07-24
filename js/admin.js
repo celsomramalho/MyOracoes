@@ -286,6 +286,26 @@ const editorOracaoAdmin = criarEditorOracao({
   }
 });
 
+// Eventos dos botões de formatação do Admin
+const btnFormatBoldAdmin = document.getElementById('btn-format-bold-admin');
+const btnFormatLeftAdmin = document.getElementById('btn-format-left-admin');
+const btnFormatCenterAdmin = document.getElementById('btn-format-center-admin');
+if(btnFormatBoldAdmin){
+  btnFormatBoldAdmin.addEventListener('click', () => {
+    editorOracaoAdmin.toggleTagNaSelecao('<b>', '</b>');
+  });
+}
+if(btnFormatLeftAdmin){
+  btnFormatLeftAdmin.addEventListener('click', () => {
+    editorOracaoAdmin.toggleTagNaSelecao('<left>', '</left>');
+  });
+}
+if(btnFormatCenterAdmin){
+  btnFormatCenterAdmin.addEventListener('click', () => {
+    editorOracaoAdmin.toggleTagNaSelecao('<center>', '</center>');
+  });
+}
+
 function abrirForm(id) {
   editandoId = id || null;
   editorOracaoAdmin.abrir(editandoId);

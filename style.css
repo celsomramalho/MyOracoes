@@ -513,6 +513,19 @@ html,body{
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+.format-botoes{
+  display: flex;
+  gap: 4px;
+}
+.btn-format{
+  padding: 4px 10px;
+  font-size: 1rem;
+  font-family: monospace;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* Menu suspenso do botão "+ Inserir" (Admin) */
 .menu-inserir-wrapper{
