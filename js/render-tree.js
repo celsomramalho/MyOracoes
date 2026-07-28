@@ -13,6 +13,7 @@ function adicionarLinhas(nos, texto, estado){
     const diretiva = linha.match(/^\{(.*)\}$/);
     if(diretiva){
       estado.respostaAuto = diretiva[1].trim() || null;
+      estado.respostaAutoUsada = false;
       continue;
     }
 
@@ -28,7 +29,15 @@ function adicionarLinhas(nos, texto, estado){
       const proximaEhResposta = proxima && proxima.startsWith('R.');
       if(!proximaEhResposta){
         const classeAuto = estado.respostaAuto.startsWith('V.') ? 'linha-v' : 'linha-r';
-        nos.push({ tipo: 'linha', texto: estado.respostaAuto, classe: classeAuto });
+        const isFirst = !estado.respostaAutoUsada;
+        nos.push({ 
+          tipo: 'linha', 
+          texto: estado.respostaAuto, 
+          classe: classeAuto,
+          isAutoResp: true,
+          isFirstAutoResp: isFirst
+        });
+        estado.respostaAutoUsada = true;
       }
     }
   }
@@ -383,6 +392,10 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
 
       const conteudo = document.createElement('div');
       conteudo.className = 'grupo-texto-conteudo';
+      if (g.linhas.some(l => l.isFirstAutoResp)) {
+        conteudo.classList.add('tem-resposta-auto-primeira');
+      }
+      
       let pAtual = null;
       g.linhas.forEach((no, idxNo) => {
         // Se for a primeira linha ou começar com V. ou R., criamos um novo parágrafo.
@@ -397,6 +410,16 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
         if (ehNovoP || !pAtual) {
           pAtual = document.createElement('p');
           if(no.classe) pAtual.className = no.classe;
+          
+          if(no.isAutoResp) {
+            pAtual.classList.add('resposta-automatica');
+            if(no.isFirstAutoResp) {
+              pAtual.classList.add('primeira');
+            } else {
+              pAtual.classList.add('repetida');
+            }
+          }
+          
           conteudo.appendChild(pAtual);
         } else {
           // É uma continuação de linha no mesmo bloco P
