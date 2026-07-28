@@ -926,24 +926,24 @@ html,body{
   box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
 }
 
-/* Oculta as respostas automáticas repetidas no modo leitura */
-#view-rezar.modo-leitura-ativo .resposta-automatica.repetida {
+/* Oculta as respostas automáticas repetidas (no modo visual, independente do tema claro/escuro) */
+body:not(.fala-ativa) #view-rezar .resposta-automatica.repetida {
   display: none;
 }
 
 /* Coloca a linha V. e a primeira resposta automática na mesma linha */
-#view-rezar.modo-leitura-ativo .tem-resposta-auto-primeira .linha-v {
+body:not(.fala-ativa) #view-rezar .tem-resposta-auto-primeira .linha-v {
   display: inline;
 }
 
 /* Formata a primeira resposta automática (inline e negrito) */
-#view-rezar.modo-leitura-ativo .resposta-automatica.primeira {
+body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira {
   display: inline;
   font-weight: bold;
 }
 
-/* Oculta o prefixo "R." da primeira resposta automática no modo leitura */
-#view-rezar.modo-leitura-ativo .resposta-automatica.primeira .resposta {
+/* Oculta o prefixo "R." da primeira resposta automática */
+body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira .resposta {
   display: none;
 }
 

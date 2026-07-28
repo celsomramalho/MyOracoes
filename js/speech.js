@@ -599,14 +599,17 @@ function atualizarBotaoFala(){
   if(!falando){
     btn.textContent = '▶';
     btn.title = 'Ouvir';
+    document.body.classList.remove('fala-ativa');
   }else if(pausado){
     btn.textContent = '▶';
     btn.title = 'Continuar';
     btn.classList.add('btn-falar-pausado');
+    document.body.classList.add('fala-ativa');
   }else{
     btn.textContent = '⏸';
     btn.title = 'Pausar';
     btn.classList.add('btn-falar-tocando');
+    document.body.classList.add('fala-ativa');
   }
 }
 
