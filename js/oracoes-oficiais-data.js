@@ -22,7 +22,7 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mqtuc5nv",
     "titulo": "Angelus (tempo comum)",
-    "texto": "V. O anjo do Senhor anunciou a Maria.\nR. E ela concebeu do Espírito Santo.\n[Ave Maria]\nV. Eis aqui a escrava do Senhor.\nR. Faça-se em mim segundo a vossa palavra.\n[Ave Maria]\nV. E o Verbo se fez carne.\nR. E habitou entre nós.\n[Ave Maria]\nV. Rogai por nós, santa Mãe de Deus.\nR. Para que sejamos dignos das promessas de Cristo.\n[pausa]{2}\nV. Oremos. Infundi, Senhor, nós vos pedimos, em nossas almas a vossa graça, para que nós, que conhecemos pela anunciação do Anjo a encarnação de Jesus Cristo, vosso Filho, cheguemos por sua paixão e sua cruz à glória da ressurreição. Pelo mesmo Cristo, Senhor nosso. \nR. Amém.",
+    "texto": "V. O anjo do Senhor anunciou a Maria.\nR. E ela concebeu do Espírito Santo.\n[Ave Maria]\nV. Eis aqui a escrava do Senhor.\nR. Faça-se em mim segundo a vossa palavra.\n[Ave Maria]\nV. E o Verbo Divino se fez carne.\nR. E habitou entre nós.\n[Ave Maria]\nV. Rogai por nós, santa Mãe de Deus.\nR. Para que sejamos dignos das promessas de Cristo.\n[pausa]{2}\nV. Oremos. Infundi, Senhor, nós vos pedimos, em nossas almas a vossa graça, para que nós, que conhecemos pela anunciação do Anjo a encarnação de Jesus Cristo, vosso Filho, cheguemos por sua paixão e sua cruz à glória da ressurreição. Pelo mesmo Cristo, Senhor nosso. \nR. Amém.",
     "oculta": false,
     "colapsarNaFala": false
   },
