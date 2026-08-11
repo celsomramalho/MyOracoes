@@ -188,6 +188,21 @@ html,body{
   display: none;
 }
 
+.lista-passos-instalar{
+  margin: 4px 0 4px;
+  padding-left: 20px;
+  color: var(--texto-secundario, #c7c9d6);
+  font-family: 'EB Garamond', serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.lista-passos-instalar li{
+  margin-bottom: 8px;
+}
+.lista-passos-instalar strong{
+  color: var(--ouro-suave);
+}
+
 /* Ícone emoji (🙏) do botão Rezar na topbar do admin, para ficar
    visualmente do mesmo tamanho dos demais ícones SVG da topbar */
 #btn-rezar-admin {

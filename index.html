@@ -305,6 +305,22 @@
     </div>
   </div>
 
+  <!-- MODAL: INSTRUÇÕES DE INSTALAÇÃO (Safari/iOS, sem prompt nativo) -->
+  <div id="modal-instalar-ios" class="modal hidden">
+    <div class="modal-conteudo">
+      <h3>Instalar o app</h3>
+      <p class="dica" id="instalar-ios-texto">No iPhone/iPad, a instalação é feita direto pelo Safari:</p>
+      <ol class="lista-passos-instalar">
+        <li>Toque no ícone de <strong>Compartilhar</strong> <span aria-hidden="true">(⬆️ no rodapé do Safari)</span></li>
+        <li>Role a lista e toque em <strong>"Adicionar à Tela de Início"</strong></li>
+        <li>Toque em <strong>Adicionar</strong> no canto superior direito</li>
+      </ol>
+      <div class="modal-botoes">
+        <button id="btn-fechar-modal-instalar-ios" class="btn-primario">Entendi</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script src="js/oracoes-oficiais-data.js"></script> <!-- Passo 1: dados embutidos -->

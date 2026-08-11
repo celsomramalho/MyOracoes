@@ -553,12 +553,5 @@ var ORACOES_OFICIAIS_DATA = [
     "texto": "Infinitas graças vos damos, ó Soberana Rainha, pelos benefícios que todos os dias recebemos de vossas mãos maternais.\n\nDignai-vos, agora e para sempre, tomar-nos debaixo do vosso poderoso amparo e, para mais vos agradecer, vos saudamos com uma Salve-Rainha:",
     "oculta": false,
     "colapsarNaFala": false
-  },
-  {
-    "id": "oficial_msp5vt26",
-    "titulo": "Salve Rainha",
-    "texto": "Salve, Rainha, mãe de misericórdia, vida, doçura, esperança nossa, salve! \nA Vós bradamos, os degredados filhos de Eva. \nA Vós suspiramos, gemendo e chorando neste vale de lágrimas. \nEia, pois, advogada nossa, esses Vossos olhos misericordiosos \na nós volvei. \nE, depois deste desterro, nos mostrai Jesus, bendito fruto \ndo Vosso ventre. \nÓ clemente, ó piedosa, ó doce Virgem Maria. \nRogai por nós, Santa Mãe de Deus, para que sejamos dignos das promessas de Cristo.",
-    "oculta": false,
-    "colapsarNaFala": false
   }
 ];
