@@ -278,7 +278,7 @@ function salvarEditor(){
     o.titulo = valores.titulo;
     o.texto = valores.texto;
   }else{
-    const nova = { id: gerarId(), titulo: valores.titulo, texto: valores.texto, favorita: false };
+    const nova = { id: gerarId(), titulo: valores.titulo, texto: valores.texto, favorita: true };
     ORACOES.push(nova);
     editandoId = nova.id; // passa a editar a oração recém-criada, sem sair da tela
   }

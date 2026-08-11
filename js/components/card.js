@@ -49,7 +49,8 @@ function criarCardOracao(oracao, origem, tipo){
   card.innerHTML = `
     <div class="card-inicial">${escaparHTML(obterInicial(oracao.titulo))}</div>
     <div class="card-corpo">
-      <h3>${escaparHTML(oracao.titulo)}${badgeRezada}</h3>
+      <h3>${escaparHTML(oracao.titulo)}</h3>
+      ${badgeRezada}
       <p>${escaparHTML(primeiraLinhaUtil(oracao.texto))}</p>
     </div>
     ${badgeOficial}
