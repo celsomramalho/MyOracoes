@@ -518,5 +518,40 @@ var ORACOES_OFICIAIS_DATA = [
     "texto": "[Terço de São José (dezena)|oficial_msgn972n]{5}\n[pausa]{2}\nA vós, glorioso São José, ofereço este terço em louvor e glória de Jesus e Maria, para que seja minha luz e guia, minha proteção e defesa, minha fortaleza e alegria em todos os meus trabalhos e tribulações, principalmente na hora da agonia.\n\nPelo nome de Jesus, pela glória de Maria, imploro o vosso poderoso patrocínio, para que me alcanceis a graça que tanto desejo. Falai em meu favor, advogai a minha causa no Céu e na Terra, alegrai a minha alma para honra de Jesus, de Maria e vossa. Amém.",
     "oculta": false,
     "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_msp480wr",
+    "titulo": "Oração do trabalho (a São José por Pe Paulo)",
+    "texto": "Meu pai e querido São José, recorro a vós para interceder pelo meu trabalho, vós que sois o seu grande padroeiro por ter ensinado Jesus, o Filho de Deus, a trabalhar.\n\nGostaria de agradecer, em primeiro lugar, estar com saúde e poder me dedicar ao trabalho no dia de hoje.\n\nEm segundo lugar gostaria de vos pedir algumas bênçãos por seu intermédio.\n\nQue meu trabalho seja uma ocasião de amar e servir a Deus e que este seja o seu primeiro fim. Quero trabalhar, São José, antes de mais nada para dar glória a Deus. Quero pedir também que ele seja ocasião para fazer o bem à sociedade e seja sustento para a minha vida e a minha família.\n\nQue Deus esteja junto de mim durante o meu trabalho, iluminando-me e guiando-me em tudo, para tomar as melhores decisões e acertar em tudo.\n\nQue eu trabalhe com paz e serenidade, não me afligindo com as dificuldades financeiras, com as dificuldades de relacionamento com meus colegas, por ter um chefe difícil etc. Aproveito para pedir proteção contra todas as maldades humanas como a inveja e a má competição. Neste sentido, prometo buscar com todas as minhas forças a harmonia no meu ambiente de trabalho, não fazendo fofocas ou falando mal de alguém pelas costas.\n\nQue me ajudeis a trabalhar com a máxima perfeição como Jesus na carpintaria, com ordem, intensidade e pontualidade. Que eu consiga render ao máximo minhas qualidades, capacitando-me a desempenhar trabalhos cada vez mais elevados.\n\nQue eu seja sempre uma luz de Deus para espalhar o seu amor e a sua alegria a todos os meus colegas de trabalho, dando a minha vida por eles, e não tendo nenhum inimigo.\n\nMeu pai e querido São José, agradeço desde já toda ajuda e proteção! Sei que sempre poderei contar convosco pois não há ninguém que tenha recorrido a vós sem ser atendido.\n\nSão José, insigne padroeiro do trabalho, rogai por mim! (Sugestão: repetir muitas vezes esta frase durante o trabalho).",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_msp4g5gi",
+    "titulo": "Oração a São José para obter a conversão de um pecador",
+    "texto": "Ó justo e glorioso São José, eu vos recomendo insistentemente a salvação da alma de , que Jesus resgatou à custa do seu sangue. Vós sabeis, grande santo, quanto são infelizes aqueles que, tendo banido do seu coração ao Divino Salvador, ficam expostos a perdê-lo por toda a eternidade.\n\nNão permitais, pois, que esta alma que me é tão querida, fique por muito tempo separada de Jesus. Mostrai-lhe os perigos que a ameaçam. Falai fortemente ao seu coração. Reconduzi este filho pródigo ao seio do melhor dos pais e não o deixeis, sem lhe terdes aberto as portas do Céu, onde vos bendirá eternamente pela felicidade que lhe tiverdes alcançado. R. Amém.",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_msp4jcm5",
+    "titulo": "Glorioso São José",
+    "texto": "Glorioso São José, esposo da Virgem Maria, suplicamos a vós, pelo coração de Jesus Cristo, conceder-nos vossa proteção paterna. Vós, cujo poder alcança todas as nossas necessidades, e que sabeis como tornar possíveis as coisas mais impossíveis, voltai vossos olhos paternos para as necessidades de vossos filhos. Na confusão e dor que nos afligem, recorremos confiantes a vós.\nDignai-vos tomar sob a vossa caridosa condução este importante e difícil assunto, que é causa de nossas preocupações, e fazei com que seu feliz desfecho sirva para a glória de Deus e o bem de Seus filhos devotos. \nR. Amém.",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_msp4ni5d",
+    "titulo": "Oração para todos os dias",
+    "texto": "Deus Menino, diante de vosso Presépio, nós nos reunimos, nesta noite , para uma vez mais celebrar a dádiva de valor infinito que nos fizestes com o vosso nascimento.\n\nUnidos ao júbilo que inundou os corações de Maria  e José na Gruta de Belém, desejamos depositar, aos vossos pés, nossa filial gratidão por tudo que de Vós recebemos. \n\nAceitai, Deus Menino, como nossos humildes presentes, as alegrias e as realizações, os anseios e os sonhos, as esperanças e os esforços, as provações e os sofrimentos, que marcaram nossas vidas neste último ano santo de caminhada para a salvação. \n\nE vos pedimos: transformai, com a vossa graça, nossas obras imperfeitas em sementes fecundas que germinem em melhores frutos neste ano de 2026. \n\nIluminai, Sol de Justiça, os caminhos que devemos trilhar neste mundo, e fazei luzir, à nossa frente, as pegadas de virtude e caridade que conduzem a Vós. \n\nR. Amém.\n\nJesus, Maria, José: abençoai nossa família!",
+    "oculta": false,
+    "colapsarNaFala": false
+  },
+  {
+    "id": "oficial_msp4popf",
+    "titulo": "Oração das Infinitas Graças",
+    "texto": "Infinitas graças vos damos, ó Soberana Rainha, pelos benefícios que todos os dias recebemos de vossas mãos maternais.\n\nDignai-vos, agora e para sempre, tomar-nos debaixo do vosso poderoso amparo e, para mais vos agradecer, vos saudamos com uma Salve-Rainha:",
+    "oculta": false,
+    "colapsarNaFala": false
   }
 ];

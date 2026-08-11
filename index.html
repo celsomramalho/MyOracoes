@@ -28,6 +28,13 @@
       <button id="btn-falar" class="btn-topbar-acao" title="Ouvir" aria-label="Ouvir">🔊</button>
       <button id="btn-velocidade" class="btn-topbar-acao">⚡ 1.0x</button>
     </div>
+    <button id="btn-instalar-app" class="btn-topbar-home hidden" title="Instalar o app" aria-label="Instalar o app">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v12"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <path d="M5 19h14"></path>
+      </svg>
+    </button>
     <button id="btn-compartilhar-app" class="btn-topbar-home" title="Compartilhar o app" aria-label="Compartilhar o app">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="18" cy="5" r="3"></circle>
@@ -311,6 +318,7 @@
 <script src="js/speech.js"></script>            <!-- Passo 7 -->
 <script src="js/components/progresso.js"></script> <!-- Passo 8 -->
 <script src="js/editor-core.js"></script>          <!-- Passo 9: marcadores compartilhados -->
+<script src="js/pwa-install.js"></script>          <!-- Botão "Instalar app" (beforeinstallprompt) -->
 <script src="app.js"></script>
 </body>
 </html>

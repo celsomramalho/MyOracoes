@@ -1,4 +1,4 @@
-const CACHE_NOME = 'minhas-oracoes-v8';
+const CACHE_NOME = 'minhas-oracoes-v9';
 const ARQUIVOS_PARA_CACHE = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const ARQUIVOS_PARA_CACHE = [
   './js/render-tree.js',
   './js/speech.js',
   './js/editor-core.js',
+  './js/pwa-install.js',
   './js/components/card.js',
   './js/components/toast.js',
   './js/components/progresso.js',
