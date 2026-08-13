@@ -49,13 +49,17 @@ function criarCardOracao(oracao, origem, tipo){
   card.innerHTML = `
     <div class="card-inicial">${escaparHTML(obterInicial(oracao.titulo))}</div>
     <div class="card-corpo">
-      <h3>${escaparHTML(oracao.titulo)}</h3>
-      ${badgeRezada}
-      <p>${escaparHTML(primeiraLinhaUtil(oracao.texto))}</p>
+      <div class="card-linha-topo">
+        <h3>${escaparHTML(oracao.titulo)}</h3>
+        ${badgeRezada}
+      </div>
+      <div class="card-linha-baixo">
+        <p>${escaparHTML(primeiraLinhaUtil(oracao.texto))}</p>
+        ${botoesAcoes}
+      </div>
     </div>
     ${badgeOficial}
     ${botaoCompartilhar}
-    ${botoesAcoes}
     <button class="btn-estrela-card" aria-label="Favoritar">${ehFavorita ? '★' : '☆'}</button>
   `;
 

@@ -414,8 +414,24 @@ html,body{
   flex:1;
   min-width: 0;
 }
+
+.card-linha-topo{
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.card-linha-baixo{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+}
+
 .card-corpo h3{
-  margin:0 0 2px;
+  flex: 1;
+  min-width: 0;
+  margin:0;
   font-family: 'Cormorant Garamond', serif;
   font-weight: 600;
   font-size: 1.15rem;
@@ -425,6 +441,8 @@ html,body{
   text-overflow: ellipsis;
 }
 .card-corpo p{
+  flex: 1;
+  min-width: 0;
   margin:0;
   font-size: 0.92rem;
   color: var(--texto-suave);
@@ -790,14 +808,14 @@ html,body{
   border-radius: var(--raio);
   padding: 20px 18px;
   font-size: var(--tamanho-fonte-rezar, 1.12rem);
-  line-height: 1.35;
+  line-height: 1.28;
 }
 .texto-oracao p{
-  margin: 0 0 3px;
+  margin: 0 0 1px;
 }
 .linha-r{
   padding-left: 18px;
-  margin: 0 0 3px;
+  margin: 0 0 1px;
 }
 .rubrica{ color: var(--voz1); }   /* "V." e "Oremos." */
 .resposta{ color: var(--voz2); }  /* "R." */
@@ -1020,16 +1038,23 @@ body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira .resposta {
 
 /* ---------- ACORDEÃO DE REFERÊNCIAS ---------- */
 .bloco-ref{
-  margin: 8px 0;
+  margin: 3px 0;
   border-left: 2px solid var(--ouro);
   border-radius: 0 6px 6px 0;
+}
+
+/* Bloco manual ({bloco:...}{/bloco}): agrupamento puramente interno,
+   sem qualquer aparência própria — o conteúdo de dentro se comporta como
+   se estivesse direto no fluxo do pai (nenhum recuo, borda ou cabeçalho). */
+.bloco-manual{
+  display: contents;
 }
 
 .bloco-ref-cabecalho{
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
   border-radius: 0 6px 6px 0;
-  padding-bottom: 2px;
+  padding-bottom: 0;
 }
 .bloco-ref-cabecalho:hover{
   background: rgba(215,170,86,0.10);
@@ -1044,7 +1069,7 @@ body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira .resposta {
   gap: 6px;
   font-style: italic;
   color: #FFFFFF;
-  padding: 6px 6px 6px 10px;
+  padding: 4px 6px 4px 10px;
   user-select: none;
   transition: color 0.15s;
 }
@@ -1475,12 +1500,14 @@ body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira .resposta {
 .badge-rezada{
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
   background: rgba(46, 125, 50, 0.15);
   color: #81c784;
   font-size: 0.72rem;
   padding: 2px 6px;
   border-radius: 4px;
-  margin: 2px 0 4px;
+  margin: 0;
   border: 1px solid rgba(129, 199, 132, 0.3);
   font-family: sans-serif;
   font-weight: 500;
@@ -1501,10 +1528,13 @@ body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira .resposta {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 2px 6px;
+  padding: 1px 6px;
   border-radius: 8px;
-  margin: 1px 0;
-  transition: background 0.2s;
+  margin: 0;
+  transition: background 0.15s;
+}
+.grupo-texto-secao:hover{
+  background: rgba(215,170,86,0.10);
 }
 .grupo-texto-secao > .grupo-texto-conteudo{
   flex: 1;

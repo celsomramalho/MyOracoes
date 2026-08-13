@@ -488,6 +488,18 @@ function criarControladorInsercao(config) {
     });
   }
 
+  // Botão "Bloco": envolve a seleção atual (ou insere vazio no cursor) com
+  // os marcadores {bloco: Título} ... {/bloco}. Usa toggleTagNaSelecao, o
+  // mesmo mecanismo já usado pelos botões de formatação (negrito/alinhar) —
+  // clicar de novo com a MESMA seleção (agora incluindo os marcadores)
+  // remove os marcadores.
+  if (dom.btnInserirBloco) {
+    dom.btnInserirBloco.addEventListener('click', () => {
+      fecharMenuInserir();
+      toggleTagNaSelecao('{bloco: Bloco}\n', '\n{/bloco}');
+    });
+  }
+
   // Retorna métodos para controle manual se necessário
   return {
     obterCursor() { return posicaoCursorSalva; },

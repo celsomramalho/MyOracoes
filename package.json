@@ -4,6 +4,7 @@
   "description": "MyOrações é um **PWA (Progressive Web App) em JavaScript vanilla**, sem frameworks e sem build step, para guardar, organizar e rezar orações — tanto orações pessoais criadas pelo próprio usuário quanto um acervo de \"Orações Oficiais\" (Pai Nosso, Ave Maria, ladainhas, novenas etc.) mantido pelo administrador do app.",
   "main": "app.js",
   "scripts": {
+    "dev": "npx serve . -l 3000",
     "lint": "eslint \"js/**/*.js\" \"*.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

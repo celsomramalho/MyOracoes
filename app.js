@@ -172,6 +172,7 @@ const editorOracao = criarEditorOracao({
       btnInserirCondicional: 'btn-inserir-condicional',
       btnInserirLink:        'btn-inserir-link',
       btnInserirPausa:       'btn-inserir-pausa',
+      btnInserirBloco:       'btn-inserir-bloco',
       modalInserir:          'modal-inserir',
       modalInserirTitulo:    'modal-inserir-titulo',
       modalInserirDica:      'modal-inserir-dica',

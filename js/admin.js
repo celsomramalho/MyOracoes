@@ -239,6 +239,7 @@ const editorOracaoAdmin = criarEditorOracao({
       btnInserirCondicional: 'btn-inserir-condicional-admin',
       btnInserirLink:        'btn-inserir-link-admin',
       btnInserirPausa:       'btn-inserir-pausa-admin',
+      btnInserirBloco:       'btn-inserir-bloco-admin',
       modalInserir:          'modal-inserir-admin',
       modalInserirTitulo:    'modal-inserir-admin-titulo',
       modalInserirDica:      'modal-inserir-admin-dica',

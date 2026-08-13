@@ -112,9 +112,70 @@ function extrairUrlReferenciaLink(tituloRef){
   return url;
 }
 
+// Divide um texto em segmentos de texto puro e blocos manuais marcados com
+// {bloco: Título} ... {/bloco}. Suporta aninhamento (um {bloco} dentro de
+// outro) através de uma pilha — cada abertura empilha um novo bloco-alvo,
+// cada fechamento desempilha (fechamentos sem abertura correspondente são
+// ignorados, nunca fecham a "raiz").
+function extrairBlocosManuais(texto){
+  const str = texto || '';
+  const tagRegex = /\{bloco\s*:\s*([^}]*)\}|\{\/bloco\}/gi;
+  const raiz = { segmentos: [] };
+  const pilha = [raiz];
+  let ultimoIndice = 0;
+  let match;
+
+  while((match = tagRegex.exec(str)) !== null){
+    const antes = str.slice(ultimoIndice, match.index);
+    if(antes) pilha[pilha.length - 1].segmentos.push({ tipo: 'texto', conteudo: antes });
+
+    const ehAbertura = match[0].toLowerCase().startsWith('{bloco');
+    if(ehAbertura){
+      const rotulo = (match[1] || '').trim() || 'Bloco';
+      const novoBloco = { tipo: 'bloco', rotulo, segmentos: [] };
+      pilha[pilha.length - 1].segmentos.push(novoBloco);
+      pilha.push(novoBloco);
+    }else if(pilha.length > 1){
+      pilha.pop();
+    }
+
+    ultimoIndice = match.index + match[0].length;
+  }
+
+  const restoFinal = str.slice(ultimoIndice);
+  if(restoFinal) pilha[pilha.length - 1].segmentos.push({ tipo: 'texto', conteudo: restoFinal });
+
+  return raiz.segmentos;
+}
+
+// Processa uma lista de segmentos (resultado de extrairBlocosManuais),
+// convertendo trechos de texto puro em nós via processarReferencias e
+// trechos de bloco manual em nós { tipo: 'bloco', manual: true, ... }.
+// O nó fica marcado com `manual: true` para que a renderização o trate como
+// agrupamento puramente interno (sem acordeão visível) — ver renderizarNos.
+function processarSegmentosBloco(segmentos, titulosVisitados, estado){
+  const nos = [];
+  segmentos.forEach(seg => {
+    if(seg.tipo === 'texto'){
+      processarReferencias(seg.conteudo, titulosVisitados, estado, nos);
+    }else{
+      // Bloco manual: ganha seu próprio estado de resposta automática,
+      // independente do que estiver ligado fora dele (mesmo critério já
+      // usado para orações referenciadas via [Nome]).
+      const filhos = processarSegmentosBloco(seg.segmentos, titulosVisitados, { respostaAuto: null });
+      nos.push({ tipo: 'bloco', manual: true, rotulo: seg.rotulo, filhos, colapsarNaFala: false });
+    }
+  });
+  return nos;
+}
+
 function construirArvore(texto, titulosVisitados, estado){
   if(!estado) estado = { respostaAuto: null };
-  const nos = [];
+  const segmentos = extrairBlocosManuais(texto);
+  return processarSegmentosBloco(segmentos, titulosVisitados, estado);
+}
+
+function processarReferencias(texto, titulosVisitados, estado, nos){
   // O modificador entre chaves aceita um número (repetição) ou a palavra
   // reservada "opcional" (leitura opcional, oculta por padrão).
   const regex = /\[([^[\]]+)\](?:\{(\d+|opcional)\})?(?:\{depende:([^}]+)\})?/gi;
@@ -184,9 +245,9 @@ function construirArvore(texto, titulosVisitados, estado){
 
   const textoFinal = texto ? texto.slice(ultimoIndice) : '';
   if(textoFinal) adicionarLinhas(nos, textoFinal, estado);
-
-  return nos;
 }
+
+
 
 function criarBtnCheck(idx, ctx){
   const btn = document.createElement('button');
@@ -446,6 +507,20 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
         ctx.elementos.push({ idx, el: wrapper, btn });
       }
       container.appendChild(wrapper);
+
+    }else if(g.tipo === 'bloco' && g.manual){
+      // Bloco manual ({bloco:...}{/bloco}): agrupamento puramente interno —
+      // sem acordeão, sem cabeçalho, sem check próprio. As orações/linhas
+      // de dentro são renderizadas exatamente como se o marcador não
+      // existisse, recebendo check individual normalmente. O wrapper usa
+      // display:contents (ver style.css) para não interferir no layout —
+      // ele só existe no DOM para eventualmente sabermos, durante a fala,
+      // dentro de qual bloco (rótulo) a leitura está no momento.
+      const divBlocoManual = document.createElement('div');
+      divBlocoManual.className = 'bloco-manual';
+      if(g.rotulo) divBlocoManual.dataset.rotuloBloco = g.rotulo;
+      renderizarNos(g.filhos, divBlocoManual, ctx, ctxRepetidoAninhado, oracaoIdAtual);
+      container.appendChild(divBlocoManual);
 
     }else if(g.tipo === 'bloco' || g.tipo === 'repetido'){
       const divBloco = document.createElement('div');
