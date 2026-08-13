@@ -354,6 +354,7 @@ const telaRezarUsuario = criarTelaRezar({
     const tituloEl = document.getElementById('rezar-titulo');
     tituloEl.textContent = o.titulo;
     tituloEl.title = o.titulo;
+    if(typeof atualizarSubtituloBlocoAtivo === 'function') atualizarSubtituloBlocoAtivo(null);
     atualizarEstrelaRezar();
     atualizarBotaoMarcarRezada();
     atualizarTextosVelocidade();

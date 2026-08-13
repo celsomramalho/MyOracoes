@@ -1047,6 +1047,24 @@ function encontrarBlocoColapsadoNaFala(el){
   return null;
 }
 
+// Atualiza o subtítulo mostrado abaixo do nome da oração na tela Rezar
+// (#rezar-subtitulo-bloco), refletindo em qual bloco manual ({bloco:...})
+// o elemento em destaque no momento está — o bloco manual ancestral mais
+// próximo (".bloco-manual[data-rotulo-bloco]"). Chamar com null/undefined
+// (ou um elemento fora de qualquer bloco manual) esconde o subtítulo.
+function atualizarSubtituloBlocoAtivo(elemento){
+  const el = document.getElementById('rezar-subtitulo-bloco');
+  if(!el) return;
+  const blocoAtivo = elemento ? elemento.closest('.bloco-manual[data-rotulo-bloco]') : null;
+  if(blocoAtivo){
+    el.textContent = blocoAtivo.dataset.rotuloBloco;
+    el.classList.remove('hidden');
+  }else{
+    el.textContent = '';
+    el.classList.add('hidden');
+  }
+}
+
 function expandirParaElemento(el){
   const ancestrais = new Set();
   let pai = el.parentElement;

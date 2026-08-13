@@ -753,6 +753,10 @@ html,body{
   justify-content: space-between;
   gap: 10px;
 }
+.rezar-titulo-grupo{
+  min-width: 0;
+  flex: 1;
+}
 .rezar-cabecalho h2{
   font-family: 'Cormorant Garamond', serif;
   font-weight: 700;
@@ -764,6 +768,15 @@ html,body{
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+}
+.rezar-subtitulo-bloco{
+  margin: 1px 0 0;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--texto-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .btn-estrela{
   background:none;
@@ -834,6 +847,9 @@ html,body{
 
 #view-rezar.modo-leitura-ativo .rezar-cabecalho h2 {
   color: #1A1A1A !important;
+}
+#view-rezar.modo-leitura-ativo .rezar-subtitulo-bloco {
+  color: #4A4A4A !important;
 }
 
 #view-rezar.modo-leitura-ativo .texto-oracao {

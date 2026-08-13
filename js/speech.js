@@ -769,6 +769,7 @@ function falarProximaLinha(){
     item.elemento.classList.add('linha-falando');
     rolarParaElemento(item.elemento);
   }
+  atualizarSubtituloBlocoAtivo(item.elemento);
 
   if (item.repetido && item.historicoRepeticoes) {
     item.historicoRepeticoes.forEach(rep => {
@@ -892,6 +893,7 @@ function falarPausa(item){
   if(item.elemento){
     rolarParaElemento(item.elemento);
     item.elemento.classList.add('linha-falando');
+    atualizarSubtituloBlocoAtivo(item.elemento);
   }
   timeoutPausaAtual = setTimeout(() => {
     timeoutPausaAtual = null;
@@ -943,6 +945,7 @@ function pararFala(){
   }
   document.querySelectorAll('.linha-falando, .titulo-falando').forEach(el => el.classList.remove('linha-falando', 'titulo-falando'));
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
+  atualizarSubtituloBlocoAtivo(null);
   atualizarBotaoFala();
 }
 
