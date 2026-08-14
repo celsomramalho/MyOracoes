@@ -963,7 +963,10 @@ function marcarSecao(oracaoId, idx){
   tentarMarcarBlocosPaiAutomaticamente(oracaoId, idx);
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
-    
+    if(typeof atualizarSubtituloBlocoAtivoPorProgresso === 'function'){
+      atualizarSubtituloBlocoAtivoPorProgresso(oracaoId, secaoCtxAtual.elementos);
+    }
+
     // Auto-expande a PRÓXIMA seção ainda não rezada ao marcar manualmente —
     // mas NUNCA durante o modo de fala (quando falando=true), pois o motor
     // de fala já gerencia a abertura dos acordeões por conta própria e uma
@@ -1004,6 +1007,9 @@ function desmarcarSecao(oracaoId, idx){
   tentarDesmarcarBlocosPaiAutomaticamente(oracaoId, idx);
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
+    if(typeof atualizarSubtituloBlocoAtivoPorProgresso === 'function'){
+      atualizarSubtituloBlocoAtivoPorProgresso(oracaoId, secaoCtxAtual.elementos);
+    }
   }
 }
 
@@ -1023,6 +1029,9 @@ function limparProgressoLeitura(){
 
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoAtualId){
     atualizarVisuaisProgresso(oracaoAtualId, secaoCtxAtual.elementos);
+    if(typeof atualizarSubtituloBlocoAtivoPorProgresso === 'function'){
+      atualizarSubtituloBlocoAtivoPorProgresso(oracaoAtualId, secaoCtxAtual.elementos);
+    }
   }
   mostrarToast('Progresso de leitura reiniciado.');
 }
@@ -1085,6 +1094,29 @@ function atualizarSubtituloBlocoAtivo(elemento){
     el.textContent = '';
     el.classList.add('hidden');
   }
+}
+
+// Mesma ideia de atualizarSubtituloBlocoAtivo, mas para o modo leitura
+// (toque manual nos checks, sem fala ativa): descobre qual é a PRÓXIMA
+// seção ainda não marcada como rezada (a mesma lógica de "onde continuar"
+// já usada por marcarSecao pra auto-expandir) e usa o elemento dela pra
+// atualizar o subtítulo do bloco em #rezar-subtitulo-bloco. Se a fala
+// estiver ativa, não faz nada (ela já cuida do subtítulo sozinha). Se não
+// houver próxima seção (tudo concluído) ou não houver contexto de
+// progresso (ex: preview do admin), esconde o subtítulo.
+function atualizarSubtituloBlocoAtivoPorProgresso(oracaoId, elementos){
+  if(typeof atualizarSubtituloBlocoAtivo !== 'function') return;
+  const modoFalaAtivo = typeof falando !== 'undefined' && falando;
+  if(modoFalaAtivo) return;
+
+  if(!elementos || !elementos.length){
+    atualizarSubtituloBlocoAtivo(null);
+    return;
+  }
+
+  const concluidas = new Set(progressoLeitura[oracaoId] || []);
+  const proximoItem = elementos.find(e => !concluidas.has(e.idx));
+  atualizarSubtituloBlocoAtivo(proximoItem ? proximoItem.el : null);
 }
 
 function expandirParaElemento(el){

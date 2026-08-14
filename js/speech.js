@@ -945,7 +945,13 @@ function pararFala(){
   }
   document.querySelectorAll('.linha-falando, .titulo-falando').forEach(el => el.classList.remove('linha-falando', 'titulo-falando'));
   document.querySelectorAll('.conta-terco.ativa').forEach(c => c.classList.remove('ativa'));
-  atualizarSubtituloBlocoAtivo(null);
+  // Ao parar a fala, o subtítulo não some — passa a refletir o progresso
+  // manual (mesma lógica do modo leitura), já que falando agora é false.
+  if(typeof atualizarSubtituloBlocoAtivoPorProgresso === 'function' && secaoCtxAtual){
+    atualizarSubtituloBlocoAtivoPorProgresso(secaoCtxAtual.oracaoId, secaoCtxAtual.elementos);
+  }else{
+    atualizarSubtituloBlocoAtivo(null);
+  }
   atualizarBotaoFala();
 }
 

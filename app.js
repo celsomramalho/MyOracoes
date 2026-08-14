@@ -488,7 +488,12 @@ function renderizarTextoRezar(textoOriginal){
     'Esta oração ainda não tem texto. Toque em "Editar" para escrever.'
   );
 
-  if(ctx) atualizarVisuaisProgresso(ctx.oracaoId, ctx.elementos);
+  if(ctx) {
+    atualizarVisuaisProgresso(ctx.oracaoId, ctx.elementos);
+    if(typeof atualizarSubtituloBlocoAtivoPorProgresso === 'function'){
+      atualizarSubtituloBlocoAtivoPorProgresso(ctx.oracaoId, ctx.elementos);
+    }
+  }
 }
 
 // adicionarLinhas, construirArvore, criarBtnCheck, agruparNos, renderizarNos,
