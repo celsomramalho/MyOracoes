@@ -651,6 +651,16 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
 
       if(idx >= 0) divBloco.dataset.secaoIdx = idx;
       if(g.colapsarNaFala) divBloco.dataset.colapsarNaFala = '1';
+      // Blocos de oração inseridos (não repetidos, ex: "Segundo Mistério: A
+      // flagelação do Senhor") também servem de rótulo pro subtítulo do
+      // bloco ativo (#rezar-subtitulo-bloco), igual aos blocos manuais
+      // {bloco:...}{/bloco} — ver atualizarSubtituloBlocoAtivo. Decadas
+      // repetidas (ex: "Santo Rosário (dezena)") ficam de fora de propósito:
+      // não têm dataset.rotuloBloco, então o subtítulo continua mostrando o
+      // Mistério (bloco ancestral mais próximo com o atributo) enquanto o
+      // usuário reza as contas daquela dezena, em vez de trocar pra um
+      // rótulo genérico repetido a cada dezena.
+      if(g.tipo === 'bloco' && g.rotulo) divBloco.dataset.rotuloBloco = g.rotulo;
 
       if(ctxProprio){
         const btn = criarBtnCheck(idx, ctxProprio);
@@ -1079,14 +1089,16 @@ function encontrarBlocoColapsadoNaFala(el){
 }
 
 // Atualiza o subtítulo mostrado abaixo do nome da oração na tela Rezar
-// (#rezar-subtitulo-bloco), refletindo em qual bloco manual ({bloco:...})
-// o elemento em destaque no momento está — o bloco manual ancestral mais
-// próximo (".bloco-manual[data-rotulo-bloco]"). Chamar com null/undefined
-// (ou um elemento fora de qualquer bloco manual) esconde o subtítulo.
+// (#rezar-subtitulo-bloco), refletindo em qual bloco o elemento em destaque
+// no momento está — o bloco ancestral mais próximo com um rótulo conhecido
+// ("[data-rotulo-bloco]"): tanto blocos manuais ({bloco:...}{/bloco}) quanto
+// blocos de oração inseridos e não repetidos (ex: cada Mistério do Rosário,
+// que carrega o título da oração referenciada). Chamar com null/undefined
+// (ou um elemento fora de qualquer bloco rotulado) esconde o subtítulo.
 function atualizarSubtituloBlocoAtivo(elemento){
   const el = document.getElementById('rezar-subtitulo-bloco');
   if(!el) return;
-  const blocoAtivo = elemento ? elemento.closest('.bloco-manual[data-rotulo-bloco]') : null;
+  const blocoAtivo = elemento ? elemento.closest('[data-rotulo-bloco]') : null;
   if(blocoAtivo){
     el.textContent = blocoAtivo.dataset.rotuloBloco;
     el.classList.remove('hidden');
