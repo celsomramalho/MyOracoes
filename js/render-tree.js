@@ -43,6 +43,28 @@ function adicionarLinhas(nos, texto, estado){
   }
 }
 
+// Divide um texto em pedaços de texto puro e negrito, interpretando as tags
+// <b>...</b> inseridas pelo botão "Negrito" do editor (que antes eram
+// tratadas como texto literal — sem isto, "<b>Assim</b>" aparecia com as
+// tags visíveis em vez de aplicar negrito de verdade). Sem suporte a tags
+// aninhadas (não é necessário para o uso atual do editor).
+function anexarTextoComNegrito(container, texto){
+  const partes = (texto || '').split(/(<b>|<\/b>)/i);
+  let negritoAtivo = false;
+  partes.forEach(parte => {
+    if(/^<b>$/i.test(parte)){ negritoAtivo = true; return; }
+    if(/^<\/b>$/i.test(parte)){ negritoAtivo = false; return; }
+    if(!parte) return;
+    if(negritoAtivo){
+      const b = document.createElement('b');
+      b.textContent = parte;
+      container.appendChild(b);
+    }else{
+      container.appendChild(document.createTextNode(parte));
+    }
+  });
+}
+
 // Divide uma linha em partes para colorir só o prefixo ("V."/"R.") e a
 // palavra "Oremos." (quando houver), deixando o restante do texto sem cor
 // própria (herda o branco padrão do tema).
@@ -492,10 +514,10 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
           if(parte.classe){
             const span = document.createElement('span');
             span.className = parte.classe;
-            span.textContent = parte.texto;
+            anexarTextoComNegrito(span, parte.texto);
             pAtual.appendChild(span);
           }else{
-            pAtual.appendChild(document.createTextNode(parte.texto));
+            anexarTextoComNegrito(pAtual, parte.texto);
           }
         });
       });

@@ -771,7 +771,7 @@ html,body{
 }
 .rezar-subtitulo-bloco{
   margin: 1px 0 0;
-  font-size: 0.88rem;
+  font-size: 1.32rem;
   font-style: italic;
   color: var(--texto-suave);
   white-space: nowrap;
