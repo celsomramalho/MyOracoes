@@ -202,7 +202,7 @@ var ORACOES_OFICIAIS_DATA = [
   {
     "id": "oficial_mr97jmdw",
     "titulo": "Exorcismo de São Bento (pequeno)",
-    "texto": "{bloco: Exorcismo de São Bento}\nV. A Cruz Sagrada seja a minha luz,\nR. A Cruz Sagrada seja a minha luz,\nV. Não seja o dragão o meu guia.\nR. Não seja o dragão o meu guia.\nV. Retira-te, Satanás!\n[pausa]{1}\nR. Retira-te, Satanás!\n[pausa]{1}\nV. Nunca me aconselhes coisas vãs.\nR. Nunca me aconselhes coisas vãs.\nV. É mau o que tu me ofereces,\nR. É mau o que tu me ofereces,\nV. Bebe tu mesmo o teu veneno.\nR. Bebe tu mesmo o teu veneno.\n{/bloco}",
+    "texto": "{bloco: Exorcismo de São Bento}\nV. A Cruz Sagrada seja a minha luz,\nR. A Cruz Sagrada seja a minha luz,\nV. Não seja o dragão o meu guia.\nR. Não seja o dragão o meu guia.\nV. Retira-te, Satanás!\nR. Retira-te, Satanás!\nV. Nunca me aconselhes coisas vãs.\nR. Nunca me aconselhes coisas vãs.\nV. É mau o que tu me ofereces,\nR. É mau o que tu me ofereces,\nV. Bebe tu mesmo o teu veneno.\nR. Bebe tu mesmo o teu veneno.\n{/bloco}",
     "oculta": false,
     "colapsarNaFala": false
   },
