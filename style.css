@@ -518,10 +518,10 @@ html,body{
 
 /* Campos extras do editor (ex.: checkboxes "oculta", "colapsarNaFala" do admin) */
 .editor-campo-extra{
-  margin: 12px 0 16px 0;
+  margin: 6px 0 8px 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .editor-checkbox{
   width: 20px;
@@ -741,9 +741,35 @@ html,body{
   border-color: var(--ouro);
 }
 
+/* ---------- CABEÇALHO FIXO DO EDITOR (Nova/Editar oração) ----------
+   Mesmo padrão de cabeçalho fixo do Modo Rezar / busca: título +
+   (checkboxes extras no Admin) + fileira "Texto" com os botões de
+   formatação ficam parados logo abaixo da topbar; só o textarea e a
+   dica abaixo rolam. */
+.editor-fixo{
+  position: sticky;
+  top: var(--topbar-altura, 78px);
+  z-index: 4;
+  background: var(--bg);
+  margin: 0 -20px;
+  padding: 0 20px 10px;
+  border-bottom: 1px solid var(--borda);
+}
+.editor-fixo.com-sombra{
+  box-shadow: 0 8px 14px -10px rgba(0,0,0,0.45);
+}
+.editor-fixo .editor-toolbar{ margin-top: 16px; }
+.editor-fixo .editor-toolbar .campo-label{ margin-top: 0; margin-bottom: 6px; }
+.editor-fixo > .campo-label:first-child{ margin-top: 2px; }
+
 /* Espaço entre a linha do campo de busca fixo e a lista que vem depois
    (ex: tela Orações Oficiais), evitando que o primeiro card encoste na borda. */
 #lista-oficiais{
+  margin-top: 16px;
+}
+
+/* Espaço entre o cabeçalho fixo do editor e o textarea que rola abaixo */
+#input-texto, #input-oficial-texto{
   margin-top: 16px;
 }
 

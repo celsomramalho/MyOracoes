@@ -120,6 +120,8 @@ function mostrarView(id) {
   atualizarTopbarTituloAdmin(id);
   const listaFixo = document.querySelector('.admin-lista-fixo');
   if (listaFixo) listaFixo.classList.remove('com-sombra');
+  const editorAdminFixo = document.getElementById('editor-admin-fixo');
+  if (editorAdminFixo) editorAdminFixo.classList.remove('com-sombra');
   // A altura da topbar pode variar (ex: botão de logout aparecendo/sumindo),
   // então remedimos depois que o navegador aplicar a troca de tela
   requestAnimationFrame(atualizarAlturaTopbar);
@@ -130,6 +132,10 @@ window.addEventListener('scroll', () => {
   const listaFixo = document.querySelector('.admin-lista-fixo');
   const viewListaAtiva = document.getElementById('view-admin-list')?.classList.contains('view-active');
   if (listaFixo) listaFixo.classList.toggle('com-sombra', viewListaAtiva && window.scrollY > 4);
+
+  const editorAdminFixo = document.getElementById('editor-admin-fixo');
+  const viewAdminFormAtiva = document.getElementById('view-admin-form')?.classList.contains('view-active');
+  if (editorAdminFixo) editorAdminFixo.classList.toggle('com-sombra', viewAdminFormAtiva && window.scrollY > 4);
 }, { passive: true });
 
 async function carregarDadosIniciais() {

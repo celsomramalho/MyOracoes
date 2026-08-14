@@ -67,6 +67,10 @@ function mostrarView(id){
   const rezarFixo = document.getElementById('rezar-fixo');
   if (rezarFixo) rezarFixo.classList.remove('com-sombra');
 
+  // Cabeçalho fixo do editor (Nova/Editar oração): idem
+  const editorFixo = document.getElementById('editor-fixo');
+  if (editorFixo) editorFixo.classList.remove('com-sombra');
+
   // A altura da topbar pode mudar de tela pra tela (ex: Modo Rezar tem 2 botões
   // extras), então remedimos depois que o navegador aplicar a troca de tela
   requestAnimationFrame(atualizarAlturaTopbar);
@@ -82,6 +86,10 @@ window.addEventListener('scroll', () => {
   const oficiaisFixo = document.getElementById('oficiais-busca-fixa');
   const viewOficiaisAtiva = document.getElementById('view-oficiais')?.classList.contains('view-active');
   if (oficiaisFixo) oficiaisFixo.classList.toggle('com-sombra', viewOficiaisAtiva && window.scrollY > 4);
+
+  const editorFixo = document.getElementById('editor-fixo');
+  const viewEditorAtiva = document.getElementById('view-editor')?.classList.contains('view-active');
+  if (editorFixo) editorFixo.classList.toggle('com-sombra', viewEditorAtiva && window.scrollY > 4);
 }, { passive: true });
 
 
