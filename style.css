@@ -1,3 +1,58 @@
+/* ---------- FONTES LOCAIS (offline, sem depender do Google Fonts) ----------
+   Arquivos em /fonts, cacheados pelo service worker (sw.js). Cobrem só os
+   pesos/estilos realmente usados no app (equivalente ao que antes vinha de
+   fonts.googleapis.com: Cormorant Garamond 500/600/700 + 500 itálico,
+   EB Garamond 400/500 + 400 itálico). */
+@font-face{
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: 'Cormorant Garamond';
+  src: url('fonts/cormorant-garamond-latin-500-italic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face{
+  font-family: 'EB Garamond';
+  src: url('fonts/eb-garamond-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: 'EB Garamond';
+  src: url('fonts/eb-garamond-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: 'EB Garamond';
+  src: url('fonts/eb-garamond-latin-400-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root{
   --bg: #1B2238;
   --bg-alto: #232C49;

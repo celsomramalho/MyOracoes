@@ -1,4 +1,4 @@
-const CACHE_NOME = 'minhas-oracoes-v11';
+const CACHE_NOME = 'minhas-oracoes-v12';
 const ARQUIVOS_PARA_CACHE = [
   './',
   './index.html',
@@ -19,7 +19,14 @@ const ARQUIVOS_PARA_CACHE = [
   './js/components/toast.js',
   './js/components/progresso.js',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './fonts/cormorant-garamond-latin-500-normal.woff2',
+  './fonts/cormorant-garamond-latin-600-normal.woff2',
+  './fonts/cormorant-garamond-latin-700-normal.woff2',
+  './fonts/cormorant-garamond-latin-500-italic.woff2',
+  './fonts/eb-garamond-latin-400-normal.woff2',
+  './fonts/eb-garamond-latin-500-normal.woff2',
+  './fonts/eb-garamond-latin-400-italic.woff2'
 ];
 
 self.addEventListener('install', (evento) => {
@@ -43,14 +50,6 @@ self.addEventListener('fetch', (evento) => {
   // injetadas por extensões do navegador). O Cache API não aceita esses
   // esquemas e tentar usá-los gera erro no console sem benefício algum.
   if (!evento.request.url.startsWith('http')) {
-    return;
-  }
-
-  // Fontes do Google Fonts: tenta rede, sem quebrar offline se falhar
-  if(evento.request.url.includes('fonts.googleapis.com') || evento.request.url.includes('fonts.gstatic.com')){
-    evento.respondWith(
-      fetch(evento.request).catch(() => caches.match(evento.request))
-    );
     return;
   }
 
