@@ -903,6 +903,16 @@ html,body{
   padding: 20px 18px;
   font-size: var(--tamanho-fonte-rezar, 1.12rem);
   line-height: 1.28;
+  /* Sem isso, um toque em cima de uma palavra específica no celular é
+     interpretado pelo navegador como início de seleção de texto, abrindo
+     o menu nativo de "selecionar palavra" / dicionário / busca (em vez de
+     apenas destacar o bloco, que é a intenção do toque aqui). Desativando
+     a seleção nesta área, o toque passa a se comportar como um clique
+     comum no bloco inteiro, sem interferência do navegador. */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 .texto-oracao p{
   margin: 0 0 1px;
@@ -1623,7 +1633,12 @@ body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira .resposta {
 /* Wrapper de parágrafos agrupados em uma seção */
 .grupo-texto-secao{
   display: flex;
-  align-items: flex-start;
+  /* align-items:flex-end alinha a base do botão à base da última linha do
+     texto (que é sempre o item mais alto da linha flex); o botão então é
+     puxado para cima com margin-bottom (ver .btn-check-secao abaixo) até
+     ficar centralizado na altura dessa última linha — funciona tanto para
+     blocos de uma linha só quanto para blocos com várias linhas. */
+  align-items: flex-end;
   gap: 10px;
   padding: 1px 6px;
   border-radius: 8px;
@@ -1664,6 +1679,17 @@ body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira .resposta {
   border-color: #66bb6a;
   background: rgba(46, 125, 50, 0.18);
   color: #81c784;
+}
+
+/* No bloco de texto (.grupo-texto-secao), o wrapper já está com
+   align-items:flex-end (base do botão = base da última linha do texto).
+   Este margin-bottom sobe o botão pela metade do "sobra" entre a altura
+   da linha (font-size × line-height do .texto-oracao) e a altura do
+   próprio botão, centralizando-o verticalmente na última linha — vale
+   tanto para blocos de 1 linha quanto para blocos com várias linhas. */
+.grupo-texto-secao > .btn-check-secao{
+  margin-top: 0;
+  margin-bottom: calc((var(--tamanho-fonte-rezar, 1.12rem) * 1.28 - 13px) / 2);
 }
 
 /* Botão de check no bloco-ref: empurra para direita com margin-left: auto */

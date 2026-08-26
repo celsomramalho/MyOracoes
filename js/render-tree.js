@@ -420,7 +420,7 @@ function verificarDependenciaAtiva(dependeStr, oracaoIdAtual){
   return negado ? !ativa : ativa;
 }
 
-function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
+function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual, rotuloJaDefinido){
   // ctxRepetidoAninhado: o ctx de progresso "real" mais próximo, propagado por
   // baixo de qualquer nível de repetição — serve só para dar identidade
   // própria (idx e entrada em elementos) a um bloco REPETIDO aninhado dentro
@@ -538,10 +538,18 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
       // display:contents (ver style.css) para não interferir no layout —
       // ele só existe no DOM para eventualmente sabermos, durante a fala,
       // dentro de qual bloco (rótulo) a leitura está no momento.
+      //
+      // Só assume o rótulo se NENHUM bloco ancestral (nesta mesma ramificação
+      // da árvore) já tiver assumido um — ver rotuloJaDefinido, propagado
+      // pela recursão. Isso evita que uma citação de oração aninhada mais
+      // pra dentro (ex: "Glória ao Pai" dentro de "Santo Rosário (dezena)")
+      // acabe "roubando" o rótulo do bloco do Mistério (o ancestral correto,
+      // mais significativo) só por estar mais perto do trecho em destaque.
+      const esteBlocoManualAssumeRotulo = !!g.rotulo && !rotuloJaDefinido;
       const divBlocoManual = document.createElement('div');
       divBlocoManual.className = 'bloco-manual';
-      if(g.rotulo) divBlocoManual.dataset.rotuloBloco = g.rotulo;
-      renderizarNos(g.filhos, divBlocoManual, ctx, ctxRepetidoAninhado, oracaoIdAtual);
+      if(esteBlocoManualAssumeRotulo) divBlocoManual.dataset.rotuloBloco = g.rotulo;
+      renderizarNos(g.filhos, divBlocoManual, ctx, ctxRepetidoAninhado, oracaoIdAtual, rotuloJaDefinido || esteBlocoManualAssumeRotulo);
       container.appendChild(divBlocoManual);
 
     }else if(g.tipo === 'bloco' || g.tipo === 'repetido'){
@@ -567,6 +575,19 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
       let idx;
       let fileira = null;
       let ctxProprio; // ctx efetivamente "dono" deste nó (usado pro check/idx dele)
+
+      // Este nó só assume o rótulo do subtítulo (#rezar-subtitulo-bloco) se
+      // for do tipo 'bloco' simples (nunca 'repetido' — decadas e outras
+      // repetições não servem de rótulo) E se NENHUM bloco ancestral, nesta
+      // mesma ramificação, já tiver assumido um rótulo antes. Calculado
+      // ANTES de descer pros filhos e propagado pra recursão, exatamente
+      // pra evitar que uma citação aninhada mais pra dentro (ex: "Glória ao
+      // Pai" ou "Santo Rosário (dezena)", que também são blocos simples e
+      // teriam rótulo próprio) acabe "roubando" o rótulo do bloco do
+      // Mistério — o ancestral correto e mais significativo — só por estar
+      // mais perto do trecho em destaque no momento.
+      const esteBlocoAssumeRotulo = g.tipo === 'bloco' && !!g.rotulo && !rotuloJaDefinido;
+      const rotuloJaDefinidoParaFilhos = rotuloJaDefinido || esteBlocoAssumeRotulo;
 
       if(g.tipo === 'repetido'){
         // Repetido sempre precisa de identidade própria — usa o ctx local se
@@ -627,7 +648,7 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
         // Filhos diretos (linhas soltas) continuam sem checks próprios (null),
         // mas ctxProprio segue disponível como ctxRepetidoAninhado para caso
         // haja outro repetido mais interno ainda.
-        renderizarNos(g.filhos, divConteudo, null, ctxProprio, oracaoIdAtual);
+        renderizarNos(g.filhos, divConteudo, null, ctxProprio, oracaoIdAtual, rotuloJaDefinidoParaFilhos);
 
       }else{
         // Bloco simples (referência sem repetição): renderiza os filhos
@@ -645,7 +666,7 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
         // pois tem conteúdo independente. Nesse caso, usamos ctxRepetidoAninhado
         // como fallback para ctxProprio, garantindo idx e entrada em ctx.elementos.
         ctxProprio = ctx || ctxRepetidoAninhado;
-        renderizarNos(g.filhos, divConteudo, ctxProprio, ctxRepetidoAninhado, oracaoIdAtual);
+        renderizarNos(g.filhos, divConteudo, ctxProprio, ctxRepetidoAninhado, oracaoIdAtual, rotuloJaDefinidoParaFilhos);
         idx = ctxProprio ? ctxProprio.n++ : -1;
       }
 
@@ -654,13 +675,17 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
       // Blocos de oração inseridos (não repetidos, ex: "Segundo Mistério: A
       // flagelação do Senhor") também servem de rótulo pro subtítulo do
       // bloco ativo (#rezar-subtitulo-bloco), igual aos blocos manuais
-      // {bloco:...}{/bloco} — ver atualizarSubtituloBlocoAtivo. Decadas
-      // repetidas (ex: "Santo Rosário (dezena)") ficam de fora de propósito:
-      // não têm dataset.rotuloBloco, então o subtítulo continua mostrando o
-      // Mistério (bloco ancestral mais próximo com o atributo) enquanto o
-      // usuário reza as contas daquela dezena, em vez de trocar pra um
-      // rótulo genérico repetido a cada dezena.
-      if(g.tipo === 'bloco' && g.rotulo) divBloco.dataset.rotuloBloco = g.rotulo;
+      // {bloco:...}{/bloco} — ver atualizarSubtituloBlocoAtivo. Mas só o
+      // PRIMEIRO bloco rotulado encontrado descendo a árvore (o mais
+      // externo) assume o rótulo — ver esteBlocoAssumeRotulo acima. Decadas
+      // e citações aninhadas mais pra dentro (ex: "Santo Rosário (dezena)",
+      // "Glória ao Pai") ficam de fora de propósito: não recebem
+      // dataset.rotuloBloco quando já existe um rótulo assumido acima na
+      // mesma ramificação, então o subtítulo continua mostrando o Mistério
+      // (bloco ancestral correto) enquanto o usuário reza as contas daquela
+      // dezena, em vez de trocar pra um rótulo genérico repetido a cada
+      // citação interna.
+      if(esteBlocoAssumeRotulo) divBloco.dataset.rotuloBloco = g.rotulo;
 
       if(ctxProprio){
         const btn = criarBtnCheck(idx, ctxProprio);
@@ -759,7 +784,7 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual){
       // oracaoIdAtual continua propagado para que leituras opcionais aninhadas
       // (ex: meditação de mistério dentro de outro opcional) encontrem suas
       // preferências salvas corretamente.
-      renderizarNos(g.filhos, divConteudo, ctx, ctxRepetidoAninhado, oracaoIdAtual);
+      renderizarNos(g.filhos, divConteudo, ctx, ctxRepetidoAninhado, oracaoIdAtual, rotuloJaDefinido);
 
       divTitulo.addEventListener('click', () => {
         const ativo = divBloco.classList.toggle('aberto');
@@ -973,8 +998,17 @@ function marcarSecao(oracaoId, idx){
   tentarMarcarBlocosPaiAutomaticamente(oracaoId, idx);
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
-    if(typeof atualizarSubtituloBlocoAtivoPorProgresso === 'function'){
-      atualizarSubtituloBlocoAtivoPorProgresso(oracaoId, secaoCtxAtual.elementos);
+
+    // O subtítulo reflete o bloco do item que o usuário ACABOU de tocar/marcar
+    // (a "seleção" atual), e não o primeiro item ainda pendente na oração
+    // inteira. Antes, usar atualizarSubtituloBlocoAtivoPorProgresso aqui podia
+    // deixar o subtítulo "preso" num bloco anterior (ex: um Mistério já
+    // passado) sempre que sobrava algum item mais atrás ainda não marcado,
+    // mesmo com o usuário claramente adiantado, tocando itens de um bloco
+    // bem mais à frente.
+    if(typeof atualizarSubtituloBlocoAtivo === 'function'){
+      const itemMarcado = secaoCtxAtual.elementos.find(e => e.idx === idx);
+      atualizarSubtituloBlocoAtivo(itemMarcado ? itemMarcado.el : null);
     }
 
     // Auto-expande a PRÓXIMA seção ainda não rezada ao marcar manualmente —
@@ -1017,8 +1051,11 @@ function desmarcarSecao(oracaoId, idx){
   tentarDesmarcarBlocosPaiAutomaticamente(oracaoId, idx);
   if(secaoCtxAtual && secaoCtxAtual.oracaoId === oracaoId){
     atualizarVisuaisProgresso(oracaoId, secaoCtxAtual.elementos);
-    if(typeof atualizarSubtituloBlocoAtivoPorProgresso === 'function'){
-      atualizarSubtituloBlocoAtivoPorProgresso(oracaoId, secaoCtxAtual.elementos);
+    // Mesma lógica de marcarSecao: subtítulo reflete o bloco do item tocado
+    // (o que acabou de ser desmarcado), não o primeiro pendente da oração.
+    if(typeof atualizarSubtituloBlocoAtivo === 'function'){
+      const itemDesmarcado = secaoCtxAtual.elementos.find(e => e.idx === idx);
+      atualizarSubtituloBlocoAtivo(itemDesmarcado ? itemDesmarcado.el : null);
     }
   }
 }
