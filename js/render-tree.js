@@ -848,28 +848,73 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual, 
       container.appendChild(divBloco);
 
     }else if(g.tipo === 'link'){
-      const divLink = document.createElement('div');
-      divLink.className = 'link-marcador';
+      const idYoutube = extrairIdYoutube(g.url);
 
-      const anchor = document.createElement('a');
-      anchor.className = 'link-marcador-anchor';
-      anchor.href = g.url;
-      anchor.target = '_blank';
-      anchor.rel = 'noopener noreferrer';
-      anchor.title = g.url;
+      if(idYoutube){
+        // Link de vídeo do YouTube: mostra uma prévia (thumbnail + botão de
+        // play) em vez do player carregado direto. O iframe do YouTube só é
+        // criado no clique — assim a tela "Rezar" não fica pesada com
+        // players escondidos para orações que têm vídeo mas o usuário nunca
+        // chega a assistir.
+        const divPreviaYoutube = document.createElement('div');
+        divPreviaYoutube.className = 'youtube-previa';
+        divPreviaYoutube.dataset.videoId = idYoutube;
 
-      const icone = document.createElement('span');
-      icone.className = 'link-marcador-icone';
-      icone.textContent = '🔗';
-      anchor.appendChild(icone);
+        const imgThumb = document.createElement('img');
+        imgThumb.className = 'youtube-previa-thumb';
+        imgThumb.loading = 'lazy';
+        imgThumb.alt = 'Prévia do vídeo do YouTube';
+        // hqdefault existe pra praticamente todo vídeo (maxresdefault às
+        // vezes não existe e quebra a imagem); se falhar mesmo assim, cai
+        // pro fundo escuro do CSS com o botão de play por cima.
+        imgThumb.src = `https://i.ytimg.com/vi/${idYoutube}/hqdefault.jpg`;
+        divPreviaYoutube.appendChild(imgThumb);
 
-      const texto = document.createElement('span');
-      texto.className = 'link-marcador-texto';
-      texto.textContent = g.url;
-      anchor.appendChild(texto);
+        const btnPlay = document.createElement('button');
+        btnPlay.type = 'button';
+        btnPlay.className = 'youtube-previa-play';
+        btnPlay.setAttribute('aria-label', 'Assistir vídeo');
+        btnPlay.innerHTML = '<svg viewBox="0 0 68 48" width="52" height="36" aria-hidden="true"><path d="M66.5 7.7c-.8-2.9-2.5-5.2-4.9-6.1C57.1 0 33.9 0 33.9 0S10.6 0 6.1 1.6C3.7 2.5 2 4.7 1.2 7.7 0 12 0 24 0 24s0 12 1.2 16.3c.8 2.9 2.5 5.1 4.9 6C10.6 48 33.9 48 33.9 48s23.2 0 27.7-1.6c2.4-.9 4.1-3.1 4.9-6C67.7 36 67.7 24 67.7 24s0-12-1.2-16.3z" fill="rgba(0,0,0,0.65)"/><path d="M27 34.5V13.5L45 24z" fill="#fff"/></svg>';
+        divPreviaYoutube.appendChild(btnPlay);
 
-      divLink.appendChild(anchor);
-      container.appendChild(divLink);
+        divPreviaYoutube.addEventListener('click', () => {
+          const iframe = document.createElement('iframe');
+          iframe.className = 'youtube-previa-iframe';
+          iframe.src = `https://www.youtube-nocookie.com/embed/${idYoutube}?autoplay=1`;
+          iframe.title = 'Player de vídeo do YouTube';
+          iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+          iframe.allowFullscreen = true;
+          iframe.frameBorder = '0';
+          divPreviaYoutube.replaceChildren(iframe);
+          divPreviaYoutube.classList.add('carregado');
+        }, { once: true });
+
+        container.appendChild(divPreviaYoutube);
+
+      }else{
+        const divLink = document.createElement('div');
+        divLink.className = 'link-marcador';
+
+        const anchor = document.createElement('a');
+        anchor.className = 'link-marcador-anchor';
+        anchor.href = g.url;
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+        anchor.title = g.url;
+
+        const icone = document.createElement('span');
+        icone.className = 'link-marcador-icone';
+        icone.textContent = '🔗';
+        anchor.appendChild(icone);
+
+        const texto = document.createElement('span');
+        texto.className = 'link-marcador-texto';
+        texto.textContent = g.url;
+        anchor.appendChild(texto);
+
+        divLink.appendChild(anchor);
+        container.appendChild(divLink);
+      }
 
     }else if(g.tipo === 'pausa'){
       const divPausa = document.createElement('div');

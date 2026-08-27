@@ -97,3 +97,29 @@ function trocarViewAtiva(id){
   if (typeof pararFala === 'function') pararFala();
   window.scrollTo(0,0);
 }
+
+// ===================== YOUTUBE (prévia + player embutido) =====================
+// Extrai o ID de 11 caracteres de um link do YouTube em qualquer formato comum
+// (youtu.be/ID, youtube.com/watch?v=ID, youtube.com/embed/ID, /shorts/ID,
+// com ou sem parâmetros extras tipo ?si=..., &t=...). Retorna null se a URL
+// não for reconhecida como um link de vídeo do YouTube.
+function extrairIdYoutube(url){
+  if(!url) return null;
+  try{
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '').replace(/^m\./, '');
+    if(host === 'youtu.be'){
+      const id = u.pathname.slice(1).split('/')[0];
+      return /^[\w-]{11}$/.test(id) ? id : null;
+    }
+    if(host === 'youtube.com' || host === 'youtube-nocookie.com'){
+      if(u.pathname === '/watch'){
+        const id = u.searchParams.get('v');
+        return id && /^[\w-]{11}$/.test(id) ? id : null;
+      }
+      const m = u.pathname.match(/^\/(embed|shorts|live)\/([\w-]{11})/);
+      if(m) return m[2];
+    }
+  }catch(e){ /* URL inválida — ignora */ }
+  return null;
+}
