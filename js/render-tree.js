@@ -878,15 +878,54 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual, 
         divPreviaYoutube.appendChild(btnPlay);
 
         divPreviaYoutube.addEventListener('click', () => {
+          // enablejsapi=1 + origin habilitam o "YouTube Player postMessage
+          // API": permite mandar comandos pro player (ex: mudar a
+          // velocidade) via postMessage, sem precisar carregar a biblioteca
+          // JS inteira da API do YouTube nem reabrir o player.
+          const origem = encodeURIComponent(window.location.origin);
           const iframe = document.createElement('iframe');
           iframe.className = 'youtube-previa-iframe';
-          iframe.src = `https://www.youtube-nocookie.com/embed/${idYoutube}?autoplay=1`;
+          iframe.src = `https://www.youtube-nocookie.com/embed/${idYoutube}?autoplay=1&enablejsapi=1&origin=${origem}`;
           iframe.title = 'Player de vídeo do YouTube';
           iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
           iframe.allowFullscreen = true;
           iframe.frameBorder = '0';
           divPreviaYoutube.replaceChildren(iframe);
           divPreviaYoutube.classList.add('carregado');
+          // "Apresenta" a página pro player assim que o iframe carrega —
+          // parte do protocolo de postMessage do YouTube, deixa o player
+          // pronto pra aceitar comandos (como o de velocidade) sem precisar
+          // de tentativa e erro depois.
+          iframe.addEventListener('load', () => {
+            iframe.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: idYoutube }), '*');
+          });
+
+          // Botão de velocidade próprio: o player embutido do YouTube some
+          // com o ícone de engrenagem (ajuste de velocidade) em telas
+          // estreitas de celular, deixando só play/mudo/legenda/tela cheia.
+          // Como não dá pra alterar os controles nativos do YouTube (é um
+          // iframe de outro domínio), este botão flutua por cima do vídeo e
+          // manda o comando de velocidade direto pro player via
+          // postMessage — mesmas opções (0.8x a 2x) usadas no botão de
+          // velocidade da leitura em voz alta do app.
+          const btnVelocidadeVideo = document.createElement('button');
+          btnVelocidadeVideo.type = 'button';
+          btnVelocidadeVideo.className = 'youtube-previa-velocidade';
+          let velocidadeVideoAtual = 1.0;
+          btnVelocidadeVideo.textContent = '⚡ 1.0x';
+          btnVelocidadeVideo.addEventListener('click', (e) => {
+            e.stopPropagation();
+            let idx = OPCOES_VELOCIDADE.indexOf(velocidadeVideoAtual);
+            idx = (idx + 1) % OPCOES_VELOCIDADE.length;
+            velocidadeVideoAtual = OPCOES_VELOCIDADE[idx];
+            btnVelocidadeVideo.textContent = `⚡ ${velocidadeVideoAtual.toFixed(2).replace('.00','.0')}x`;
+            iframe.contentWindow.postMessage(JSON.stringify({
+              event: 'command',
+              func: 'setPlaybackRate',
+              args: [velocidadeVideoAtual]
+            }), '*');
+          });
+          divPreviaYoutube.appendChild(btnVelocidadeVideo);
         }, { once: true });
 
         container.appendChild(divPreviaYoutube);
