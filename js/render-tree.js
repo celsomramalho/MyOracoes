@@ -913,19 +913,58 @@ function renderizarNos(nos, container, ctx, ctxRepetidoAninhado, oracaoIdAtual, 
           btnVelocidadeVideo.className = 'youtube-previa-velocidade';
           let velocidadeVideoAtual = 1.0;
           btnVelocidadeVideo.textContent = '⚡ 1.0x';
+
+          // Reenvia a velocidade escolhida pro player. Precisa ser chamada
+          // de novo sempre que o player "reinicia" internamente — o que
+          // acontece, por exemplo, ao entrar/sair da tela cheia (o YouTube
+          // reseta a velocidade pra 1.0x nessa troca de modo, mesmo com o
+          // vídeo continuando a tocar). Um pequeno atraso dá tempo do
+          // player terminar essa troca antes do comando chegar.
+          function reaplicarVelocidadeNoIframe(atraso){
+            if(velocidadeVideoAtual === 1.0) return; // 1.0x já é o padrão
+            setTimeout(() => {
+              if(!iframe.contentWindow) return;
+              iframe.contentWindow.postMessage(JSON.stringify({
+                event: 'command',
+                func: 'setPlaybackRate',
+                args: [velocidadeVideoAtual]
+              }), '*');
+            }, atraso || 0);
+          }
+
           btnVelocidadeVideo.addEventListener('click', (e) => {
             e.stopPropagation();
             let idx = OPCOES_VELOCIDADE.indexOf(velocidadeVideoAtual);
             idx = (idx + 1) % OPCOES_VELOCIDADE.length;
             velocidadeVideoAtual = OPCOES_VELOCIDADE[idx];
             btnVelocidadeVideo.textContent = `⚡ ${velocidadeVideoAtual.toFixed(2).replace('.00','.0')}x`;
-            iframe.contentWindow.postMessage(JSON.stringify({
-              event: 'command',
-              func: 'setPlaybackRate',
-              args: [velocidadeVideoAtual]
-            }), '*');
+            reaplicarVelocidadeNoIframe(0);
           });
           divPreviaYoutube.appendChild(btnVelocidadeVideo);
+
+          // A troca de tela cheia é feita pelo player DENTRO do iframe (outro
+          // domínio, sem acesso ao seu DOM interno), mas o navegador ainda
+          // avisa o documento principal quando ISSO acontece via
+          // fullscreenchange (com os prefixos antigos pra Safari/iOS).
+          // Reaplicamos a velocidade tanto ao entrar quanto ao sair da tela
+          // cheia, já que o reset acontece nas duas transições — mas só
+          // quando é ESTE vídeo especificamente que entrou/saiu (senão,
+          // numa oração com mais de um vídeo, um reaplicaria a velocidade
+          // do outro por engano).
+          let estaEmTelaCheiaEsteVideo = false;
+          ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evento => {
+            document.addEventListener(evento, () => {
+              const elEmTelaCheia = document.fullscreenElement || document.webkitFullscreenElement
+                || document.mozFullScreenElement || document.msFullscreenElement;
+              if(elEmTelaCheia === iframe){
+                estaEmTelaCheiaEsteVideo = true;
+                reaplicarVelocidadeNoIframe(500);
+              }else if(estaEmTelaCheiaEsteVideo && !elEmTelaCheia){
+                estaEmTelaCheiaEsteVideo = false;
+                reaplicarVelocidadeNoIframe(500);
+              }
+            });
+          });
         }, { once: true });
 
         container.appendChild(divPreviaYoutube);
