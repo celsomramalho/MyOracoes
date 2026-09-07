@@ -951,7 +951,7 @@ html,body{
 }
 
 #view-rezar.modo-leitura-ativo .rubrica {
-  color: #1A1A1A !important;
+  color: #8B6914 !important; /* Dourado escuro - mesma família do "V." no modo escuro, com contraste alto em fundo branco */
   font-weight: 700;
 }
 
@@ -1069,24 +1069,25 @@ html,body{
   box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
 }
 
-/* Oculta as respostas automáticas repetidas (no modo visual, independente do tema claro/escuro) */
-body:not(.fala-ativa) #view-rezar .resposta-automatica.repetida {
+/* Oculta as respostas automáticas repetidas (no modo visual, independente do tema
+   claro/escuro, e tanto na tela Rezar do usuário quanto no preview do admin) */
+body:not(.fala-ativa) :is(#view-rezar, #view-rezar-admin) .resposta-automatica.repetida {
   display: none;
 }
 
 /* Coloca a linha V. e a primeira resposta automática na mesma linha */
-body:not(.fala-ativa) #view-rezar .tem-resposta-auto-primeira .linha-v {
+body:not(.fala-ativa) :is(#view-rezar, #view-rezar-admin) .tem-resposta-auto-primeira .linha-v {
   display: inline;
 }
 
 /* Formata a primeira resposta automática (inline e negrito) */
-body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira {
+body:not(.fala-ativa) :is(#view-rezar, #view-rezar-admin) .resposta-automatica.primeira {
   display: inline;
   font-weight: bold;
 }
 
 /* Oculta o prefixo "R." da primeira resposta automática */
-body:not(.fala-ativa) #view-rezar .resposta-automatica.primeira .resposta {
+body:not(.fala-ativa) :is(#view-rezar, #view-rezar-admin) .resposta-automatica.primeira .resposta {
   display: none;
 }
 
